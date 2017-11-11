@@ -1,0 +1,5 @@
+
+dependencies {
+    compile "org.develnext.jphp:jphp-runtime:${jphpVersion}"
+    compile "org.develnext.jphp:jphp-xml-ext:${jphpVersion}"
+}

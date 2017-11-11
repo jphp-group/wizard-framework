@@ -1,0 +1,8 @@
+
+rootProject.name = 'framework'
+
+include 'core';
+include 'web'
+
+include 'sandbox'
+

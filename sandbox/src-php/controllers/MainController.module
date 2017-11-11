@@ -1,0 +1,9 @@
+{
+    "props": {},
+    "components": [
+        {
+            "type": "components\\HelloWorldComponent",
+            "name": "DevelNext"
+        }
+    ]
+}

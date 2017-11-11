@@ -1,0 +1,54 @@
+buildscript {
+    ext {
+        projectGroup = "org.develnext.framework"
+        projectVersion = "1.0.0"
+
+        jphpVersion = "0.9.3-SNAPSHOT"
+        javaVersion = "1.8"
+        junitVersion = "4.12"
+    }
+}
+
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'maven'
+
+    group projectGroup
+    version projectVersion
+
+    ext.isSnapshot = !Boolean.getBoolean("release");
+
+    if (ext.isSnapshot) {
+        version += '-SNAPSHOT'
+    }
+
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+
+    [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+
+    configurations {
+        provided
+    }
+
+    sourceSets {
+        main {
+            compileClasspath += configurations.provided
+            resources.srcDirs = ['src-php']
+        }
+    }
+
+    dependencies {
+        testCompile group: 'junit', name: 'junit', version: "${junitVersion}"
+    }
+
+    task sourcesJar(type: Jar, dependsOn: 'classes') {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+}
