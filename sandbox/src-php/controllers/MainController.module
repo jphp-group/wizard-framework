@@ -2,8 +2,13 @@
     "props": {},
     "components": [
         {
+            "id": "greeting",
             "type": "components\\HelloWorldComponent",
             "name": "DevelNext"
+        },
+        {
+            "id": "appModule",
+            "type": "modules\\AppModule"
         }
     ]
 }

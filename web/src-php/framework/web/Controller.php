@@ -1,8 +1,10 @@
 <?php
 namespace framework\web;
 
+use framework\core\Annotations;
 use framework\core\Component;
-use framework\core\ContainerComponent;
+use framework\core\ComponentLoader;
+use framework\core\Module;
 use php\format\JsonProcessor;
 use php\http\HttpServerRequest;
 use php\http\HttpServerResponse;
@@ -16,7 +18,7 @@ use php\lib\str;
  * Class Controller
  * @package framework\web
  */
-class Controller extends ContainerComponent
+class Controller extends Module
 {
     /**
      * @var HttpServerRequest
@@ -36,23 +38,13 @@ class Controller extends ContainerComponent
     {
         $this->request = $request;
         $this->response = $response;
+    }
 
-        $moduleFile = reflect::typeModule(reflect::typeOf($this))->getName();
-        $ext = fs::ext($moduleFile);
-        $moduleFile = str::sub($moduleFile, 0, str::length($moduleFile) - str::length($ext) - 1) . ".module";
-
-        if (Stream::exists($moduleFile)) {
-            $stream = Stream::of($moduleFile);
-            $json = (new JsonProcessor(JsonProcessor::DESERIALIZE_AS_ARRAYS))->parse($stream);
-            $stream->close();
-
-            $props = (array) $json['props'];
-            $components = (array) $json['components'];
-
-            foreach ($components as $component) {
-                $component = new $component['type'];
-                $this->addComponent($component);
-            }
-        }
+    /**
+     * @return string
+     */
+    public function getPath(): string
+    {
+        return Annotations::getOfClass('path', new \ReflectionClass($this), '');
     }
 }

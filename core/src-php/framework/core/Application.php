@@ -17,6 +17,11 @@ abstract class Application extends Component
     protected $settings;
 
     /**
+     * @var Component[]
+     */
+    private $singletons = [];
+
+    /**
      * Application constructor.
      */
     public function __construct()
@@ -24,6 +29,41 @@ abstract class Application extends Component
         self::$instance = $this;
 
         $this->initialize();
+    }
+
+    /**
+     * @param string $class
+     * @return Component
+     */
+    protected function getSingletonInstance(string $class): Component
+    {
+        if ($component = $this->singletons[$class]) {
+            return $component;
+        }
+
+        $instance = new $class();
+        $this->singletons[$class] = $instance;
+
+        return $instance;
+    }
+
+    /**
+     * @param string $class
+     * @return Component
+     */
+    public function getInstance(string $class): Component
+    {
+        /** @var Component $instance */
+        $reflectionClass = new \ReflectionClass($class);
+        $singleton = Annotations::getOfClass('singleton', $reflectionClass);
+
+        if ($singleton) {
+            $instance = $this->getSingletonInstance($class);
+        } else {
+            $instance = $reflectionClass->newInstance();
+        }
+
+        return $instance;
     }
 
     /**
@@ -48,7 +88,7 @@ abstract class Application extends Component
      * @return Application
      * @throws \Exception
      */
-    public function current()
+    public static function current()
     {
         if (!static::$instance) {
             throw new \Exception("Application is not initialized");

@@ -2,4 +2,5 @@
 dependencies {
     compile project(":core")
     compile "org.develnext.jphp:jphp-httpserver-ext:${jphpVersion}"
+    compile "org.develnext.jphp:jphp-jsoup-ext:${jphpVersion}"
 }

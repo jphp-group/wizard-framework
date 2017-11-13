@@ -1,5 +1,6 @@
 <?php
 namespace framework\core;
+
 use php\util\Regex;
 use ReflectionClass;
 use ReflectionFunctionAbstract;
@@ -22,7 +23,21 @@ class Annotations
      */
     public static function getOfClass(string $annotationName, ReflectionClass $reflection, $default = null)
     {
-        return static::get($annotationName, $reflection->getDocComment(), $default);
+        do {
+            $var = static::get($annotationName, $reflection->getDocComment(), null);
+
+            if (!$var) {
+                $reflection = $reflection->getParentClass();
+
+                if (!$reflection) {
+                    return $default;
+                }
+            } else {
+                break;
+            }
+        } while (true);
+
+        return $var;
     }
 
     /**

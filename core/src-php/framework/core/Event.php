@@ -6,6 +6,7 @@ namespace framework\core;
  * @package framework\core
  *
  * @property Component $sender
+ * @property Component|null $context
  * @property string $type
  */
 class Event
@@ -26,14 +27,21 @@ class Event
     private $consumed = false;
 
     /**
+     * @var Component|null
+     */
+    private $context;
+
+    /**
      * Event constructor.
      * @param string $type
      * @param Component $sender
+     * @param Component|null $context
      */
-    public function __construct(string $type, Component $sender)
+    public function __construct(string $type, Component $sender, ?Component $context = null)
     {
         $this->type = $type;
         $this->sender = $sender;
+        $this->context = $context;
     }
 
     /**
@@ -62,6 +70,7 @@ class Event
         switch ($name) {
             case "type": return $this->type;
             case "sender": return $this->sender;
+            case "context": return $this->context;
         }
 
         throw new \Error("Property '$name' is not found");

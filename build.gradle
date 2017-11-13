@@ -39,7 +39,7 @@ allprojects {
     sourceSets {
         main {
             compileClasspath += configurations.provided
-            resources.srcDirs = ['src-php']
+            resources.srcDirs = ['src-php', 'resources']
         }
     }
 

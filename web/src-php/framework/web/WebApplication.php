@@ -1,8 +1,10 @@
 <?php
+
 namespace framework\web;
 
 use framework\core\Annotations;
 use framework\core\Application;
+use framework\core\Component;
 use framework\core\Event;
 use framework\core\Logger;
 use php\http\HttpServer;
@@ -16,7 +18,7 @@ use ReflectionMethod;
 /**
  * Class WebApplication
  * @package framework\web
- * @method WebApplication current()
+ * @method static WebApplication current()
  */
 class WebApplication extends Application
 {
@@ -35,15 +37,68 @@ class WebApplication extends Application
      */
     protected $response;
 
+    /**
+     * @var array
+     */
+    protected $sessionInstances = [];
+
     protected function initialize()
     {
         parent::initialize();
         $this->server = new HttpServer();
 
-        $this->request  = new ThreadLocal();
+        $this->request = new ThreadLocal();
         $this->response = new ThreadLocal();
 
-        Logger::addWriter(Logger::stdoutWriter());
+        Logger::addWriter(Logger::stdoutWriter(true));
+    }
+
+    /**
+     * @param string $class
+     * @return Component
+     */
+    public function getInstance(string $class): Component
+    {
+        $scope = Annotations::getOfClass('scope', new ReflectionClass($class));
+
+        switch ($scope) {
+            case 'request':
+                $request = $this->request();
+                $instance = $request->attribute('webApp#' . $class);
+
+                if (!$instance) {
+                    $instance = new $class();
+                    $request->attribute('webApp#' . $class, $instance);
+                }
+
+                return $instance;
+
+            case 'session':
+                $sessionId = $this->request()->sessionId();
+
+                $instance = $this->sessionInstances[$sessionId][$class];
+
+                if (!$instance) {
+                    $instance = new $class();
+                    $this->sessionInstances[$sessionId][$class] = $instance;
+                }
+
+                return $instance;
+
+            case 'singleton':
+                return $this->getSingletonInstance($class);
+
+            default:
+                return parent::getInstance($class);
+        }
+    }
+
+    /**
+     * @return HttpServer
+     */
+    public function server(): HttpServer
+    {
+        return $this->server;
     }
 
     /**
@@ -51,6 +106,7 @@ class WebApplication extends Application
      */
     public function request(): HttpServerRequest
     {
+        return $this->request->get();
     }
 
     /**
@@ -58,6 +114,7 @@ class WebApplication extends Application
      */
     public function response(): HttpServerResponse
     {
+        return $this->response->get();
     }
 
     public function launch(): void
@@ -154,27 +211,38 @@ class WebApplication extends Application
                     $this->request->set($request);
                     $this->response->set($response);
 
-                    /** @var Controller $controller */
-                    $controller = $class->newInstance();
-                    $controller->initialize($request, $response);
-
-                    foreach ($events as $name => $one) {
-                        $controller->on($name, function (Event $e) use ($controller, $one) {
-                            $one->invoke($controller, $e);
-                        });
-                    }
-
                     try {
+                        /** @var Controller $controller */
+                        $controller = $class->newInstance();
+                        $controller->initialize($request, $response);
+
+                        foreach ($events as $name => $one) {
+                            $controller->on($name, function (Event $e) use ($controller, $one) {
+                                $one->invoke($controller, $e);
+                            });
+                        }
+
                         $controller->trigger(new Event('beforeRequest', $controller));
                         $result = $method->invoke($controller);
                         $controller->trigger(new Event('afterRequest', $controller));
                         return $result;
                     } catch (\Throwable $e) {
-                        $event = new Event('exception', $controller);
-                        $controller->trigger($event);
+                        if ($controller) {
+                            $event = new Event('exception', $controller);
+                            $controller->trigger($event);
+                        } else {
+                            $event = null;
+                        }
 
-                        if (!$event->isConsumed()) {
-                            throw $e;
+                        if (!$event || !$event->isConsumed()) {
+                            $response->status(505);
+                            $errId = str::uuid();
+
+                            $response->body("Oops, there was an error [$errId].");
+                            $request->end();
+
+                            Logger::error("{0}, {1}", $e->getMessage(), $errId);
+                            Logger::error("\n{0}\n\t-> at {1} on line {2}", $e->getTraceAsString(), $e->getFile(), $e->getLine());
                         }
                     }
                 }

@@ -7,6 +7,7 @@ use framework\web\Controller;
 /**
  * Class HelloWorldComponent
  * @package components
+ * @singleton
  */
 class HelloWorldComponent extends Component
 {
@@ -14,21 +15,4 @@ class HelloWorldComponent extends Component
      * @var string
      */
     public $name = 'World';
-
-    /**
-     * @event register
-     * @param Controller $controller
-     */
-    public function onRegister(Controller $controller)
-    {
-    }
-
-    /**
-     * @GET
-     * @path /hello-world
-     */
-    public function helloWorld()
-    {
-        return "Hello, $this->name";
-    }
 }

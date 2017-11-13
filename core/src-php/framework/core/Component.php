@@ -1,5 +1,7 @@
 <?php
 namespace framework\core;
+
+use php\lib\reflect;
 use php\lib\str;
 
 /**
@@ -8,6 +10,11 @@ use php\lib\str;
  */
 abstract class Component
 {
+    /**
+     * @var string
+     */
+    public $id;
+
     /**
      * @var array
      */
@@ -91,5 +98,32 @@ abstract class Component
                 }
             }
         }
+    }
+
+    public function __get(string $name)
+    {
+        $method = "get$name";
+
+        if (method_exists($this, $method)) {
+            return $method();
+        }
+
+        $method = "is$name";
+        if (method_exists($this, $method)) {
+            return (bool) $method();
+        }
+
+        throw new \Error("Property '$name' is not exists in class " . reflect::typeOf($this));
+    }
+
+    public function __set(string $name, $value)
+    {
+        $method = "set$name";
+
+        if (method_exists($this, $method)) {
+            return $method($value);
+        }
+
+        throw new \Error("Property '$name' is not exists in class or readonly" . reflect::typeOf($this));
     }
 }
