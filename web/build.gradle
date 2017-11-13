@@ -1,6 +1,50 @@
+plugins {
+    id "com.moowork.node" version "1.2.0"
+    id "com.moowork.gulp" version "1.2.0"
+}
+
+node {
+    version = '6.11.3'
+    npmVersion = '3.10.10'
+    download = true
+
+    nodeModulesDir = file("${project.projectDir}/src-js")
+}
+
+gulp {
+    workDir = file("${project.projectDir}/src-js")
+    colors = true
+}
 
 dependencies {
     compile project(":core")
     compile "org.develnext.jphp:jphp-httpserver-ext:${jphpVersion}"
     compile "org.develnext.jphp:jphp-jsoup-ext:${jphpVersion}"
 }
+
+task buildCss(dependsOn: 'gulp_compile-css') {
+}
+
+// собрать front.
+task buildJs(dependsOn: ['buildCss', 'gulp_compile']) {
+}
+
+task buildWebLib(dependsOn: ['buildJs']) {
+    doLast {
+        copy {
+            from "${gulp.workDir}/build/lib/dnext-engine.js"
+            into "${project.projectDir}/resources/"
+        }
+
+        copy {
+            from "${gulp.workDir}/build/lib/dnext-engine.js.map"
+            into "${project.projectDir}/resources/"
+        }
+
+        copy {
+            from "${gulp.workDir}/build/lib/dnext-engine.min.css"
+            into "${project.projectDir}/resources/"
+        }
+    }
+}
+
