@@ -7,11 +7,18 @@ use framework\core\Application;
 use framework\core\Component;
 use framework\core\Event;
 use framework\core\Logger;
+use php\format\JsonProcessor;
+use php\http\HttpResourceHandler;
 use php\http\HttpServer;
 use php\http\HttpServerRequest;
 use php\http\HttpServerResponse;
+use php\http\WebSocketSession;
+use php\io\ResourceStream;
+use php\lang\System;
 use php\lang\ThreadLocal;
+use php\lib\fs;
 use php\lib\str;
+use php\time\Time;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -51,6 +58,10 @@ class WebApplication extends Application
         $this->response = new ThreadLocal();
 
         Logger::addWriter(Logger::stdoutWriter(true));
+
+        Logger::info("Initialize Web Application ({0})", $this->getStamp());
+
+        $this->initializeWebLib();
     }
 
     /**
@@ -131,9 +142,86 @@ class WebApplication extends Application
 
         $this->server->listen($host . ":" . $port);
 
-        Logger::info("Web Application run at '{0}:{1}'", $host, $port);
+        Logger::info("Web Application run at '{0}:{1}', startup time = {2}ms.", $host, $port, Time::millis() - $this->getInitializeTime());
 
         $this->server->run();
+    }
+
+    protected function initializeWebLib()
+    {
+        Logger::info("Initialize Web Library (DNext Engine) with stamp ...");
+
+        $jsResource = new ResourceStream('/dnext-engine.js');
+        $cssResource = new ResourceStream('/dnext-engine.min.css');
+        $mapResource = new ResourceStream('/dnext-engine.js.map');
+
+        $tempDir = System::getProperty('java.io.tmpdir') . "/dnext-engine/";
+        fs::makeDir($tempDir);
+
+        fs::copy($jsResource, "$tempDir/engine.js");
+        fs::copy($mapResource, "$tempDir/engine.js.map");
+        fs::copy($cssResource, "$tempDir/engine.min.css");
+
+        $this->server->get($jsUrl = "/dnext/engine-{$this->getStamp()}.js", new HttpResourceHandler("$tempDir/engine.js"));
+        $this->server->get($mapUrl = "/dnext/engine-{$this->getStamp()}.js.map", new HttpResourceHandler("$tempDir/engine.js.map"));
+        $this->server->get($cssUrl = "/dnext/engine-{$this->getStamp()}.min.css", new HttpResourceHandler("$tempDir/engine.min.css"));
+
+        Logger::info("Add DNext Engine:");
+        Logger::info("\t-> GET {0}", $jsUrl);
+        Logger::info("\t-> GET {0}", $cssUrl);
+        Logger::info("\t-> WS {0}", "/dnext/ws");
+
+        $this->server->addWebSocket('/dnext/ws', [
+            'onConnect' => function (WebSocketSession $session) {
+                Logger::info("WS Connect {0} ...", $session->remoteAddress());
+                $session->sendText('Hello, Mike!', null);
+            },
+
+            'onMessage' => function (WebSocketSession $session, $text) {
+                Logger::info("WS message: {0}", $text);
+            },
+
+            'onClose' => function (WebSocketSession $session, int $status, string $reason) {
+                Logger::info("WS Close.");
+            }
+        ]);
+    }
+
+    public function addUI(string $uiClass)
+    {
+        $reflectionClass = new ReflectionClass($uiClass);
+
+        $path = Annotations::getOfClass('path', $reflectionClass);
+
+        Logger::info("Add UI ({0})", $uiClass);
+
+        $route = function ($path, callable $handler) use ($uiClass) {
+            $this->server->get($path, function (HttpServerRequest $request, HttpServerResponse $response) use ($uiClass, $handler) {
+                $this->request->set($request);
+                $this->response->set($response);
+
+                /** @var UI $instance */
+                $instance = $this->getInstance($uiClass);
+                $instance->trigger(new Event('beforeRequest', $instance, $this));
+
+                $handler($instance, $request, $response);
+
+                $instance->trigger(new Event('afterRequest', $instance, $this));
+            });
+
+            Logger::info("\t-> GET {0}", $path);
+        };
+
+        $route($path, function (UI $ui, HttpServerRequest $request, HttpServerResponse $response) use ($path) {
+            $ui->show($request, $response, $path);
+        });
+
+        $route("$path/@ui-schema", function (UI $ui, HttpServerRequest $request, HttpServerResponse $response) use ($uiClass) {
+            $resource = $ui->getUISchema();
+
+            $response->contentType("application/json");
+            $response->body((new JsonProcessor())->format($resource));
+        });
     }
 
     /**
@@ -222,13 +310,13 @@ class WebApplication extends Application
                             });
                         }
 
-                        $controller->trigger(new Event('beforeRequest', $controller));
+                        $controller->trigger(new Event('beforeRequest', $controller, $this));
                         $result = $method->invoke($controller);
-                        $controller->trigger(new Event('afterRequest', $controller));
+                        $controller->trigger(new Event('afterRequest', $controller, $this));
                         return $result;
                     } catch (\Throwable $e) {
                         if ($controller) {
-                            $event = new Event('exception', $controller);
+                            $event = new Event('exception', $controller, $this);
                             $controller->trigger($event);
                         } else {
                             $event = null;

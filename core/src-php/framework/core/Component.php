@@ -26,6 +26,31 @@ abstract class Component
     private $data = [];
 
     /**
+     * @return array
+     */
+    public function getProperties(): array
+    {
+        $reflect = new \ReflectionClass($this);
+        $props = $reflect->getProperties();
+
+        $result = [];
+
+        foreach ($props as $prop) {
+            if (!$prop->isStatic()) {
+                $name = $prop->getName();
+
+                if (method_exists($this, "get$name")) {
+                    $result[$name] = $this->{"get$name"}();
+                } else if (method_exists($this, "is$name")) {
+                    $result[$name] = $this->{"is$name"}();
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * @param string $name
      * @param null|mixed $value
      * @return mixed

@@ -26,10 +26,10 @@ task buildCss(dependsOn: 'gulp_compile-css') {
 }
 
 // собрать front.
-task buildJs(dependsOn: ['buildCss', 'gulp_compile']) {
+task buildJs(dependsOn: ['gulp_compile']) {
 }
 
-task buildWebLib(dependsOn: ['buildJs']) {
+task buildWebLib(dependsOn: ['buildCss', 'buildJs']) {
     doLast {
         copy {
             from "${gulp.workDir}/build/lib/dnext-engine.js"

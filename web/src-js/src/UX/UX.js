@@ -11,7 +11,6 @@ import Container from './Container';
 import HBox from './HBox';
 import VBox from './VBox';
 import ListView from './ListView';
-import FragmentPane from './FragmentPane';
 import AnchorPane from './AnchorPane';
 import ImageView from './ImageView';
 import TextInputControl from './TextInputControl';
@@ -30,7 +29,7 @@ export default {
   Labeled,
   Label, Checkbox, Combobox, Listbox, ProgressBar,
   TextInputControl, TextField, PasswordField, TextArea,
-  Container, HBox, VBox, AnchorPane, FragmentPane, ListView,
+  Container, HBox, VBox, AnchorPane, ListView,
 
   Font
 }

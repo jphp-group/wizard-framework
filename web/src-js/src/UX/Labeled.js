@@ -20,6 +20,7 @@ class Labeled extends Node {
 
     set font(value) {
       Font.applyToDom(this.dom, value);
+      this.__triggerPropertyChange('value', value);
     }
 
     get align() {
@@ -49,6 +50,8 @@ class Labeled extends Node {
       this.dom.removeClass('ux-m-halign-center');
 
       this.dom.addClass('ux-m-halign-' + value);
+
+      this.__triggerPropertyChange('horAlign', value);
     }
 
     get verAlign() {
@@ -67,6 +70,8 @@ class Labeled extends Node {
       this.dom.removeClass('ux-m-valign-center');
 
       this.dom.addClass('ux-m-valign-' + value);
+
+      this.__triggerPropertyChange('verAlign', value);
     }
 
     get text() {
@@ -90,6 +95,8 @@ class Labeled extends Node {
           this.dom.find('> span.ux-labeled-text').html(value);
           break;
       }
+
+      this.__triggerPropertyChange('text', value);
     }
 
     get textColor() {
@@ -98,6 +105,8 @@ class Labeled extends Node {
 
     set textColor(value) {
       this.dom.css('color', value ? value : '');
+
+      this.__triggerPropertyChange('textColor', value);
     }
 
     get textType() {
@@ -105,8 +114,8 @@ class Labeled extends Node {
     }
 
     set textType(value) {
-      var text = this.text;
-      var graphic = this.graphic;
+      const text = this.text;
+      const graphic = this.graphic;
 
       if (value) {
         this._textType = value.toString().toLowerCase();
@@ -116,6 +125,7 @@ class Labeled extends Node {
 
       this.text = text;
       this.graphic = graphic;
+      this.__triggerPropertyChange('textType', value);
     }
 
     get contentDisplay() {
@@ -137,8 +147,8 @@ class Labeled extends Node {
     }
 
     set contentDisplay(value) {
-      var graphic = this.graphic;
-      var graphicGap = this.graphicTextGap;
+      const graphic = this.graphic;
+      const graphicGap = this.graphicTextGap;
       this._contentDisplay = value;
 
       switch (value) {
@@ -158,15 +168,16 @@ class Labeled extends Node {
           break;
       }
 
+      this.__triggerPropertyChange('contentDisplay', value);
       this.graphic = graphic;
       this.graphicTextGap = graphicGap;
     }
 
     get graphicTextGap() {
-      var grDom = this.dom.find('.ux-graphic');
+      const grDom = this.dom.find('.ux-graphic');
 
       if (grDom.length) {
-        var prop = 'margin-right';
+        let prop = 'margin-right';
 
         switch (this.contentDisplay) {
           case 'bottom': prop = 'margin-top'; break;
@@ -183,12 +194,12 @@ class Labeled extends Node {
     set graphicTextGap(value) {
       this._graphicGap = value;
 
-      var grDom = this.dom.find('.ux-graphic');
+      const grDom = this.dom.find('.ux-graphic');
 
       if (grDom.length) {
         grDom.css('margin', 0);
 
-        var prop = 'margin-right';
+        let prop = 'margin-right';
 
         switch (this.contentDisplay) {
           case 'bottom': prop = 'margin-top'; break;
@@ -198,6 +209,8 @@ class Labeled extends Node {
 
         grDom.css(prop, value + 'px');
       }
+
+      this.__triggerPropertyChange('contentDisplay', value);
     }
 
     get graphic() {
@@ -205,7 +218,7 @@ class Labeled extends Node {
     }
 
     set graphic(node) {
-      var graphicGap = this.graphicTextGap;
+      const graphicGap = this.graphicTextGap;
       this.dom.find('.ux-graphic').remove();
 
       if (node) {
@@ -213,7 +226,7 @@ class Labeled extends Node {
           node = new ImageView(node);
         }
 
-        var dom = jQuery('<span class="ux-graphic" />').append(node.dom);
+        const dom = jQuery('<span class="ux-graphic" />').append(node.dom);
 
         switch (this.contentDisplay) {
           case 'top':
@@ -228,6 +241,8 @@ class Labeled extends Node {
 
         this.graphicTextGap = graphicGap;
       }
+
+      this.__triggerPropertyChange('graphic', node);
     }
 }
 

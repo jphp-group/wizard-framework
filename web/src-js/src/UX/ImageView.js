@@ -14,7 +14,7 @@ class ImageView extends Node {
   }
 
   get source() {
-    var source = this.dom.css('background-image');
+    let source = this.dom.css('background-image');
 
     if (source) {
       source = /^url\((['"]?)(.*)\1\)$/.exec(source);
@@ -27,9 +27,11 @@ class ImageView extends Node {
   set source(value) {
     this.dom.css({'background-image': `url('${value}')`});
 
-    if (this.displayType == 'origin') {
+    if (this.displayType === 'origin') {
       this.dom.find('img').attr('src', value);
     }
+
+    this.__triggerPropertyChange('source', value);
   }
 
   get centered() {
@@ -38,6 +40,7 @@ class ImageView extends Node {
 
   set centered(value) {
     this.dom.css('background-position', value ? '50% 50%' : '0 0');
+    this.__triggerPropertyChange('centered', value);
   }
 
   get displayType() {
@@ -68,16 +71,18 @@ class ImageView extends Node {
         this.dom.css('background-size', 'contain');
         break;
       case 'origin':
-        var source = this.source;
+        const source = this.source;
         this.dom.css('background-size', 'auto auto');
         this.dom.append(jQuery('<img style="visibility: hidden" />'));
         this.source = source;
         break;
     }
+
+    this.__triggerPropertyChange('displayType', type);
   }
 
   createDom() {
-    var dom = jQuery('<div></div>');
+    const dom = jQuery('<div></div>');
     dom.addClass('ux-image-view');
 
     dom.css({

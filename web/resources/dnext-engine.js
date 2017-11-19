@@ -1,232 +1,4 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\App.js":[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _Logger = require('./Logger');
-
-var _Logger2 = _interopRequireDefault(_Logger);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var App = function () {
-  function App() {
-    _classCallCheck(this, App);
-
-    this.logger = new _Logger2.default();
-  }
-
-  _createClass(App, [{
-    key: 'log',
-    value: function log(message) {
-      this.logger.info(message);
-    }
-  }]);
-
-  return App;
-}();
-
-exports.default = App;
-
-},{"./Logger":"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\Logger.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\Fragment.js":[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _UILoader = require('./UILoader');
-
-var _UILoader2 = _interopRequireDefault(_UILoader);
-
-var _Container = require('./../UX/Container');
-
-var _Container2 = _interopRequireDefault(_Container);
-
-var _Utils = require('./../UX/util/Utils');
-
-var _Utils2 = _interopRequireDefault(_Utils);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Fragment = function () {
-  function Fragment(uiResource) {
-    _classCallCheck(this, Fragment);
-
-    this.uiLoader = new _UILoader2.default();
-    this.ui = {};
-    this._content = null;
-
-    this.loadUi(uiResource);
-  }
-
-  _createClass(Fragment, [{
-    key: 'bindOne',
-    value: function bindOne(id, handler) {
-      var _this = this;
-
-      if (this._binds) {
-        this._binds[id] = handler;
-      } else {
-        this._binds = {};
-        this._binds[id] = handler;
-      }
-
-      if (this._content) {
-        var sub = this._content.child(id);
-
-        if (sub) {
-          for (var event in handler) {
-            if (handler.hasOwnProperty(event)) {
-              sub.on(event, function (e) {
-                handler[event].call(_this, e);
-              });
-            }
-          }
-        } else {
-          console.warn('Child \'' + id + '\' is not defined');
-        }
-      }
-    }
-  }, {
-    key: 'bind',
-    value: function bind(handlers) {
-      this._binds = handlers;
-
-      if (this._content) {
-        for (var id in handlers) {
-          if (handlers.hasOwnProperty(id)) {
-            this.bindOne(id, handlers[id]);
-          }
-        }
-      }
-    }
-  }, {
-    key: 'loadUi',
-    value: function loadUi(uiResource) {
-      var _this2 = this;
-
-      if (uiResource instanceof String || typeof uiResource === 'string') {
-        this.uiLoader.loadFromUrl(uiResource, function (node) {
-          _this2._content = node;
-          _this2.afterLoad();
-        }, this);
-      } else {
-        this._content = this.uiLoader.load(uiResource, this);
-        this.afterLoad();
-      }
-    }
-  }, {
-    key: 'afterLoad',
-    value: function afterLoad() {
-      if (this._binds) {
-        this.bind(this._binds);
-      }
-
-      this._refreshUi();
-
-      if (this._rootDom) {
-        this._rootDom.empty().append(this._content.dom);
-      }
-    }
-  }, {
-    key: '_refreshUi',
-    value: function _refreshUi() {
-      if (this.ui) {
-        for (var key in this) {
-          if (this.ui.hasOwnProperty(key)) {
-            delete this[key];
-          }
-        }
-      }
-
-      this.ui = {};
-
-      var self = this;
-
-      var refresh = function refresh(node) {
-        if (node instanceof _Container2.default) {
-          var children = node.children();
-
-          for (var i = 0; i < children.length; i++) {
-            var child = children[i];
-
-            if (child) {
-              var id = child.id;
-
-              if (id && !self.ui[id]) {
-                self.ui[id] = child;
-              }
-
-              refresh(child);
-            }
-          }
-        }
-      };
-
-      refresh(this._content);
-
-      for (var key in this.ui) {
-        if (this.ui.hasOwnProperty(key)) {
-          this[key] = this.ui[key];
-        }
-      }
-    }
-  }, {
-    key: 'load',
-    value: function load(fragment) {
-      if (fragment instanceof Fragment) {
-        fragment.parent = this;
-        fragment.render(this._rootDom);
-      } else {
-        console.warn('load(): 1 argument must be an fragment instance');
-      }
-    }
-  }, {
-    key: 'render',
-    value: function render(root) {
-      var dom;
-
-      if (_Utils2.default.isElement(root)) {
-        dom = jQuery(root);
-      } else {
-        if (root instanceof jQuery) {
-          dom = root;
-        } else {
-          dom = jQuery(document).find(root).first();
-        }
-      }
-
-      this._rootDom = dom;
-
-      if (this._content) {
-        dom.children().detach();
-        dom.append(this._content.dom);
-      }
-    }
-  }, {
-    key: 'content',
-    get: function get() {
-      return this._content;
-    }
-  }]);
-
-  return Fragment;
-}();
-
-exports.default = Fragment;
-
-},{"./../UX/Container":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Container.js","./../UX/util/Utils":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\util\\Utils.js","./UILoader":"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\UILoader.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\Logger.js":[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -237,75 +9,58 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Logger = function () {
-  _createClass(Logger, null, [{
-    key: "DEBUG",
-    get: function get() {
-      return 1;
-    }
-  }, {
-    key: "INFO",
-    get: function get() {
-      return 10;
-    }
-  }, {
-    key: "WARNING",
-    get: function get() {
-      return 100;
-    }
-  }, {
-    key: "ERROR",
-    get: function get() {
-      return 1000;
-    }
-  }]);
+var App = function () {
+  function App() {
+    _classCallCheck(this, App);
 
-  function Logger() {
-    _classCallCheck(this, Logger);
-
-    this.level = Logger.INFO;
+    this._callbacks = {};
   }
 
-  _createClass(Logger, [{
-    key: "debug",
-    value: function debug(message) {
-      if (this.level >= Logger.DEBUG) {
-        var _console;
+  /**
+   * @param {string} message
+   */
 
-        (_console = console).debug.apply(_console, arguments);
-      }
+
+  _createClass(App, [{
+    key: "log",
+    value: function log(message) {
+      console.log(message);
     }
   }, {
-    key: "info",
-    value: function info(message) {
-      if (this.level >= Logger.INFO) {
-        var _console2;
+    key: "launch",
+    value: function launch() {
+      this.socket = new WebSocket("/dnext/ws/");
 
-        (_console2 = console).info.apply(_console2, arguments);
-      }
+      this.socket.onmessage = function (event) {
+        var data = JSON.parse(event.data);
+
+        if (data.id && data.message) {
+          var callback = this._callbacks[data.id];
+
+          if (callback) {
+            callback(data);
+          }
+        }
+      };
     }
   }, {
-    key: "error",
-    value: function error(message) {
-      if (this.level >= Logger.ERROR) {
-        var _console3;
+    key: "send",
+    value: function send(message, data, callback) {
+      data.message = message;
+      data.id = Math.random().toString(36).substring(7);
 
-        (_console3 = console).error.apply(_console3, arguments);
+      if (callback) {
+        this._callbacks[data.id] = callback;
       }
-    }
-  }, {
-    key: "warn",
-    value: function warn(message) {
-      if (this.level >= Logger.WARNING) {
-        console.warn(message);
-      }
+
+      this.socket.send(JSON.stringify(data));
     }
   }]);
 
-  return Logger;
+  return App;
 }();
 
-exports.default = Logger;
+exports.default = App;
 
 },{}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\NX.js":[function(require,module,exports){
 'use strict';
@@ -318,14 +73,6 @@ var _App = require('./App');
 
 var _App2 = _interopRequireDefault(_App);
 
-var _Logger = require('./Logger');
-
-var _Logger2 = _interopRequireDefault(_Logger);
-
-var _Fragment = require('./Fragment');
-
-var _Fragment2 = _interopRequireDefault(_Fragment);
-
 var _UILoader = require('./UILoader');
 
 var _UILoader2 = _interopRequireDefault(_UILoader);
@@ -333,34 +80,10 @@ var _UILoader2 = _interopRequireDefault(_UILoader);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = {
-  App: _App2.default, Logger: _Logger2.default, UILoader: _UILoader2.default, Fragment: _Fragment2.default,
-
-  init: function init() {
-    var app = new _App2.default();
-
-    jQuery(document).find('[data-fragment]').each(function () {
-      var fragment = $(this).attr('data-fragment');
-
-      if (fragment) {
-        var cls = window[fragment];
-
-        if (!cls) {
-          console.warn(cls + ' cannot find global class for fragment');
-          return;
-        }
-
-        var fragment = new cls();
-        $(this).data('--wrapper', fragment);
-        fragment.render(this);
-      }
-    });
-
-    window.NX.app = app;
-    return app;
-  }
+  App: _App2.default, UILoader: _UILoader2.default
 };
 
-},{"./App":"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\App.js","./Fragment":"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\Fragment.js","./Logger":"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\Logger.js","./UILoader":"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\UILoader.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\UILoader.js":[function(require,module,exports){
+},{"./App":"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\App.js","./UILoader":"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\UILoader.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\UILoader.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -394,7 +117,7 @@ var UILoader = function () {
 
   _createClass(UILoader, [{
     key: 'load',
-    value: function load(object, controller) {
+    value: function load(object) {
       if (object && (typeof object === 'undefined' ? 'undefined' : _typeof(object)) === "object") {
         var type = object['_'];
 
@@ -415,12 +138,10 @@ var UILoader = function () {
             var children = object['_content'];
 
             for (var i = 0; i < children.length; i++) {
-              var child = this.load(children[i], controller);
+              var child = this.load(children[i]);
               node.add(child);
             }
           }
-
-          node.load(object, controller);
 
           return node;
         } else {
@@ -430,16 +151,16 @@ var UILoader = function () {
     }
   }, {
     key: 'loadFromJson',
-    value: function loadFromJson(jsonString, controller) {
-      return this.load(JSON.parse(jsonString), controller);
+    value: function loadFromJson(jsonString) {
+      return this.load(JSON.parse(jsonString));
     }
   }, {
     key: 'loadFromUrl',
-    value: function loadFromUrl(urlToJson, callback, controller) {
+    value: function loadFromUrl(urlToJson, callback) {
       var _this = this;
 
       jQuery.getJSON(urlToJson, function (data) {
-        callback(_this.load(data, controller));
+        callback(_this.load(data));
       });
     }
   }]);
@@ -889,69 +610,7 @@ var Container = function (_Node) {
 
 exports.default = Container;
 
-},{"./Node":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Node.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\FragmentPane.js":[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _Node2 = require('./Node');
-
-var _Node3 = _interopRequireDefault(_Node2);
-
-var _Fragment = require('./../NX/Fragment');
-
-var _Fragment2 = _interopRequireDefault(_Fragment);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var FragmentPane = function (_Node) {
-  _inherits(FragmentPane, _Node);
-
-  function FragmentPane() {
-    _classCallCheck(this, FragmentPane);
-
-    return _possibleConstructorReturn(this, (FragmentPane.__proto__ || Object.getPrototypeOf(FragmentPane)).call(this));
-  }
-
-  _createClass(FragmentPane, [{
-    key: 'createDom',
-    value: function createDom() {
-      return jQuery('<div class="ux-fragment-pane">');
-    }
-  }, {
-    key: 'content',
-    get: function get() {
-      this._content;
-    },
-    set: function set(fragment) {
-      if (fragment instanceof _Fragment2.default) {
-        this._content = fragment;
-      } else if (typeof fragment === 'string' || fragment instanceof String) {
-        this._content = new window[fragment]();
-      }
-
-      if (this._content) {
-        this._content.render(this.dom);
-      }
-    }
-  }]);
-
-  return FragmentPane;
-}(_Node3.default);
-
-exports.default = FragmentPane;
-
-},{"./../NX/Fragment":"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\Fragment.js","./Node":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Node.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\HBox.js":[function(require,module,exports){
+},{"./Node":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Node.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\HBox.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1111,9 +770,11 @@ var ImageView = function (_Node) {
     set: function set(value) {
       this.dom.css({ 'background-image': 'url(\'' + value + '\')' });
 
-      if (this.displayType == 'origin') {
+      if (this.displayType === 'origin') {
         this.dom.find('img').attr('src', value);
       }
+
+      this.__triggerPropertyChange('source', value);
     }
   }, {
     key: 'centered',
@@ -1122,6 +783,7 @@ var ImageView = function (_Node) {
     },
     set: function set(value) {
       this.dom.css('background-position', value ? '50% 50%' : '0 0');
+      this.__triggerPropertyChange('centered', value);
     }
   }, {
     key: 'displayType',
@@ -1162,6 +824,8 @@ var ImageView = function (_Node) {
           this.source = source;
           break;
       }
+
+      this.__triggerPropertyChange('displayType', type);
     }
   }]);
 
@@ -1270,6 +934,7 @@ var Labeled = function (_Node) {
     },
     set: function set(value) {
       _Font2.default.applyToDom(this.dom, value);
+      this.__triggerPropertyChange('value', value);
     }
   }, {
     key: 'align',
@@ -1299,6 +964,8 @@ var Labeled = function (_Node) {
       this.dom.removeClass('ux-m-halign-center');
 
       this.dom.addClass('ux-m-halign-' + value);
+
+      this.__triggerPropertyChange('horAlign', value);
     }
   }, {
     key: 'verAlign',
@@ -1317,6 +984,8 @@ var Labeled = function (_Node) {
       this.dom.removeClass('ux-m-valign-center');
 
       this.dom.addClass('ux-m-valign-' + value);
+
+      this.__triggerPropertyChange('verAlign', value);
     }
   }, {
     key: 'text',
@@ -1340,6 +1009,8 @@ var Labeled = function (_Node) {
           this.dom.find('> span.ux-labeled-text').html(value);
           break;
       }
+
+      this.__triggerPropertyChange('text', value);
     }
   }, {
     key: 'textColor',
@@ -1348,6 +1019,8 @@ var Labeled = function (_Node) {
     },
     set: function set(value) {
       this.dom.css('color', value ? value : '');
+
+      this.__triggerPropertyChange('textColor', value);
     }
   }, {
     key: 'textType',
@@ -1366,6 +1039,7 @@ var Labeled = function (_Node) {
 
       this.text = text;
       this.graphic = graphic;
+      this.__triggerPropertyChange('textType', value);
     }
   }, {
     key: 'contentDisplay',
@@ -1408,6 +1082,7 @@ var Labeled = function (_Node) {
           break;
       }
 
+      this.__triggerPropertyChange('contentDisplay', value);
       this.graphic = graphic;
       this.graphicTextGap = graphicGap;
     }
@@ -1454,6 +1129,8 @@ var Labeled = function (_Node) {
 
         grDom.css(prop, value + 'px');
       }
+
+      this.__triggerPropertyChange('contentDisplay', value);
     }
   }, {
     key: 'graphic',
@@ -1484,6 +1161,8 @@ var Labeled = function (_Node) {
 
         this.graphicTextGap = graphicGap;
       }
+
+      this.__triggerPropertyChange('graphic', node);
     }
   }]);
 
@@ -1684,6 +1363,8 @@ var Node = function () {
   function Node(dom) {
     _classCallCheck(this, Node);
 
+    this.__observers = [];
+
     if (dom === undefined) {
       this.dom = this.createDom();
 
@@ -1701,7 +1382,50 @@ var Node = function () {
     this.dom.data('--wrapper', this);
   }
 
+  /**
+   * @param {function} handler
+   */
+
+
   _createClass(Node, [{
+    key: "__forEachObservers",
+    value: function __forEachObservers(handler) {
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = this.__observers[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var observer = _step.value;
+
+          handler(observer);
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+    }
+  }, {
+    key: "__triggerPropertyChange",
+    value: function __triggerPropertyChange(name, newValue) {
+      var _this = this;
+
+      this.__forEachObservers(function (observer) {
+        var oldValue = _this[name];
+        observer.triggerPropertyChange(name, oldValue, newValue);
+      });
+    }
+  }, {
     key: "createDom",
     value: function createDom() {
       throw new Error("Cannot call abstract method createDom()");
@@ -1761,12 +1485,12 @@ var Node = function () {
   }, {
     key: "lookupAll",
     value: function lookupAll(selector) {
-      var _this = this;
+      var _this2 = this;
 
       var nodes = [];
 
       this.dom.find(selector).each(function () {
-        nodes.push(Node.getFromDom(_this));
+        nodes.push(Node.getFromDom(_this2));
       });
 
       return nodes;
@@ -1827,11 +1551,11 @@ var Node = function () {
   }, {
     key: "on",
     value: function on(event, callback) {
-      var _this2 = this;
+      var _this3 = this;
 
       this.dom.on(event, function (event) {
-        event.sender = _this2;
-        callback.call(_this2, event);
+        event.sender = _this3;
+        callback.call(_this3, event);
       });
 
       return this;
@@ -1853,44 +1577,12 @@ var Node = function () {
       return null;
     }
   }, {
-    key: "load",
-    value: function load(object, controller) {
-      for (var prop in object) {
-        if (object.hasOwnProperty(prop)) {
-          if (prop[0] == '_') {
-            continue;
-          }
-
-          var value = object[prop];
-
-          switch (prop) {
-            case 'on':
-              if (controller) {
-                for (var event in value) {
-
-                  if (value.hasOwnProperty(event)) {
-                    var handler = value[event];
-                    if (typeof controller[handler] === 'function') {
-                      this.on(event, controller[handler].bind(controller));
-                    }
-                  }
-                }
-              }
-              break;
-
-            default:
-              this[prop] = value;
-              break;
-          }
-        }
-      }
-    }
-  }, {
     key: "id",
     get: function get() {
       return this.dom.attr('id');
     },
     set: function set(value) {
+      this.__triggerPropertyChange('id', value);
       this.dom.attr('id', value);
     }
   }, {
@@ -1899,6 +1591,8 @@ var Node = function () {
       return this.dom.is(':visible');
     },
     set: function set(value) {
+      this.__triggerPropertyChange('visible', value);
+
       if (value) {
         this.dom.show();
       } else {
@@ -1911,6 +1605,7 @@ var Node = function () {
       return this.dom.css('opacity');
     },
     set: function set(value) {
+      this.__triggerPropertyChange('opacity', value);
       this.dom.css('opacity', value);
     }
   }, {
@@ -1919,6 +1614,7 @@ var Node = function () {
       return !this.dom.prop("disabled");
     },
     set: function set(value) {
+      this.__triggerPropertyChange('enabled', value);
       this.dom.prop('disabled', !value);
     }
   }, {
@@ -1932,6 +1628,7 @@ var Node = function () {
       return this.dom.position().left;
     },
     set: function set(value) {
+      this.__triggerPropertyChange('x', value);
       this.dom.css({ left: value });
     }
   }, {
@@ -1940,6 +1637,7 @@ var Node = function () {
       return this.dom.position().top;
     },
     set: function set(value) {
+      this.__triggerPropertyChange('y', value);
       this.dom.css({ top: value });
     }
   }, {
@@ -1959,6 +1657,7 @@ var Node = function () {
       return this.dom.width();
     },
     set: function set(value) {
+      this.__triggerPropertyChange('width', value);
       this.dom.width(value);
     }
   }, {
@@ -1967,6 +1666,7 @@ var Node = function () {
       return this.dom.height();
     },
     set: function set(value) {
+      this.__triggerPropertyChange('height', value);
       this.dom.height(value);
     }
   }, {
@@ -1986,6 +1686,8 @@ var Node = function () {
       return [_Utils2.default.toPt(this.dom.css('padding-top')), _Utils2.default.toPt(this.dom.css('padding-right')), _Utils2.default.toPt(this.dom.css('padding-bottom')), _Utils2.default.toPt(this.dom.css('padding-left'))];
     },
     set: function set(value) {
+      this.__triggerPropertyChange('padding', value);
+
       if (value instanceof Array) {
         if (value.length >= 4) {
           this.dom.css({
@@ -2029,6 +1731,7 @@ var Node = function () {
       return this.dom.data('--user-data');
     },
     set: function set(value) {
+      this.__triggerPropertyChange('userData', value);
       this.dom.data('--user-data', value);
     }
   }, {
@@ -2603,10 +2306,6 @@ var _ListView = require('./ListView');
 
 var _ListView2 = _interopRequireDefault(_ListView);
 
-var _FragmentPane = require('./FragmentPane');
-
-var _FragmentPane2 = _interopRequireDefault(_FragmentPane);
-
 var _AnchorPane = require('./AnchorPane');
 
 var _AnchorPane2 = _interopRequireDefault(_AnchorPane);
@@ -2648,12 +2347,12 @@ exports.default = {
   Labeled: _Labeled2.default,
   Label: _Label2.default, Checkbox: _Checkbox2.default, Combobox: _Combobox2.default, Listbox: _Listbox2.default, ProgressBar: _ProgressBar2.default,
   TextInputControl: _TextInputControl2.default, TextField: _TextField2.default, PasswordField: _PasswordField2.default, TextArea: _TextArea2.default,
-  Container: _Container2.default, HBox: _HBox2.default, VBox: _VBox2.default, AnchorPane: _AnchorPane2.default, FragmentPane: _FragmentPane2.default, ListView: _ListView2.default,
+  Container: _Container2.default, HBox: _HBox2.default, VBox: _VBox2.default, AnchorPane: _AnchorPane2.default, ListView: _ListView2.default,
 
   Font: _Font2.default
 };
 
-},{"./AnchorPane":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\AnchorPane.js","./Button":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Button.js","./Checkbox":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Checkbox.js","./Combobox":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Combobox.js","./Container":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Container.js","./FragmentPane":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\FragmentPane.js","./HBox":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\HBox.js","./ImageView":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\ImageView.js","./Label":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Label.js","./Labeled":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Labeled.js","./ListView":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\ListView.js","./Listbox":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Listbox.js","./Node":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Node.js","./PasswordField":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\PasswordField.js","./ProgressBar":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\ProgressBar.js","./TextArea":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\TextArea.js","./TextField":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\TextField.js","./TextInputControl":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\TextInputControl.js","./ToggleButton":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\ToggleButton.js","./VBox":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\VBox.js","./paint/Font":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\paint\\Font.js","./util/Utils":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\util\\Utils.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\VBox.js":[function(require,module,exports){
+},{"./AnchorPane":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\AnchorPane.js","./Button":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Button.js","./Checkbox":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Checkbox.js","./Combobox":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Combobox.js","./Container":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Container.js","./HBox":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\HBox.js","./ImageView":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\ImageView.js","./Label":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Label.js","./Labeled":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Labeled.js","./ListView":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\ListView.js","./Listbox":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Listbox.js","./Node":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Node.js","./PasswordField":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\PasswordField.js","./ProgressBar":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\ProgressBar.js","./TextArea":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\TextArea.js","./TextField":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\TextField.js","./TextInputControl":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\TextInputControl.js","./ToggleButton":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\ToggleButton.js","./VBox":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\VBox.js","./paint/Font":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\paint\\Font.js","./util/Utils":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\util\\Utils.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\VBox.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

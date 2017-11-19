@@ -2,6 +2,8 @@
 namespace framework\core;
 
 use php\io\Stream;
+use php\lib\str;
+use php\time\Time;
 
 /**
  * Class Application
@@ -22,13 +24,41 @@ abstract class Application extends Component
     private $singletons = [];
 
     /**
+     * @var string
+     */
+    private $stamp = '';
+
+    /**
+     * @var int
+     */
+    private $initializeTime;
+
+    /**
      * Application constructor.
      */
     public function __construct()
     {
         self::$instance = $this;
+        $this->stamp = str::random();
+        $this->initializeTime = Time::millis();
 
         $this->initialize();
+    }
+
+    /**
+     * @return int
+     */
+    public function getInitializeTime(): int
+    {
+        return $this->initializeTime;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStamp(): string
+    {
+        return $this->stamp;
     }
 
     /**

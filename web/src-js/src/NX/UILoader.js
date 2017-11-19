@@ -4,7 +4,7 @@ import UX from './../UX/UX';
 
 class UILoader {
 
-  load(object, controller) {
+  load(object) {
     if (object && typeof object === "object") {
       const type = object['_'];
 
@@ -24,13 +24,11 @@ class UILoader {
         if (node instanceof Container && jQuery.isArray(object['_content'])) {
           const children = object['_content'];
 
-          for (var i = 0; i < children.length; i++) {
-            const child = this.load(children[i], controller);
+          for (let i = 0; i < children.length; i++) {
+            const child = this.load(children[i]);
             node.add(child);
           }
         }
-
-        node.load(object, controller);
 
         return node;
       } else {
@@ -39,14 +37,13 @@ class UILoader {
     }
   }
 
-  loadFromJson(jsonString, controller) {
-    return this.load(JSON.parse(jsonString), controller);
+  loadFromJson(jsonString) {
+    return this.load(JSON.parse(jsonString));
   }
 
-  loadFromUrl(urlToJson, callback, controller) {
-
+  loadFromUrl(urlToJson, callback) {
     jQuery.getJSON(urlToJson, (data) => {
-        callback(this.load(data, controller));
+        callback(this.load(data));
     });
   }
 }
