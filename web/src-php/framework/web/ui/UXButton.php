@@ -4,6 +4,8 @@ namespace framework\web\ui;
 /**
  * Class UXButton
  * @package framework\web\ui
+ *
+ * @property string $text
  */
 class UXButton extends UXNode
 {
@@ -18,6 +20,8 @@ class UXButton extends UXNode
      */
     public function __construct(string $text = null)
     {
+        parent::__construct();
+
         if ($text) {
             $this->setText($text);
         }

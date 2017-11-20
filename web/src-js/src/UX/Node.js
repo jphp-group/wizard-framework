@@ -40,6 +40,22 @@ class Node {
     });
   }
 
+  /**
+   * @returns {string}
+   */
+  get uuid() {
+    return this.dom.attr('uuid')
+  }
+
+  /**
+   * @param {string} value
+   */
+  set uuid(value) {
+    this.dom.removeClass(this.uuid);
+    this.dom.attr('uuid', value);
+    this.dom.addClass(value);
+  }
+
   get id() {
     return this.dom.attr('id')
   }
@@ -201,14 +217,6 @@ class Node {
     this.dom.data('--user-data', value);
   }
 
-  get controller() {
-    return this._controller;
-  }
-
-  set controller(object) {
-    this._controller = object;
-  }
-
   createDom() {
     throw new Error("Cannot call abstract method createDom()");
   }
@@ -318,17 +326,51 @@ class Node {
     return this;
   }
 
+  /**
+   * @param {string} event
+   * @returns {Node}
+   */
   off(event) {
     this.dom.off(event);
     return this;
   }
 
+  /**
+   * @param {string} event
+   * @param params
+   * @returns {*}
+   */
   trigger(event, params) {
     return this.dom.trigger(event, params);
   }
 
+  /**
+   * @param {string} id
+   * @returns {Node}
+   */
   child(id) {
     return null;
+  }
+
+  /**
+   * @param object
+   */
+  loadSchema(object) {
+    for (const prop in object) {
+      if (object.hasOwnProperty(prop)) {
+        if (prop[0] === '_') {
+          continue;
+        }
+
+        const value = object[prop];
+
+        switch (prop) {
+          default:
+            this[prop] = value;
+            break;
+        }
+      }
+    }
   }
 
   static getFromDom(jqueryObject) {

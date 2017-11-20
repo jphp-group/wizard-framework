@@ -23,13 +23,16 @@ dependencies {
 }
 
 task buildCss(dependsOn: 'gulp_compile-css') {
+    doLast {
+        copy {
+            from "${gulp.workDir}/build/lib/dnext-engine.min.css"
+            into "${project.projectDir}/resources/"
+        }
+    }
 }
 
 // собрать front.
 task buildJs(dependsOn: ['gulp_compile']) {
-}
-
-task buildWebLib(dependsOn: ['buildCss', 'buildJs']) {
     doLast {
         copy {
             from "${gulp.workDir}/build/lib/dnext-engine.js"
@@ -40,11 +43,9 @@ task buildWebLib(dependsOn: ['buildCss', 'buildJs']) {
             from "${gulp.workDir}/build/lib/dnext-engine.js.map"
             into "${project.projectDir}/resources/"
         }
-
-        copy {
-            from "${gulp.workDir}/build/lib/dnext-engine.min.css"
-            into "${project.projectDir}/resources/"
-        }
     }
+}
+
+task buildWebLib(dependsOn: ['buildCss', 'buildJs']) {
 }
 

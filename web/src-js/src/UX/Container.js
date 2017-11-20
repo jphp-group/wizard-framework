@@ -58,7 +58,7 @@ class Container extends Node {
       throw new TypeError('createSlotDom(): 1 argument must be instance of Node')
     }
 
-    var dom = jQuery('<div/>').append(object.dom);
+    const dom = jQuery('<div/>').append(object.dom);
     dom.addClass('ux-slot');
 
     dom.data('--wrapper', object);
@@ -67,14 +67,14 @@ class Container extends Node {
   }
 
   createDom() {
-    var dom = jQuery('<div></div>');
+    const dom = jQuery('<div></div>');
     dom.addClass('ux-container');
 
     return dom;
   }
 
   child(id) {
-    var dom = this.dom.find(`#${id}`);
+    const dom = this.dom.find(`#${id}`);
 
     if (dom && dom.length) {
       return Node.getFromDom(dom);
@@ -88,7 +88,7 @@ class Container extends Node {
   }
 
   children() {
-    var children = [];
+    const children = [];
 
     this.dom.children().each(function () {
       children.push(Node.getFromDom(jQuery(this)));
@@ -98,7 +98,7 @@ class Container extends Node {
   }
 
   removeByIndex(index) {
-    var child = this.children()[index];
+    const child = this.children()[index];
     
     if (child) {
       child.free();
@@ -106,7 +106,7 @@ class Container extends Node {
   }
 
   add(nodes) {
-    for (var i = 0; i < arguments.length; i++) {
+    for (let i = 0; i < arguments.length; i++) {
       this.dom.append(this.createSlotDom(arguments[i]));
     }
 
@@ -116,7 +116,7 @@ class Container extends Node {
   insert(index, nodes) {
     index = index | 0;
 
-    var children = this.dom.children();
+    const children = this.dom.children();
 
     if (!children.length || index >= children.length) {
       return this.add(...Array.prototype.slice.call(arguments, 1));
@@ -124,13 +124,13 @@ class Container extends Node {
 
     nodes = Array.prototype.slice.call(arguments, 1);
 
-    var i = 0;
-    var self = this;
+    let i = 0;
+    const self = this;
 
     this.dom.children().each(function () {
       if (index === i) {
-        for (var k = 0; k < nodes.length; k++) {
-          var slot = self.createSlotDom(nodes[k]);
+        for (let k = 0; k < nodes.length; k++) {
+          const slot = self.createSlotDom(nodes[k]);
           slot.insertBefore(this);
         }
 

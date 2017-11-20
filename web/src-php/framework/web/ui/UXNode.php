@@ -1,25 +1,61 @@
 <?php
+
 namespace framework\web\ui;
 
 use framework\core\Component;
+use framework\web\UI;
+use php\lib\str;
 
 /**
  * Class UXNode
  * @package framework\web\ui
  *
  * @property string $id
+ * @property string $uuid
+ * @property mixed $width
+ * @property mixed $height
+ *
  */
 abstract class UXNode extends Component implements UXViewable
 {
+    /**
+     * @var string
+     */
+    private $uuid;
+
+    /**
+     * @var string|int
+     */
+    private $width;
+
+    /**
+     * @var string|int
+     */
+    private $height;
+
     /**
      * @var array
      */
     protected $state = [];
 
     /**
+     * @var UI
+     */
+    protected $connectedUi;
+
+    /**
      * @return string
      */
     abstract public function uiSchemaClassName(): string;
+
+
+    /**
+     * UXNode constructor.
+     */
+    public function __construct()
+    {
+        $this->uuid = str::uuid();
+    }
 
     /**
      * @return array
@@ -36,35 +72,77 @@ abstract class UXNode extends Component implements UXViewable
             $view[$name] = $value;
         }
 
+        $view['_watchedEvents'] = [];
+
+        foreach ($this->eventHandlers as $event => $handlers) {
+            $view['_watchedEvents'][] = $event;
+        }
+
         return $view;
     }
 
     /**
-     * @param string $name
-     * @param $value
+     * @return string
      */
-    protected function setProperty(string $name, $value)
+    public function getUuid(): string
     {
-        $this->state[$name] = $value;
+        return $this->uuid;
     }
 
     /**
-     * @param string $name
-     * @param mixed $def
-     * @return mixed
+     * @param string $uuid
      */
-    protected function getProperty(string $name, $def = null)
+    public function setUuid(string $uuid)
     {
-        return $this->state[$name] ?? $def;
+        $this->uuid = $uuid;
     }
 
-    public function getId(): string
+    /**
+     * @return int|string
+     */
+    public function getWidth()
     {
-        return $this->getProperty('id');
+        return $this->width;
     }
 
-    public function setId(string $id)
+    /**
+     * @param int|string $width
+     */
+    public function setWidth($width)
     {
-        $this->setProperty('id', $id);
+        $this->width = $width;
+    }
+
+    /**
+     * @return int|string
+     */
+    public function getHeight()
+    {
+        return $this->height;
+    }
+
+    /**
+     * @param int|string $height
+     */
+    public function setHeight($height)
+    {
+        $this->height = $height;
+    }
+
+    public function __set(string $name, $value)
+    {
+        if ($this->connectedUi) {
+            $this->connectedUi->changeNodeProperty($this, $name, $value);
+        }
+
+        parent::__set($name, $value);
+    }
+
+    /**
+     * @param UI $ui
+     */
+    public function connectToUI(?UI $ui)
+    {
+        $this->connectedUi = $ui;
     }
 }

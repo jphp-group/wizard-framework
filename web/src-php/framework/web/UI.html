@@ -16,9 +16,13 @@
         <div id="app"></div>
 
         <script>
-            var uiLoader = new NX.UILoader();
-            uiLoader.loadFromUrl('{{uiSchemaUrl}}', function () {
-              // callback
+            uiLoader = new NX.UILoader();
+            uiMediator = new NX.UIMediator();
+
+            uiLoader.loadFromUrl('{{uiSchemaUrl}}', uiMediator, function (node) {
+              $('#app').append(node.dom);
+
+              uiMediator.startWatching(node, '{{uiSocketUrl}}', '{{sessionId}}');
             });
         </script>
     </body>

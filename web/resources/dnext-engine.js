@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\App.js":[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"E:\\Dev\\framework\\web\\src-js\\src\\NX\\App.js":[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -62,7 +62,7 @@ var App = function () {
 
 exports.default = App;
 
-},{}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\NX.js":[function(require,module,exports){
+},{}],"E:\\Dev\\framework\\web\\src-js\\src\\NX\\NX.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -77,13 +77,17 @@ var _UILoader = require('./UILoader');
 
 var _UILoader2 = _interopRequireDefault(_UILoader);
 
+var _UIMediator = require('./UIMediator');
+
+var _UIMediator2 = _interopRequireDefault(_UIMediator);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = {
-  App: _App2.default, UILoader: _UILoader2.default
+  App: _App2.default, UILoader: _UILoader2.default, UIMediator: _UIMediator2.default
 };
 
-},{"./App":"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\App.js","./UILoader":"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\UILoader.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\UILoader.js":[function(require,module,exports){
+},{"./App":"E:\\Dev\\framework\\web\\src-js\\src\\NX\\App.js","./UILoader":"E:\\Dev\\framework\\web\\src-js\\src\\NX\\UILoader.js","./UIMediator":"E:\\Dev\\framework\\web\\src-js\\src\\NX\\UIMediator.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\NX\\UILoader.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -116,8 +120,55 @@ var UILoader = function () {
   }
 
   _createClass(UILoader, [{
+    key: 'linkToMediator',
+    value: function linkToMediator(node, data, uiMediator) {
+      if (uiMediator !== undefined) {
+        var watchedEvents = data['_watchedEvents'];
+        if (watchedEvents !== undefined) {
+          var _iteratorNormalCompletion = true;
+          var _didIteratorError = false;
+          var _iteratorError = undefined;
+
+          try {
+            var _loop = function _loop() {
+              var watchedEvent = _step.value;
+
+
+              node.on(watchedEvent, function (e) {
+                uiMediator.triggerEvent(node, watchedEvent, e);
+              });
+            };
+
+            for (var _iterator = watchedEvents[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              _loop();
+            }
+          } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion && _iterator.return) {
+                _iterator.return();
+              }
+            } finally {
+              if (_didIteratorError) {
+                throw _iteratorError;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    /**
+     * @param object
+     * @param {UIMediator} uiMediator
+     * @returns {Node}
+     */
+
+  }, {
     key: 'load',
-    value: function load(object) {
+    value: function load(object, uiMediator) {
       if (object && (typeof object === 'undefined' ? 'undefined' : _typeof(object)) === "object") {
         var type = object['_'];
 
@@ -138,29 +189,46 @@ var UILoader = function () {
             var children = object['_content'];
 
             for (var i = 0; i < children.length; i++) {
-              var child = this.load(children[i]);
+              var child = this.load(children[i], uiMediator);
               node.add(child);
             }
           }
 
+          this.linkToMediator(node, object, uiMediator);
+          node.loadSchema(object);
           return node;
         } else {
           throw new Error('Type \'' + type + '\' is not UI component class');
         }
       }
     }
+
+    /**
+     * @param {string} jsonString
+     * @param {UIMediator} uiMediator
+     * @returns {Node}
+     */
+
   }, {
     key: 'loadFromJson',
-    value: function loadFromJson(jsonString) {
-      return this.load(JSON.parse(jsonString));
+    value: function loadFromJson(jsonString, uiMediator) {
+      return this.load(JSON.parse(jsonString), uiMediator);
     }
+
+    /**
+     *
+     * @param {string} urlToJson
+     * @param {UIMediator} uiMediator
+     * @param {function} callback
+     */
+
   }, {
     key: 'loadFromUrl',
-    value: function loadFromUrl(urlToJson, callback) {
+    value: function loadFromUrl(urlToJson, uiMediator, callback) {
       var _this = this;
 
       jQuery.getJSON(urlToJson, function (data) {
-        callback(_this.load(data));
+        callback(_this.load(data, uiMediator));
       });
     }
   }]);
@@ -170,7 +238,183 @@ var UILoader = function () {
 
 exports.default = UILoader;
 
-},{"./../UX/Container":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Container.js","./../UX/Node":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Node.js","./../UX/UX":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\UX.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\AnchorPane.js":[function(require,module,exports){
+},{"./../UX/Container":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Container.js","./../UX/Node":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Node.js","./../UX/UX":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\UX.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\NX\\UIMediator.js":[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Container = require("../UX/Container");
+
+var _Container2 = _interopRequireDefault(_Container);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var UIMediator = function () {
+  /**
+   * @param {Node} node
+   */
+  function UIMediator() {
+    _classCallCheck(this, UIMediator);
+
+    this._callbacks = [];
+  }
+
+  /**
+   * @param {Node} node
+   * @param wsUrl
+   * @param sessionId
+   */
+
+
+  _createClass(UIMediator, [{
+    key: "startWatching",
+    value: function startWatching(node, wsUrl, sessionId) {
+      var _this = this;
+
+      this.node = node;
+      this.sessionId = sessionId;
+
+      var loc = window.location;
+      var newUri = '';
+
+      if (loc.protocol === "https:") {
+        newUri = "wss:";
+      } else {
+        newUri = "ws:";
+      }
+
+      newUri += "//" + loc.host;
+      newUri += wsUrl;
+
+      this.ws = new WebSocket(newUri);
+
+      this.ws.onopen = function () {
+        _this.send('initialize', { sessionId: sessionId });
+      };
+
+      this.ws.onmessage = function (event) {
+        var message = JSON.parse(event.data);
+        var type = message.type;
+
+        switch (type) {
+          case "ui-alert":
+            _this.triggerAlert(message);
+            break;
+
+          case "ui-set-property":
+            _this.triggerSetProperty(message);
+            break;
+        }
+      };
+    }
+
+    /**
+     * @param type
+     * @param message
+     * @param callback
+     * @returns {boolean}
+     */
+
+  }, {
+    key: "sendIfCan",
+    value: function sendIfCan(type, message, callback) {
+      if (this.ws !== undefined) {
+        this.send(type, message, callback);
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    /**
+     * @param type
+     * @param message
+     * @param callback
+     */
+
+  }, {
+    key: "send",
+    value: function send(type, message, callback) {
+      if (this.ws === undefined) {
+        throw "Mediator is not in watching state.";
+      }
+
+      message.type = type;
+      message.id = Math.random().toString(36).substring(7);
+      message.sessionId = this.sessionId;
+
+      if (callback) {
+        this._callbacks[message.id] = callback;
+      }
+
+      console.info("UIMediator.send", message);
+
+      this.ws.send(JSON.stringify(message));
+    }
+  }, {
+    key: "findNodeByUuid",
+    value: function findNodeByUuid(uuid, node) {
+      if (uuid === node.uuid) {
+        return node;
+      }
+
+      if (node instanceof _Container2.default) {
+        var children = node.children();
+
+        for (var i = 0; i < children.length; i++) {
+          var found = this.findNodeByUuid(uuid, children[i]);
+
+          if (found !== null) {
+            return found;
+          }
+        }
+      }
+
+      return null;
+    }
+  }, {
+    key: "triggerEvent",
+    value: function triggerEvent(node, event, e) {
+      this.sendIfCan('ui-trigger', {
+        uuid: node.uuid,
+        event: event
+      });
+    }
+  }, {
+    key: "triggerAlert",
+    value: function triggerAlert(message) {
+      var text = message['text'];
+      alert(text);
+    }
+  }, {
+    key: "triggerSetProperty",
+    value: function triggerSetProperty(message) {
+      var uuid = message['uuid'];
+      var property = message['property'];
+      var value = message['value'];
+
+      var node = this.findNodeByUuid(uuid, this.node);
+
+      if (node !== null) {
+        node[property] = value;
+      } else {
+        console.warn("Failed to set property, node with uuid = " + uuid + " is not found");
+      }
+    }
+  }]);
+
+  return UIMediator;
+}();
+
+exports.default = UIMediator;
+
+},{"../UX/Container":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Container.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\AnchorPane.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -237,7 +481,7 @@ var AnchorPane = function (_Container) {
 
 exports.default = AnchorPane;
 
-},{"./Container":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Container.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Button.js":[function(require,module,exports){
+},{"./Container":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Container.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Button.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -311,7 +555,7 @@ var Button = function (_Labeled) {
 
 exports.default = Button;
 
-},{"./Labeled":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Labeled.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Checkbox.js":[function(require,module,exports){
+},{"./Labeled":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Labeled.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Checkbox.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -372,7 +616,7 @@ var Checkbox = function (_Labeled) {
 
 exports.default = Checkbox;
 
-},{"./Labeled":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Labeled.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Combobox.js":[function(require,module,exports){
+},{"./Labeled":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Labeled.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Combobox.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -418,7 +662,7 @@ var Combobox = function (_SelectControl) {
 
 exports.default = Combobox;
 
-},{"./SelectControl":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\SelectControl.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Container.js":[function(require,module,exports){
+},{"./SelectControl":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\SelectControl.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Container.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -610,7 +854,7 @@ var Container = function (_Node) {
 
 exports.default = Container;
 
-},{"./Node":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Node.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\HBox.js":[function(require,module,exports){
+},{"./Node":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Node.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\HBox.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -703,7 +947,7 @@ var HBox = function (_Container) {
 
 exports.default = HBox;
 
-},{"./Container":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Container.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\ImageView.js":[function(require,module,exports){
+},{"./Container":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Container.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\ImageView.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -834,7 +1078,7 @@ var ImageView = function (_Node) {
 
 exports.default = ImageView;
 
-},{"./Node":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Node.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Label.js":[function(require,module,exports){
+},{"./Node":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Node.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Label.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -877,7 +1121,7 @@ var Label = function (_Labeled) {
 
 exports.default = Label;
 
-},{"./Labeled":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Labeled.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Labeled.js":[function(require,module,exports){
+},{"./Labeled":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Labeled.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Labeled.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1171,7 +1415,7 @@ var Labeled = function (_Node) {
 
 exports.default = Labeled;
 
-},{"./ImageView":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\ImageView.js","./Node":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Node.js","./paint/Font":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\paint\\Font.js","./util/Utils":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\util\\Utils.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\ListView.js":[function(require,module,exports){
+},{"./ImageView":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\ImageView.js","./Node":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Node.js","./paint/Font":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\paint\\Font.js","./util/Utils":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\util\\Utils.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\ListView.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1292,7 +1536,7 @@ var ListView = function (_Container) {
 
 exports.default = ListView;
 
-},{"./Container":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Container.js","./Node":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Node.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Listbox.js":[function(require,module,exports){
+},{"./Container":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Container.js","./Node":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Node.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Listbox.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1339,7 +1583,7 @@ var Listbox = function (_SelectControl) {
 
 exports.default = Listbox;
 
-},{"./SelectControl":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\SelectControl.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Node.js":[function(require,module,exports){
+},{"./SelectControl":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\SelectControl.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Node.js":[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1425,6 +1669,11 @@ var Node = function () {
         observer.triggerPropertyChange(name, oldValue, newValue);
       });
     }
+
+    /**
+     * @returns {string}
+     */
+
   }, {
     key: "createDom",
     value: function createDom() {
@@ -1560,21 +1809,79 @@ var Node = function () {
 
       return this;
     }
+
+    /**
+     * @param {string} event
+     * @returns {Node}
+     */
+
   }, {
     key: "off",
     value: function off(event) {
       this.dom.off(event);
       return this;
     }
+
+    /**
+     * @param {string} event
+     * @param params
+     * @returns {*}
+     */
+
   }, {
     key: "trigger",
     value: function trigger(event, params) {
       return this.dom.trigger(event, params);
     }
+
+    /**
+     * @param {string} id
+     * @returns {Node}
+     */
+
   }, {
     key: "child",
     value: function child(id) {
       return null;
+    }
+
+    /**
+     * @param object
+     */
+
+  }, {
+    key: "loadSchema",
+    value: function loadSchema(object) {
+      for (var prop in object) {
+        if (object.hasOwnProperty(prop)) {
+          if (prop[0] === '_') {
+            continue;
+          }
+
+          var value = object[prop];
+
+          switch (prop) {
+            default:
+              this[prop] = value;
+              break;
+          }
+        }
+      }
+    }
+  }, {
+    key: "uuid",
+    get: function get() {
+      return this.dom.attr('uuid');
+    }
+
+    /**
+     * @param {string} value
+     */
+    ,
+    set: function set(value) {
+      this.dom.removeClass(this.uuid);
+      this.dom.attr('uuid', value);
+      this.dom.addClass(value);
     }
   }, {
     key: "id",
@@ -1734,14 +2041,6 @@ var Node = function () {
       this.__triggerPropertyChange('userData', value);
       this.dom.data('--user-data', value);
     }
-  }, {
-    key: "controller",
-    get: function get() {
-      return this._controller;
-    },
-    set: function set(object) {
-      this._controller = object;
-    }
   }], [{
     key: "getFromDom",
     value: function getFromDom(jqueryObject) {
@@ -1763,7 +2062,7 @@ var Node = function () {
 
 exports.default = Node;
 
-},{"./util/Utils":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\util\\Utils.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\PasswordField.js":[function(require,module,exports){
+},{"./util/Utils":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\util\\Utils.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\PasswordField.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1806,7 +2105,7 @@ var PasswordField = function (_TextInputControl) {
 
 exports.default = PasswordField;
 
-},{"./TextInputControl":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\TextInputControl.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\ProgressBar.js":[function(require,module,exports){
+},{"./TextInputControl":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\TextInputControl.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\ProgressBar.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1915,7 +2214,7 @@ var ProgressBar = function (_Node) {
 
 exports.default = ProgressBar;
 
-},{"./Node":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Node.js","./util/Utils":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\util\\Utils.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\SelectControl.js":[function(require,module,exports){
+},{"./Node":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Node.js","./util/Utils":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\util\\Utils.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\SelectControl.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2006,7 +2305,7 @@ var SelectControl = function (_Node) {
 
 exports.default = SelectControl;
 
-},{"./Node":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Node.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\TextArea.js":[function(require,module,exports){
+},{"./Node":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Node.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\TextArea.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2057,7 +2356,7 @@ var TextArea = function (_TextInputControl) {
 
 exports.default = TextArea;
 
-},{"./TextInputControl":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\TextInputControl.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\TextField.js":[function(require,module,exports){
+},{"./TextInputControl":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\TextInputControl.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\TextField.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2100,7 +2399,7 @@ var TextField = function (_TextInputControl) {
 
 exports.default = TextField;
 
-},{"./TextInputControl":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\TextInputControl.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\TextInputControl.js":[function(require,module,exports){
+},{"./TextInputControl":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\TextInputControl.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\TextInputControl.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2177,7 +2476,7 @@ var TextInputControl = function (_Node) {
 
 exports.default = TextInputControl;
 
-},{"./Node":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Node.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\ToggleButton.js":[function(require,module,exports){
+},{"./Node":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Node.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\ToggleButton.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2247,7 +2546,7 @@ var ToggleButton = function (_Button) {
 
 exports.default = ToggleButton;
 
-},{"./Button":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Button.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\UX.js":[function(require,module,exports){
+},{"./Button":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Button.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\UX.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2352,7 +2651,7 @@ exports.default = {
   Font: _Font2.default
 };
 
-},{"./AnchorPane":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\AnchorPane.js","./Button":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Button.js","./Checkbox":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Checkbox.js","./Combobox":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Combobox.js","./Container":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Container.js","./HBox":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\HBox.js","./ImageView":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\ImageView.js","./Label":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Label.js","./Labeled":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Labeled.js","./ListView":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\ListView.js","./Listbox":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Listbox.js","./Node":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Node.js","./PasswordField":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\PasswordField.js","./ProgressBar":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\ProgressBar.js","./TextArea":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\TextArea.js","./TextField":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\TextField.js","./TextInputControl":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\TextInputControl.js","./ToggleButton":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\ToggleButton.js","./VBox":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\VBox.js","./paint/Font":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\paint\\Font.js","./util/Utils":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\util\\Utils.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\VBox.js":[function(require,module,exports){
+},{"./AnchorPane":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\AnchorPane.js","./Button":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Button.js","./Checkbox":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Checkbox.js","./Combobox":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Combobox.js","./Container":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Container.js","./HBox":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\HBox.js","./ImageView":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\ImageView.js","./Label":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Label.js","./Labeled":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Labeled.js","./ListView":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\ListView.js","./Listbox":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Listbox.js","./Node":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Node.js","./PasswordField":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\PasswordField.js","./ProgressBar":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\ProgressBar.js","./TextArea":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\TextArea.js","./TextField":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\TextField.js","./TextInputControl":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\TextInputControl.js","./ToggleButton":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\ToggleButton.js","./VBox":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\VBox.js","./paint/Font":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\paint\\Font.js","./util/Utils":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\util\\Utils.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\VBox.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2432,7 +2731,7 @@ var VBox = function (_Container) {
 
 exports.default = VBox;
 
-},{"./Container":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Container.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\paint\\Font.js":[function(require,module,exports){
+},{"./Container":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Container.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\paint\\Font.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2588,7 +2887,7 @@ var Font = function () {
 
 exports.default = Font;
 
-},{"./../util/Utils":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\util\\Utils.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\util\\Utils.js":[function(require,module,exports){
+},{"./../util/Utils":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\util\\Utils.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\util\\Utils.js":[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2631,7 +2930,7 @@ var Utils = function () {
 
 exports.default = Utils;
 
-},{}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\lib.js":[function(require,module,exports){
+},{}],"E:\\Dev\\framework\\web\\src-js\\src\\lib.js":[function(require,module,exports){
 'use strict';
 
 var _NX = require('./NX/NX');
@@ -2647,6 +2946,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 window.NX = _NX2.default;
 window.UX = _UX2.default;
 
-},{"./NX/NX":"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\NX.js","./UX/UX":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\UX.js"}]},{},["D:\\dev\\personal\\framework\\web\\src-js\\src\\lib.js"])
+},{"./NX/NX":"E:\\Dev\\framework\\web\\src-js\\src\\NX\\NX.js","./UX/UX":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\UX.js"}]},{},["E:\\Dev\\framework\\web\\src-js\\src\\lib.js"])
 
 //# sourceMappingURL=dnext-engine.js.map

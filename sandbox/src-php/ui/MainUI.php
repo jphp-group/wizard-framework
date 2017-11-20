@@ -1,8 +1,11 @@
 <?php
 namespace ui;
 
+use framework\core\Logger;
 use framework\web\UI;
 use framework\web\ui\UXButton;
+use framework\web\ui\UXContainer;
+use framework\web\ui\UXHBox;
 use framework\web\ui\UXNode;
 
 /**
@@ -18,6 +21,17 @@ class MainUI extends UI
      */
     protected function makeView(): UXNode
     {
-        return new UXButton('Hello, World!');
+        $button = new UXButton('Hello, World!');
+        $button->on('click', function () use ($button) {
+            $this->alert('Привет Мир!');
+            $button->text = 'Done!';
+        });
+
+        $box = new UXHBox();
+        $box->height = '100%';
+        $box->align = ['center', 'center'];
+        $box->add($button);
+
+        return $box;
     }
 }

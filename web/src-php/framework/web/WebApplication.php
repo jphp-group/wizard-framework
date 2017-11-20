@@ -222,6 +222,41 @@ class WebApplication extends Application
             $response->contentType("application/json");
             $response->body((new JsonProcessor())->format($resource));
         });
+
+        $this->server->addWebSocket("$path/@ws/", [
+            'onConnect' => function (WebSocketSession $session) {
+            },
+
+            'onMessage' => function (WebSocketSession $session, $text) use ($uiClass) {
+                $message = (new JsonProcessor(JsonProcessor::DESERIALIZE_AS_ARRAYS))->parse($text);
+                $type = $message['type'];
+
+                /** @var UISocket $socket */
+                $sessionId = $message['sessionId'];
+
+                if (!($socket = $this->sessionInstances[$sessionId][UISocket::class])) {
+                    $this->sessionInstances[$sessionId][UISocket::class] = $socket = new UISocket();
+                }
+
+                Logger::trace("New UI socket message, (type = {0}, sessionId = {1})", $type, $sessionId);
+
+                switch ($type) {
+                    case 'initialize':
+                        $socket->initialize($uiClass, $session, $message);
+                        break;
+
+                    default:
+                        $socket->receiveMessage($uiClass, new SocketMessage($message));
+                        break;
+                }
+            },
+
+            'onClose' => function (WebSocketSession $session) use ($uiClass) {
+                /** @var UISocket $socket */
+                //$socket = $this->getInstance(UISocket::class);
+                //$socket->close($uiClass);
+            }
+        ]);
     }
 
     /**

@@ -1,6 +1,7 @@
 <?php
 namespace framework\core;
 
+use Closure;
 use php\lib\reflect;
 use php\lib\str;
 
@@ -13,7 +14,7 @@ abstract class Component
     /**
      * @var string
      */
-    public $id;
+    private $id;
 
     /**
      * @var array
@@ -125,12 +126,29 @@ abstract class Component
         }
     }
 
+    /**
+     * @return string
+     */
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param string $id
+     */
+    public function setId(string $id)
+    {
+        $this->id = $id;
+    }
+
     public function __get(string $name)
     {
         $method = "get$name";
 
         if (method_exists($this, $method)) {
-            return $method();
+            $closure = Closure::fromCallable([$this, $method]);
+            return $closure();
         }
 
         $method = "is$name";
@@ -146,7 +164,8 @@ abstract class Component
         $method = "set$name";
 
         if (method_exists($this, $method)) {
-            return $method($value);
+            $closure = Closure::fromCallable([$this, $method]);
+            return $closure($value);
         }
 
         throw new \Error("Property '$name' is not exists in class or readonly" . reflect::typeOf($this));

@@ -31,7 +31,7 @@ gulp.task('compile-sandbox', function () {
         fullPaths: true,
   });
 
-  bundler.transform("babelify", {presets: ['es2015']});
+  bundler.transform("babelify", {presets: ['es2015', 'es2016']});
 
   bundler.bundle()
     .on('error', function (err) {
@@ -54,7 +54,7 @@ gulp.task('compile', function() {
         fullPaths: env !== 'prod',
   });
 
-  bundler.transform("babelify", {presets: ['es2015']});
+  bundler.transform("babelify", {presets: ['es2015', 'es2016']});
 
   bundler.bundle()
     .on('error', function (err) {

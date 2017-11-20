@@ -4,7 +4,26 @@ import UX from './../UX/UX';
 
 class UILoader {
 
-  load(object) {
+  linkToMediator(node, data, uiMediator) {
+    if (uiMediator !== undefined) {
+      const watchedEvents = data['_watchedEvents'];
+      if (watchedEvents !== undefined) {
+        for (let watchedEvent of watchedEvents) {
+
+          node.on(watchedEvent, (e) => {
+            uiMediator.triggerEvent(node, watchedEvent, e);
+          })
+        }
+      }
+    }
+  }
+
+  /**
+   * @param object
+   * @param {UIMediator} uiMediator
+   * @returns {Node}
+   */
+  load(object, uiMediator) {
     if (object && typeof object === "object") {
       const type = object['_'];
 
@@ -25,11 +44,13 @@ class UILoader {
           const children = object['_content'];
 
           for (let i = 0; i < children.length; i++) {
-            const child = this.load(children[i]);
+            const child = this.load(children[i], uiMediator);
             node.add(child);
           }
         }
 
+        this.linkToMediator(node, object, uiMediator);
+        node.loadSchema(object);
         return node;
       } else {
         throw new Error(`Type '${type}' is not UI component class`);
@@ -37,13 +58,24 @@ class UILoader {
     }
   }
 
-  loadFromJson(jsonString) {
-    return this.load(JSON.parse(jsonString));
+    /**
+     * @param {string} jsonString
+     * @param {UIMediator} uiMediator
+     * @returns {Node}
+     */
+  loadFromJson(jsonString, uiMediator) {
+    return this.load(JSON.parse(jsonString), uiMediator);
   }
 
-  loadFromUrl(urlToJson, callback) {
+    /**
+     *
+     * @param {string} urlToJson
+     * @param {UIMediator} uiMediator
+     * @param {function} callback
+     */
+  loadFromUrl(urlToJson, uiMediator, callback) {
     jQuery.getJSON(urlToJson, (data) => {
-        callback(this.load(data));
+        callback(this.load(data, uiMediator));
     });
   }
 }

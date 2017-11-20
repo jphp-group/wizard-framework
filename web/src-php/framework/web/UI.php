@@ -3,10 +3,14 @@ namespace framework\web;
 
 use framework\core\Application;
 use framework\core\Component;
+use framework\core\Event;
+use framework\core\Logger;
+use framework\web\ui\UXContainer;
 use framework\web\ui\UXNode;
 use php\format\JsonProcessor;
 use php\http\HttpServerRequest;
 use php\http\HttpServerResponse;
+use php\http\WebSocketSession;
 use php\io\Stream;
 use php\lib\fs;
 use php\lib\reflect;
@@ -23,11 +27,23 @@ abstract class UI extends Component
     private $view;
 
     /**
+     * @var UISocket
+     */
+    private $socket;
+
+    /**
      * UI constructor.
      */
     public function __construct()
     {
         $this->view = $this->makeView();
+
+        $this->view->connectToUI($this);
+
+        $this->socket = Application::current()->getInstance(UISocket::class);
+        $this->socket->onMessage(reflect::typeOf($this), function (UIMessageEvent $e) {
+            $this->onMessage($e);
+        });
     }
 
     /**
@@ -52,6 +68,56 @@ abstract class UI extends Component
     }
 
     /**
+     * @param string $uuid
+     * @return UXNode|null
+     */
+    protected function findNodeByUuid(string $uuid, ?UXNode $view): ?UXNode
+    {
+        if ($view) {
+            if ($view->getUuid() === $uuid) {
+                return $view;
+            }
+
+            if ($view instanceof UXContainer) {
+                foreach ($view->children as $child) {
+                    if ($found = $this->findNodeByUuid($uuid, $child)) {
+                        return $found;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param UIMessageEvent $e
+     */
+    protected function onMessage(UIMessageEvent $e)
+    {
+        $message = $e->message();
+
+        switch ($message->getType()) {
+            case 'ui-trigger':
+                ['uuid' => $uuid, 'event' => $event] = $message->getData();
+                $node = $this->findNodeByUuid($uuid, $this->view);
+
+                if ($node) {
+                    Logger::info("Trigger event, uuid = {0}, event = {1}", $uuid, $event);
+                    $node->trigger(new Event($event, $node));
+                } else {
+                    Logger::warn('Failed to trigger "{0}", node with uid = {1} is not found', $event, $uuid);
+                }
+
+                break;
+
+            default:
+                Logger::warn('Unknown socket message (type = {0})', $message->getType());
+                break;
+        }
+    }
+
+    /**
      * @param HttpServerRequest $request
      * @param HttpServerResponse $response
      * @param string $path
@@ -68,8 +134,32 @@ abstract class UI extends Component
         $body = str::replace($body, '{{dnextJSUrl}}', '/dnext/engine-' . Application::current()->getStamp() . '.js');
 
         $body = str::replace($body, '{{uiSchemaUrl}}', "$path/@ui-schema");
+        $body = str::replace($body, '{{uiSocketUrl}}', "$path/@ws/");
+        $body = str::replace($body, '{{sessionId}}', $request->sessionId());
 
         $response->contentType('text/html');
         $response->body($body);
+    }
+
+    /**
+     * @param string $message
+     */
+    public function alert(string $message)
+    {
+        $this->socket->sendText(reflect::typeOf($this), 'ui-alert', ['text' => $message]);
+    }
+
+    /**
+     * @param UXNode $node
+     * @param string $property
+     * @param $value
+     */
+    public function changeNodeProperty(UXNode $node, string $property, $value)
+    {
+        $this->socket->sendText(reflect::typeOf($this), 'ui-set-property', [
+            'uuid' => $node->getUuid(),
+            'property' => $property,
+            'value' => $value
+        ]);
     }
 }
