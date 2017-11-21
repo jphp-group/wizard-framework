@@ -1,6 +1,15 @@
 import Node from './Node';
 
 class TextInputControl extends Node {
+  constructor() {
+    super();
+
+    this.dom.on('keydown.TextInputControl', (e) => {
+      if (this.uiMediator) {
+        setTimeout(() => this.uiMediator.sendUserInput(this, {text: this.text}), 0);
+      }
+    });
+  }
 
   get placeholder() {
     return this.dom.attr('placeholder');

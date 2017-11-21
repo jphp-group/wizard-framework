@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\App.js":[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"E:\\Dev\\framework\\web\\src-js\\src\\NX\\App.js":[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -62,7 +62,7 @@ var App = function () {
 
 exports.default = App;
 
-},{}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\NX.js":[function(require,module,exports){
+},{}],"E:\\Dev\\framework\\web\\src-js\\src\\NX\\NX.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -87,7 +87,7 @@ exports.default = {
   App: _App2.default, UILoader: _UILoader2.default, UIMediator: _UIMediator2.default
 };
 
-},{"./App":"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\App.js","./UILoader":"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\UILoader.js","./UIMediator":"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\UIMediator.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\UILoader.js":[function(require,module,exports){
+},{"./App":"E:\\Dev\\framework\\web\\src-js\\src\\NX\\App.js","./UILoader":"E:\\Dev\\framework\\web\\src-js\\src\\NX\\UILoader.js","./UIMediator":"E:\\Dev\\framework\\web\\src-js\\src\\NX\\UIMediator.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\NX\\UILoader.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -123,6 +123,8 @@ var UILoader = function () {
     key: 'linkToMediator',
     value: function linkToMediator(node, data, uiMediator) {
       if (uiMediator !== undefined) {
+        node.connectToMediator(uiMediator);
+
         var watchedEvents = data['_watchedEvents'];
         if (watchedEvents !== undefined) {
           var _iteratorNormalCompletion = true;
@@ -194,8 +196,8 @@ var UILoader = function () {
             }
           }
 
-          this.linkToMediator(node, object, uiMediator);
           node.loadSchema(object);
+          this.linkToMediator(node, object, uiMediator);
           return node;
         } else {
           throw new Error('Type \'' + type + '\' is not UI component class');
@@ -238,7 +240,7 @@ var UILoader = function () {
 
 exports.default = UILoader;
 
-},{"./../UX/Container":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Container.js","./../UX/Node":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Node.js","./../UX/UX":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\UX.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\UIMediator.js":[function(require,module,exports){
+},{"./../UX/Container":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Container.js","./../UX/Node":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Node.js","./../UX/UX":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\UX.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\NX\\UIMediator.js":[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -323,6 +325,20 @@ var UIMediator = function () {
     }
 
     /**
+     * @param node
+     * @param data
+     */
+
+  }, {
+    key: "sendUserInput",
+    value: function sendUserInput(node, data) {
+      this.sendIfCan('ui-user-input', {
+        'uuid': node.uuid,
+        'data': data
+      });
+    }
+
+    /**
      * @param type
      * @param message
      * @param callback
@@ -389,9 +405,18 @@ var UIMediator = function () {
   }, {
     key: "triggerEvent",
     value: function triggerEvent(node, event, e) {
+      var data = {
+        type: e.type,
+        which: e.which,
+        result: e.result,
+        namespace: e.namespace,
+        position: [e.pageX, e.pageY]
+      };
+
       this.sendIfCan('ui-trigger', {
         uuid: node.uuid,
-        event: event
+        event: event,
+        data: data
       });
     }
   }, {
@@ -457,7 +482,7 @@ var UIMediator = function () {
 
 exports.default = UIMediator;
 
-},{"../UX/Container":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Container.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\AnchorPane.js":[function(require,module,exports){
+},{"../UX/Container":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Container.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\AnchorPane.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -524,7 +549,7 @@ var AnchorPane = function (_Container) {
 
 exports.default = AnchorPane;
 
-},{"./Container":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Container.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Button.js":[function(require,module,exports){
+},{"./Container":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Container.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Button.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -598,7 +623,7 @@ var Button = function (_Labeled) {
 
 exports.default = Button;
 
-},{"./Labeled":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Labeled.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Checkbox.js":[function(require,module,exports){
+},{"./Labeled":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Labeled.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Checkbox.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -622,10 +647,17 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var Checkbox = function (_Labeled) {
   _inherits(Checkbox, _Labeled);
 
-  function Checkbox() {
+  function Checkbox(text, graphic) {
     _classCallCheck(this, Checkbox);
 
-    return _possibleConstructorReturn(this, (Checkbox.__proto__ || Object.getPrototypeOf(Checkbox)).apply(this, arguments));
+    var _this = _possibleConstructorReturn(this, (Checkbox.__proto__ || Object.getPrototypeOf(Checkbox)).call(this, text, graphic));
+
+    _this.dom.on('click.Checkbox', function () {
+      if (_this.uiMediator) {
+        _this.uiMediator.sendUserInput(_this, { selected: _this.selected });
+      }
+    });
+    return _this;
   }
 
   _createClass(Checkbox, [{
@@ -659,7 +691,7 @@ var Checkbox = function (_Labeled) {
 
 exports.default = Checkbox;
 
-},{"./Labeled":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Labeled.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Combobox.js":[function(require,module,exports){
+},{"./Labeled":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Labeled.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Combobox.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -705,7 +737,7 @@ var Combobox = function (_SelectControl) {
 
 exports.default = Combobox;
 
-},{"./SelectControl":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\SelectControl.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Container.js":[function(require,module,exports){
+},{"./SelectControl":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\SelectControl.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Container.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -903,7 +935,7 @@ var Container = function (_Node) {
 
 exports.default = Container;
 
-},{"./Node":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Node.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\HBox.js":[function(require,module,exports){
+},{"./Node":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Node.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\HBox.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -996,7 +1028,7 @@ var HBox = function (_Container) {
 
 exports.default = HBox;
 
-},{"./Container":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Container.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\ImageView.js":[function(require,module,exports){
+},{"./Container":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Container.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\ImageView.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1127,7 +1159,7 @@ var ImageView = function (_Node) {
 
 exports.default = ImageView;
 
-},{"./Node":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Node.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Label.js":[function(require,module,exports){
+},{"./Node":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Node.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Label.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1170,7 +1202,7 @@ var Label = function (_Labeled) {
 
 exports.default = Label;
 
-},{"./Labeled":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Labeled.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Labeled.js":[function(require,module,exports){
+},{"./Labeled":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Labeled.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Labeled.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1464,7 +1496,7 @@ var Labeled = function (_Node) {
 
 exports.default = Labeled;
 
-},{"./ImageView":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\ImageView.js","./Node":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Node.js","./paint/Font":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\paint\\Font.js","./util/Utils":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\util\\Utils.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\ListView.js":[function(require,module,exports){
+},{"./ImageView":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\ImageView.js","./Node":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Node.js","./paint/Font":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\paint\\Font.js","./util/Utils":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\util\\Utils.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\ListView.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1585,7 +1617,7 @@ var ListView = function (_Container) {
 
 exports.default = ListView;
 
-},{"./Container":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Container.js","./Node":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Node.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Listbox.js":[function(require,module,exports){
+},{"./Container":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Container.js","./Node":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Node.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Listbox.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1632,7 +1664,7 @@ var Listbox = function (_SelectControl) {
 
 exports.default = Listbox;
 
-},{"./SelectControl":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\SelectControl.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Node.js":[function(require,module,exports){
+},{"./SelectControl":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\SelectControl.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Node.js":[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1720,7 +1752,7 @@ var Node = function () {
     }
 
     /**
-     * @returns {string}
+     * @returns {UIMediator}
      */
 
   }, {
@@ -1917,6 +1949,26 @@ var Node = function () {
         }
       }
     }
+
+    /**
+     * @param {UIMediator} uiMediator
+     */
+
+  }, {
+    key: "connectToMediator",
+    value: function connectToMediator(uiMediator) {
+      this.dom.data('--ui-mediator', uiMediator);
+    }
+  }, {
+    key: "uiMediator",
+    get: function get() {
+      return this.dom.data('--ui-mediator') || null;
+    }
+
+    /**
+     * @returns {string}
+     */
+
   }, {
     key: "uuid",
     get: function get() {
@@ -2111,7 +2163,7 @@ var Node = function () {
 
 exports.default = Node;
 
-},{"./util/Utils":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\util\\Utils.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\PasswordField.js":[function(require,module,exports){
+},{"./util/Utils":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\util\\Utils.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\PasswordField.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2154,7 +2206,7 @@ var PasswordField = function (_TextInputControl) {
 
 exports.default = PasswordField;
 
-},{"./TextInputControl":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\TextInputControl.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\ProgressBar.js":[function(require,module,exports){
+},{"./TextInputControl":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\TextInputControl.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\ProgressBar.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2263,7 +2315,7 @@ var ProgressBar = function (_Node) {
 
 exports.default = ProgressBar;
 
-},{"./Node":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Node.js","./util/Utils":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\util\\Utils.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\SelectControl.js":[function(require,module,exports){
+},{"./Node":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Node.js","./util/Utils":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\util\\Utils.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\SelectControl.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2354,7 +2406,7 @@ var SelectControl = function (_Node) {
 
 exports.default = SelectControl;
 
-},{"./Node":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Node.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\TextArea.js":[function(require,module,exports){
+},{"./Node":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Node.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\TextArea.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2405,7 +2457,7 @@ var TextArea = function (_TextInputControl) {
 
 exports.default = TextArea;
 
-},{"./TextInputControl":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\TextInputControl.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\TextField.js":[function(require,module,exports){
+},{"./TextInputControl":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\TextInputControl.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\TextField.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2448,7 +2500,7 @@ var TextField = function (_TextInputControl) {
 
 exports.default = TextField;
 
-},{"./TextInputControl":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\TextInputControl.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\TextInputControl.js":[function(require,module,exports){
+},{"./TextInputControl":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\TextInputControl.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\TextInputControl.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2475,7 +2527,16 @@ var TextInputControl = function (_Node) {
   function TextInputControl() {
     _classCallCheck(this, TextInputControl);
 
-    return _possibleConstructorReturn(this, (TextInputControl.__proto__ || Object.getPrototypeOf(TextInputControl)).apply(this, arguments));
+    var _this = _possibleConstructorReturn(this, (TextInputControl.__proto__ || Object.getPrototypeOf(TextInputControl)).call(this));
+
+    _this.dom.on('keydown.TextInputControl', function (e) {
+      if (_this.uiMediator) {
+        setTimeout(function () {
+          return _this.uiMediator.sendUserInput(_this, { text: _this.text });
+        }, 0);
+      }
+    });
+    return _this;
   }
 
   _createClass(TextInputControl, [{
@@ -2525,7 +2586,7 @@ var TextInputControl = function (_Node) {
 
 exports.default = TextInputControl;
 
-},{"./Node":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Node.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\ToggleButton.js":[function(require,module,exports){
+},{"./Node":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Node.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\ToggleButton.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2595,7 +2656,7 @@ var ToggleButton = function (_Button) {
 
 exports.default = ToggleButton;
 
-},{"./Button":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Button.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\UX.js":[function(require,module,exports){
+},{"./Button":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Button.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\UX.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2700,7 +2761,7 @@ exports.default = {
   Font: _Font2.default
 };
 
-},{"./AnchorPane":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\AnchorPane.js","./Button":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Button.js","./Checkbox":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Checkbox.js","./Combobox":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Combobox.js","./Container":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Container.js","./HBox":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\HBox.js","./ImageView":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\ImageView.js","./Label":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Label.js","./Labeled":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Labeled.js","./ListView":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\ListView.js","./Listbox":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Listbox.js","./Node":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Node.js","./PasswordField":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\PasswordField.js","./ProgressBar":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\ProgressBar.js","./TextArea":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\TextArea.js","./TextField":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\TextField.js","./TextInputControl":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\TextInputControl.js","./ToggleButton":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\ToggleButton.js","./VBox":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\VBox.js","./paint/Font":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\paint\\Font.js","./util/Utils":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\util\\Utils.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\VBox.js":[function(require,module,exports){
+},{"./AnchorPane":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\AnchorPane.js","./Button":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Button.js","./Checkbox":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Checkbox.js","./Combobox":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Combobox.js","./Container":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Container.js","./HBox":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\HBox.js","./ImageView":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\ImageView.js","./Label":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Label.js","./Labeled":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Labeled.js","./ListView":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\ListView.js","./Listbox":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Listbox.js","./Node":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Node.js","./PasswordField":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\PasswordField.js","./ProgressBar":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\ProgressBar.js","./TextArea":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\TextArea.js","./TextField":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\TextField.js","./TextInputControl":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\TextInputControl.js","./ToggleButton":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\ToggleButton.js","./VBox":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\VBox.js","./paint/Font":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\paint\\Font.js","./util/Utils":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\util\\Utils.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\VBox.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2780,7 +2841,7 @@ var VBox = function (_Container) {
 
 exports.default = VBox;
 
-},{"./Container":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\Container.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\paint\\Font.js":[function(require,module,exports){
+},{"./Container":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\Container.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\paint\\Font.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2936,7 +2997,7 @@ var Font = function () {
 
 exports.default = Font;
 
-},{"./../util/Utils":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\util\\Utils.js"}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\util\\Utils.js":[function(require,module,exports){
+},{"./../util/Utils":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\util\\Utils.js"}],"E:\\Dev\\framework\\web\\src-js\\src\\UX\\util\\Utils.js":[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2979,7 +3040,7 @@ var Utils = function () {
 
 exports.default = Utils;
 
-},{}],"D:\\dev\\personal\\framework\\web\\src-js\\src\\lib.js":[function(require,module,exports){
+},{}],"E:\\Dev\\framework\\web\\src-js\\src\\lib.js":[function(require,module,exports){
 'use strict';
 
 var _NX = require('./NX/NX');
@@ -2995,6 +3056,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 window.NX = _NX2.default;
 window.UX = _UX2.default;
 
-},{"./NX/NX":"D:\\dev\\personal\\framework\\web\\src-js\\src\\NX\\NX.js","./UX/UX":"D:\\dev\\personal\\framework\\web\\src-js\\src\\UX\\UX.js"}]},{},["D:\\dev\\personal\\framework\\web\\src-js\\src\\lib.js"])
+},{"./NX/NX":"E:\\Dev\\framework\\web\\src-js\\src\\NX\\NX.js","./UX/UX":"E:\\Dev\\framework\\web\\src-js\\src\\UX\\UX.js"}]},{},["E:\\Dev\\framework\\web\\src-js\\src\\lib.js"])
 
 //# sourceMappingURL=dnext-engine.js.map

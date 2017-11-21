@@ -75,6 +75,7 @@ abstract class Component
      */
     public function on(string $eventType, callable $handler, string $group = 'general')
     {
+        $eventType = str::lower($eventType);
         $this->eventHandlers[$eventType][$group] = $handler;
     }
 
@@ -95,6 +96,8 @@ abstract class Component
      */
     public function off(string $eventType, ?string $group = null)
     {
+        $eventType = str::lower($eventType);
+
         if ($group) {
             unset($this->eventHandlers[$eventType][$group]);
         } else {
@@ -109,7 +112,7 @@ abstract class Component
      */
     public function trigger(Event $e, ?string $group = null)
     {
-        $eventType = $e->type;
+        $eventType = str::lower($e->type);
 
         if ($group) {
             if ($handler = $this->eventHandlers[$eventType][$group]) {
@@ -153,7 +156,8 @@ abstract class Component
 
         $method = "is$name";
         if (method_exists($this, $method)) {
-            return (bool) $method();
+            $closure = Closure::fromCallable([$this, $method]);
+            return (bool) $closure();
         }
 
         throw new \Error("Property '$name' is not exists in class " . reflect::typeOf($this));

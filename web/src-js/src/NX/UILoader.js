@@ -6,11 +6,13 @@ class UILoader {
 
   linkToMediator(node, data, uiMediator) {
     if (uiMediator !== undefined) {
+      node.connectToMediator(uiMediator);
+
       const watchedEvents = data['_watchedEvents'];
       if (watchedEvents !== undefined) {
         for (let watchedEvent of watchedEvents) {
 
-          node.on(watchedEvent, (e) => {
+          node.on(`${watchedEvent}.UIMediator`, (e) => {
             uiMediator.triggerEvent(node, watchedEvent, e);
           })
         }
@@ -49,8 +51,8 @@ class UILoader {
           }
         }
 
-        this.linkToMediator(node, object, uiMediator);
         node.loadSchema(object);
+        this.linkToMediator(node, object, uiMediator);
         return node;
       } else {
         throw new Error(`Type '${type}' is not UI component class`);

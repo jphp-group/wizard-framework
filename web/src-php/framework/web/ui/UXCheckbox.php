@@ -37,4 +37,11 @@ class UXCheckbox extends UXLabeled
     {
         $this->selected = $selected;
     }
+
+    public function provideUserInput(array $data)
+    {
+        if (isset($data['selected'])) {
+            $this->selected = $data['selected'];
+        }
+    }
 }

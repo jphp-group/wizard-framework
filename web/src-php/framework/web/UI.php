@@ -99,14 +99,26 @@ abstract class UI extends Component
 
         switch ($message->getType()) {
             case 'ui-trigger':
-                ['uuid' => $uuid, 'event' => $event] = $message->getData();
+                ['uuid' => $uuid, 'event' => $event, 'data' => $data] = $message->getData();
                 $node = $this->findNodeByUuid($uuid, $this->view);
 
                 if ($node) {
                     Logger::info("Trigger event, uuid = {0}, event = {1}", $uuid, $event);
-                    $node->trigger(new Event($event, $node));
+                    $node->trigger(new Event($event, $node, $this, $data));
                 } else {
                     Logger::warn('Failed to trigger "{0}", node with uid = {1} is not found', $event, $uuid);
+                }
+
+                break;
+
+            case 'ui-user-input':
+                ['uuid' => $uuid, 'data' => $data] = $message->getData();
+                $node = $this->findNodeByUuid($uuid, $this->view);
+
+                if ($node) {
+                    $node->provideUserInput((array) $data);
+                } else {
+                    Logger::warn('Failed to provide user input, node with uid = {1} is not found', $uuid);
                 }
 
                 break;
@@ -185,7 +197,7 @@ abstract class UI extends Component
     {
         $this->socket->sendText(reflect::typeOf($this), 'ui-event-link', [
             'uuid' => $node->getUuid(),
-            'event' => $eventType,
+            'event' => str::lower($eventType),
         ]);
     }
 }

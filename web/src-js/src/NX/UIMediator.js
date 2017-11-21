@@ -63,6 +63,17 @@ class UIMediator
   }
 
   /**
+   * @param node
+   * @param data
+   */
+  sendUserInput(node, data) {
+    this.sendIfCan('ui-user-input', {
+      'uuid': node.uuid,
+      'data': data
+    });
+  }
+
+  /**
    * @param type
    * @param message
    * @param callback
@@ -121,9 +132,18 @@ class UIMediator
   }
 
   triggerEvent(node, event, e) {
+    const data = {
+      type: e.type,
+      which: e.which,
+      result: e.result,
+      namespace: e.namespace,
+      position: [e.pageX, e.pageY]
+    };
+
     this.sendIfCan('ui-trigger', {
       uuid: node.uuid,
-      event: event
+      event: event,
+      data: data,
     });
   }
 
@@ -167,9 +187,9 @@ class UIMediator
     const node = this.findNodeByUuid(uuid, this.node);
 
     if (node !== null) {
-      node.off(event);
+      node.off(`${event}.UIMediator`);
 
-      node.on(event, (e) => {
+      node.on(`${event}.UIMediator`, (e) => {
         this.triggerEvent(node, event, e);
       })
     } else {

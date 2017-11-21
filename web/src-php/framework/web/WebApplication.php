@@ -168,6 +168,7 @@ class WebApplication extends Application
 
         Logger::info("Add DNext Engine:");
         Logger::info("\t-> GET {0}", $jsUrl);
+        Logger::info("\t-> GET {0}", $mapUrl);
         Logger::info("\t-> GET {0}", $cssUrl);
         Logger::info("\t-> WS {0}", "/dnext/ws");
 

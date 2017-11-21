@@ -80,7 +80,7 @@ abstract class UXNode extends Component implements UXViewable
         $view['_watchedEvents'] = [];
 
         foreach ($this->eventHandlers as $event => $handlers) {
-            $view['_watchedEvents'][] = $event;
+            $view['_watchedEvents'][] = str::lower($event);
         }
 
         return $view;
@@ -241,5 +241,10 @@ abstract class UXNode extends Component implements UXViewable
         if ($this->connectedUi) {
             $this->connectedUi->changeNodeProperty($this, $property, $value);
         }
+    }
+
+    public function provideUserInput(array $data)
+    {
+        // nop.
     }
 }

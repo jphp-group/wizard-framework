@@ -8,6 +8,7 @@ namespace framework\core;
  * @property Component $sender
  * @property Component|null $context
  * @property string $type
+ * @property array $data
  */
 class Event
 {
@@ -32,16 +33,23 @@ class Event
     private $context;
 
     /**
+     * @var array
+     */
+    private $data = [];
+
+    /**
      * Event constructor.
      * @param string $type
      * @param Component $sender
      * @param Component|null $context
+     * @param array|null $data
      */
-    public function __construct(string $type, Component $sender, ?Component $context = null)
+    public function __construct(string $type, Component $sender, ?Component $context = null, ?array $data = null)
     {
         $this->type = $type;
         $this->sender = $sender;
         $this->context = $context;
+        $this->data = $data;
     }
 
     /**
@@ -62,7 +70,7 @@ class Event
 
     /**
      * @param string $name
-     * @return object|string
+     * @return object|string|array
      * @throws \Error
      */
     public function __get(string $name)
@@ -71,6 +79,7 @@ class Event
             case "type": return $this->type;
             case "sender": return $this->sender;
             case "context": return $this->context;
+            case "data": return $this->data;
         }
 
         throw new \Error("Property '$name' is not found");

@@ -41,6 +41,13 @@ class Node {
   }
 
   /**
+   * @returns {UIMediator}
+   */
+  get uiMediator() {
+    return this.dom.data('--ui-mediator') || null;
+  }
+
+  /**
    * @returns {string}
    */
   get uuid() {
@@ -371,6 +378,13 @@ class Node {
         }
       }
     }
+  }
+
+  /**
+   * @param {UIMediator} uiMediator
+   */
+  connectToMediator(uiMediator) {
+    this.dom.data('--ui-mediator', uiMediator);
   }
 
   static getFromDom(jqueryObject) {

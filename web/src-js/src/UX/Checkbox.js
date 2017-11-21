@@ -1,6 +1,16 @@
 import Labeled from './Labeled';
 
 class Checkbox extends Labeled {
+  constructor(text, graphic) {
+    super(text, graphic);
+
+    this.dom.on('click.Checkbox', () => {
+      if (this.uiMediator) {
+        this.uiMediator.sendUserInput(this, {selected: this.selected});
+      }
+    });
+  }
+
   createDom() {
       const dom = jQuery('<label><input type="checkbox"> <span class="ux-labeled-text"></span></label>');
       dom.addClass('ux-labeled');

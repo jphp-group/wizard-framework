@@ -2,6 +2,10 @@ label {
   margin-bottom: 0;
 }
 
+.form-control {
+    display: inline-block;
+}
+
 /* Labeled */
 .ux-labeled {
   display: inline-flex;

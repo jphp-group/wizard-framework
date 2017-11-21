@@ -95,4 +95,14 @@ abstract class UXTextInputControl extends UXNode
     {
         $this->text = $text;
     }
+
+    /**
+     * @param array $data
+     */
+    public function provideUserInput(array $data)
+    {
+        if (isset($data['text'])) {
+            $this->text = $data['text'];
+        }
+    }
 }

@@ -4,6 +4,9 @@ namespace framework\web\ui;
 /**
  * Class UXLabeled
  * @package framework\web\ui
+ *
+ * @property string $text
+ *
  */
 abstract class UXLabeled extends UXNode
 {
