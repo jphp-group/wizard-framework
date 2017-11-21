@@ -6,26 +6,24 @@ namespace framework\web\ui;
  * @package framework\web\ui
  *
  * @property string $text
+ * @property string $kind
+ *
  */
-class UXButton extends UXNode
+class UXButton extends UXLabeled
 {
+    const KIND_DEFAULT = 'default';
+    const KIND_PRIMARY = 'primary';
+    const KIND_SUCCESS = 'success';
+    const KIND_INFO    = 'info';
+    const KIND_WARNING = 'warning';
+    const KIND_DANGER  = 'danger';
+    const KIND_LINK    = 'link';
+
     /**
+     * default, primary, success, info, warning, danger, link
      * @var string
      */
-    private $text;
-
-    /**
-     * UXButton constructor.
-     * @param string|null $text
-     */
-    public function __construct(string $text = null)
-    {
-        parent::__construct();
-
-        if ($text) {
-            $this->setText($text);
-        }
-    }
+    private $kind = 'default';
 
     /**
      * @return string
@@ -35,19 +33,20 @@ class UXButton extends UXNode
         return 'Button';
     }
 
+
     /**
      * @return string
      */
-    public function getText(): string
+    public function getKind(): string
     {
-        return $this->text;
+        return $this->kind;
     }
 
     /**
-     * @param string $text
+     * @param string $kind
      */
-    public function setText(string $text)
+    public function setKind(string $kind)
     {
-        $this->text = $text;
+        $this->kind = $kind;
     }
 }

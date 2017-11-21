@@ -27,20 +27,20 @@ class VBox extends Container {
 
   set spacing(value) {
     this._spacing = value;
-    var slots = this.dom.find('> div');
+    const slots = this.dom.find('> div');
 
     slots.css('margin-bottom', value + 'px');
     slots.last().css('margin-bottom', 0);
   }
 
   createDom() {
-    var dom = super.createDom();
+    const dom = super.createDom();
     dom.addClass('ux-v-box');
     return dom;
   }
 
   createSlotDom(object) {
-    var dom = super.createSlotDom(object);
+    const dom = super.createSlotDom(object);
     return dom;
   }
 }

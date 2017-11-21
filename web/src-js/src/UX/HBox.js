@@ -27,21 +27,21 @@ class HBox extends Container {
 
   set spacing(value) {
     this._spacing = value;
-    var slots = this.dom.find('> div');
+    const slots = this.dom.find('> div');
 
     slots.css('margin-right', value + 'px');
     slots.last().css('margin-right', 0);
   }
 
   createDom() {
-    var dom = super.createDom();
+    const dom = super.createDom();
     dom.addClass('ux-h-box');
 
     return dom;
   }
 
   createSlotDom(object) {
-    var dom = super.createSlotDom(object);
+    const dom = super.createSlotDom(object);
     return dom;
   }
 

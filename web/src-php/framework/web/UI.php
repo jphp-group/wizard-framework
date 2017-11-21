@@ -162,4 +162,30 @@ abstract class UI extends Component
             'value' => $value
         ]);
     }
+
+    /**
+     * @param UXNode $node
+     * @param string $method
+     * @param array $args
+     */
+    public function callNodeMethod(UXNode $node, string $method, array $args = [])
+    {
+        $this->socket->sendText(reflect::typeOf($this), 'ui-call-method', [
+            'uuid' => $node->getUuid(),
+            'method' => $method,
+            'args' => $args
+        ]);
+    }
+
+    /**
+     * @param UXNode $node
+     * @param string $eventType
+     */
+    public function addEventLink(UXNode $node, string $eventType)
+    {
+        $this->socket->sendText(reflect::typeOf($this), 'ui-event-link', [
+            'uuid' => $node->getUuid(),
+            'event' => $eventType,
+        ]);
+    }
 }

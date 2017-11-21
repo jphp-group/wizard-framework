@@ -50,6 +50,14 @@ class UIMediator
         case "ui-set-property":
           this.triggerSetProperty(message);
           break;
+
+        case "ui-call-method":
+          this.triggerCallMethod(message);
+          break;
+
+        case "ui-event-link":
+          this.triggerOnEventLink(message);
+          break;
       }
     };
   }
@@ -124,6 +132,20 @@ class UIMediator
     alert(text);
   }
 
+  triggerCallMethod(message) {
+    const uuid = message['uuid'];
+    const method = message['method'];
+    const args = message['args'] || [];
+
+    const node = this.findNodeByUuid(uuid, this.node);
+
+    if (node !== null) {
+      node[method].apply(node, args);
+    } else {
+      console.warn(`Failed to set property, node with uuid = ${uuid} is not found`);
+    }
+  }
+
   triggerSetProperty(message) {
     const uuid = message['uuid'];
     const property = message['property'];
@@ -135,6 +157,23 @@ class UIMediator
       node[property] = value;
     } else {
       console.warn(`Failed to set property, node with uuid = ${uuid} is not found`);
+    }
+  }
+
+  triggerOnEventLink(message) {
+    const uuid = message['uuid'];
+    const event = message['event'];
+
+    const node = this.findNodeByUuid(uuid, this.node);
+
+    if (node !== null) {
+      node.off(event);
+
+      node.on(event, (e) => {
+        this.triggerEvent(node, event, e);
+      })
+    } else {
+      console.warn(`Failed to link event ${event}, node with uuid = ${uuid} is not found`);
     }
   }
 }

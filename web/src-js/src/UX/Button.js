@@ -27,7 +27,7 @@ class Button extends Labeled {
     }
 
     createDom() {
-        var dom = jQuery('<button><span class="ux-labeled-text"></span></button>');
+        const dom = jQuery('<button><span class="ux-labeled-text"></span></button>');
         dom.addClass('ux-labeled');
         dom.addClass('ux-button');
 

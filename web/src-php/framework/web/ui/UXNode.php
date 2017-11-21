@@ -34,9 +34,14 @@ abstract class UXNode extends Component implements UXViewable
     private $height;
 
     /**
-     * @var array
+     * @var bool
      */
-    protected $state = [];
+    private $visible = true;
+
+    /**
+     * @var bool
+     */
+    private $enabled = true;
 
     /**
      * @var UI
@@ -131,11 +136,40 @@ abstract class UXNode extends Component implements UXViewable
 
     public function __set(string $name, $value)
     {
-        if ($this->connectedUi) {
-            $this->connectedUi->changeNodeProperty($this, $name, $value);
-        }
-
+        $this->changeRemoteProperty($name, $value);
         parent::__set($name, $value);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isVisible(): bool
+    {
+        return $this->visible;
+    }
+
+    /**
+     * @param bool $visible
+     */
+    public function setVisible(bool $visible)
+    {
+        $this->visible = $visible;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
+    }
+
+    /**
+     * @param bool $enabled
+     */
+    public function setEnabled(bool $enabled)
+    {
+        $this->enabled = $enabled;
     }
 
     /**
@@ -144,5 +178,68 @@ abstract class UXNode extends Component implements UXViewable
     public function connectToUI(?UI $ui)
     {
         $this->connectedUi = $ui;
+    }
+
+
+    public function toFront()
+    {
+        $this->callRemoteMethod(__FUNCTION__);
+    }
+
+    public function toBack()
+    {
+        $this->callRemoteMethod(__FUNCTION__);
+    }
+
+    public function hide()
+    {
+        $this->visible = false;
+        $this->changeRemoteProperty('visible', false);
+    }
+
+    public function show()
+    {
+        $this->visible = true;
+        $this->changeRemoteProperty('visible', true);
+    }
+
+    public function toggle()
+    {
+        if ($this->visible) {
+            $this->hide();
+        } else {
+            $this->show();
+        }
+    }
+
+    public function on(string $eventType, callable $handler, string $group = 'general')
+    {
+        parent::on($eventType, $handler, $group);
+
+        if ($this->connectedUi) {
+            $this->connectedUi->addEventLink($this, $eventType);
+        }
+    }
+
+    /**
+     * @param string$method
+     * @param array $args
+     */
+    public function callRemoteMethod(string $method, array $args = [])
+    {
+        if ($this->connectedUi) {
+            $this->connectedUi->callNodeMethod($this, $method, $args);
+        }
+    }
+
+    /**
+     * @param string $property
+     * @param $value
+     */
+    public function changeRemoteProperty(string $property, $value)
+    {
+        if ($this->connectedUi) {
+            $this->connectedUi->changeNodeProperty($this, $property, $value);
+        }
     }
 }

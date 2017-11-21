@@ -2,7 +2,7 @@ import Labeled from './Labeled';
 
 class Checkbox extends Labeled {
   createDom() {
-      var dom = jQuery('<label><input type="checkbox"> <span class="ux-labeled-text"></span></label>');
+      const dom = jQuery('<label><input type="checkbox"> <span class="ux-labeled-text"></span></label>');
       dom.addClass('ux-labeled');
       dom.addClass('ux-checkbox');
       return dom;

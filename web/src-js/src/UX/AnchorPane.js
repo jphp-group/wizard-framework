@@ -2,7 +2,7 @@ import Container from './Container';
 
 class AnchorPane extends Container {
   createDom() {
-    var dom = super.createDom();
+    const dom = super.createDom();
     dom.addClass('ux-anchor-pane');
     return dom;
   }
@@ -13,14 +13,14 @@ class AnchorPane extends Container {
   }
 
   childToBack(object) {
-    var dom = object.dom;
+    const dom = object.dom;
     dom.detach();
 
     this.dom.prepend(dom);
   }
 
   childToFront(object) {
-    var dom = object.dom;
+    const dom = object.dom;
     dom.detach();
     this.dom.append(dom);
   }

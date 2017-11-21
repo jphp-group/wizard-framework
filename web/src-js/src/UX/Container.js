@@ -146,6 +146,11 @@ class Container extends Node {
   clear() {
     this.dom.empty();
   }
+
+  show() {
+    this.dom.css('display', '');
+    return this;
+  }
 }
 
 export default Container;

@@ -73,9 +73,9 @@ class Node {
     this.__triggerPropertyChange('visible', value);
 
     if (value) {
-      this.dom.show();
+      this.show();
     } else {
-      this.dom.hide();
+      this.hide();
     }
   }
 
@@ -303,7 +303,7 @@ class Node {
   }
 
   show() {
-    this.dom.show();
+    this.dom.css('display', '');
     return this;
   }
 
