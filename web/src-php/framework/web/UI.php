@@ -252,7 +252,7 @@ abstract class UI extends Component
     protected function findNodeByUuid(string $uuid, ?UINode $view): ?UINode
     {
         if ($view) {
-            if ($view->getUuid() === $uuid) {
+            if ($view->uuid === $uuid) {
                 return $view;
             }
 
@@ -396,7 +396,7 @@ abstract class UI extends Component
     public function changeNodeProperty(UINode $node, string $property, $value)
     {
         $this->socket->sendText(reflect::typeOf($this), 'ui-set-property', [
-            'uuid' => $node->getUuid(),
+            'uuid' => $node->uuid,
             'property' => $property,
             'value' => $this->prepareValue($value)
         ]);
@@ -412,7 +412,7 @@ abstract class UI extends Component
         $args = $this->prepareValue($args);
 
         $this->socket->sendText(reflect::typeOf($this), 'ui-call-method', [
-            'uuid' => $node->getUuid(),
+            'uuid' => $node->uuid,
             'method' => $method,
             'args' => $args
         ]);
@@ -431,7 +431,7 @@ abstract class UI extends Component
         }
 
         $this->socket->sendText(reflect::typeOf($this), 'ui-event-link', [
-            'uuid' => $node->getUuid(),
+            'uuid' => $node->uuid,
             'event' => str::lower($eventType),
         ]);
     }

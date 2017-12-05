@@ -72,6 +72,44 @@ class Node {
     this.dom.attr('id', value);
   }
 
+  /**
+   * @returns {Array}
+   */
+  get classes() {
+    return this.dom.data('custom-classes') || [];
+  }
+
+  /**
+   * @param {Array} value
+   */
+  set classes(value) {
+    const oldClasses = this.classes;
+    let classes = [];
+
+    if (value instanceof Array) {
+      classes = value;
+    } else {
+      classes = value.toString().split(' ');
+    }
+
+    this.dom.data('custom-classes', classes);
+
+    if (oldClasses.length > 0) {
+      this.dom.removeClass(oldClasses.join(' '));
+    }
+
+    this.dom.addClass(classes.join(' '));
+  }
+
+  get style() {
+    return this.dom.attr('style');
+  }
+
+  set style(value) {
+    this.__triggerPropertyChange('style', value);
+    this.dom.attr('style', value);
+  }
+
   get visible() {
     return this.dom.is(':visible');
   }
@@ -389,6 +427,10 @@ class Node {
             break;
         }
       }
+    }
+
+    if (object.classes) {
+      this.classes = object.classes;
     }
   }
 

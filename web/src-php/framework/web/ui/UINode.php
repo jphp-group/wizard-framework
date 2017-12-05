@@ -5,6 +5,7 @@ namespace framework\web\ui;
 use framework\core\Component;
 use framework\core\Event;
 use framework\web\UI;
+use php\lib\arr;
 use php\lib\str;
 
 /**
@@ -12,6 +13,8 @@ use php\lib\str;
  *
  * @property string $id
  * @property string $uuid
+ * @property string $style
+ * @property array|string $classes
  * @property mixed $width
  * @property mixed $height
  * @property array $size
@@ -26,6 +29,16 @@ abstract class UINode extends Component implements UIViewable
      * @var string
      */
     private $uuid;
+
+    /**
+     * @var string
+     */
+    private $style = '';
+
+    /**
+     * @var array
+     */
+    private $classes = [];
 
     /**
      * @var string|int
@@ -101,54 +114,6 @@ abstract class UINode extends Component implements UIViewable
         return $view;
     }
 
-    /**
-     * @return string
-     */
-    public function getUuid(): string
-    {
-        return $this->uuid;
-    }
-
-    /**
-     * @param string $uuid
-     */
-    public function setUuid(string $uuid)
-    {
-        $this->uuid = $uuid;
-    }
-
-    /**
-     * @return int|string
-     */
-    public function getWidth()
-    {
-        return $this->width;
-    }
-
-    /**
-     * @param int|string $width
-     */
-    public function setWidth($width)
-    {
-        $this->width = $width;
-    }
-
-    /**
-     * @return int|string
-     */
-    public function getHeight()
-    {
-        return $this->height;
-    }
-
-    /**
-     * @param int|string $height
-     */
-    public function setHeight($height)
-    {
-        $this->height = $height;
-    }
-
     public function __set(string $name, $value)
     {
         $this->changeRemoteProperty($name, $value);
@@ -156,9 +121,89 @@ abstract class UINode extends Component implements UIViewable
     }
 
     /**
+     * @return string
+     */
+    protected function getUuid(): string
+    {
+        return $this->uuid;
+    }
+
+    /**
+     * @param string $uuid
+     */
+    protected function setUuid(string $uuid)
+    {
+        $this->uuid = $uuid;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getStyle(): string
+    {
+        return $this->style;
+    }
+
+    /**
+     * @param string $style
+     */
+    protected function setStyle(string $style)
+    {
+        $this->style = $style;
+    }
+
+    /**
+     * @return array|string
+     */
+    protected function getClasses(): array
+    {
+        return (array) $this->classes;
+    }
+
+    /**
+     * @param array|string $classes
+     */
+    protected function setClasses($classes)
+    {
+        $this->classes = is_array($classes) ? $classes : str::split(' ', $classes);
+    }
+
+    /**
+     * @return int|string
+     */
+    protected function getWidth()
+    {
+        return $this->width;
+    }
+
+    /**
+     * @param int|string $width
+     */
+    protected function setWidth($width)
+    {
+        $this->width = $width;
+    }
+
+    /**
+     * @return int|string
+     */
+    protected function getHeight()
+    {
+        return $this->height;
+    }
+
+    /**
+     * @param int|string $height
+     */
+    protected function setHeight($height)
+    {
+        $this->height = $height;
+    }
+
+    /**
      * @return bool
      */
-    public function isVisible(): bool
+    protected function isVisible(): bool
     {
         return $this->visible;
     }
@@ -174,7 +219,7 @@ abstract class UINode extends Component implements UIViewable
     /**
      * @return bool
      */
-    public function isEnabled(): bool
+    protected function isEnabled(): bool
     {
         return $this->enabled;
     }
@@ -182,7 +227,7 @@ abstract class UINode extends Component implements UIViewable
     /**
      * @param bool $enabled
      */
-    public function setEnabled(bool $enabled)
+    protected function setEnabled(bool $enabled)
     {
         $this->enabled = $enabled;
     }
@@ -190,7 +235,7 @@ abstract class UINode extends Component implements UIViewable
     /**
      * @return UIContainer
      */
-    public function getParent(): ?UIContainer
+    protected function getParent(): ?UIContainer
     {
         return $this->parent;
     }

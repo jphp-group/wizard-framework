@@ -11,7 +11,8 @@
           "_": "Button",
           "id": "button",
           "kind": "success",
-          "text": "Добавить картинку"
+          "text": "Добавить картинку",
+          "classes": ["foobar"]
         },
         {
             "_": "HBox",

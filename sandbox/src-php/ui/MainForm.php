@@ -22,11 +22,13 @@ class MainForm extends UIForm
     {
         //$this->appUI->navigateTo('OtherForm');
 
-        $dialog = new InputTextDialog(function ($text) {
+        $this->button->classes = ['foobar'];
+
+        /*$dialog = new InputTextDialog(function ($text) {
             $image = new UIImageView($text);
             $this->pics->add($image);
         });
 
-        $dialog->show();
+        $dialog->show();*/
     }
 }

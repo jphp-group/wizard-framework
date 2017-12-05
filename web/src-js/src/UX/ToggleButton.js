@@ -33,12 +33,6 @@ class ToggleButton extends Button {
       this.dom.attr('aria-pressed', false);
     }
   }
-
-  __bindEvents(dom) {
-    dom.on('click', () => {
-      this.selected = !this.selected;
-    });
-  }
 }
 
 export default ToggleButton;
