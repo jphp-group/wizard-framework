@@ -34,12 +34,12 @@ class ProgressBar extends Node {
   }
 
   get animated() {
-    var dom = this.dom.find('> .progress-bar');
+    const dom = this.dom.find('> .progress-bar');
     return dom.hasClass('active');
   }
 
   set animated(value) {
-    var dom = this.dom.find('> .progress-bar');
+    const dom = this.dom.find('> .progress-bar');
 
     if (value) {
       dom.addClass('active');
@@ -49,12 +49,12 @@ class ProgressBar extends Node {
   }
 
   get striped() {
-    var dom = this.dom.find('> .progress-bar');
+    const dom = this.dom.find('> .progress-bar');
     return dom.hasClass('progress-bar-striped');
   }
 
   set striped(value) {
-    var dom = this.dom.find('> .progress-bar');
+    const dom = this.dom.find('> .progress-bar');
 
     if (value) {
       dom.addClass('progress-bar-striped');
@@ -63,8 +63,22 @@ class ProgressBar extends Node {
     }
   }
 
+  get value() {
+    let width = this.dom.find('> .progress-bar').css('width');
+
+    if (!width) {
+      return 0;
+    }
+
+    return parseInt(width);
+  }
+
+  set value(v) {
+    this.dom.find('> .progress-bar').css('width', v + "%");
+  }
+
   createDom() {
-    var dom = jQuery('<div class="progress ux-progress-bar"><div class="progress-bar" role="progressbar"></div></div>');
+    const dom = jQuery('<div class="progress ux-progress-bar"><div class="progress-bar" role="progressbar"></div></div>');
 
     return dom;
   }

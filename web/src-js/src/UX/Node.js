@@ -144,6 +144,12 @@ class Node {
   set width(value) {
     this.__triggerPropertyChange('width', value);
     this.dom.width(value);
+
+    if (typeof value === 'string' && value.indexOf('%') > -1) {
+      this.data('--width-percent', value);
+    } else {
+      this.data('--width-percent', null);
+    }
   }
 
   get height() {
@@ -153,6 +159,12 @@ class Node {
   set height(value) {
     this.__triggerPropertyChange('height', value);
     this.dom.height(value);
+
+    if (typeof value === 'string' && value.indexOf('%') > -1) {
+      this.data('--height-percent', value);
+    } else {
+      this.data('--height-percent', null);
+    }
   }
 
   get size() {

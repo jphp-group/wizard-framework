@@ -3,13 +3,20 @@ import Node from './Node';
 export default class SelectControl extends Node {
   constructor(items) {
     super();
+
     if (items) {
       this.items = items;
     }
+
+    this.dom.on('change.SelectControl', (e) => {
+      if (this.uiMediator) {
+        this.uiMediator.sendUserInput(this, {selected: this.selected, selectedText: this.selectedText});
+      }
+    });
   }
 
   get items() {
-    var result = {};
+    const result = {};
 
     this.dom.find('option').each(function () {
       result[this.attr('value')] = $(this).text();
@@ -21,7 +28,7 @@ export default class SelectControl extends Node {
   set items(value) {
     this.dom.find('option').remove();
 
-    for (var key in value) {
+    for (const key in value) {
       if (value.hasOwnProperty(key)) {
         this.dom.append(jQuery(`<option value='${key}'>${value[key]}</option>`));
       }
@@ -44,15 +51,15 @@ export default class SelectControl extends Node {
     this.selected = null;
 
     this.dom.find('option').each(function () {
-      if ($(this).text() === value) {
-        $(this).prop('selected', true);
+      if (jQuery(this).text() === value) {
+        jQuery(this).prop('selected', true);
         return false;
       }
     });
   }
 
   createDom() {
-    var dom = jQuery('<select class="form-control ux-select-control">');
+    const dom = jQuery('<select class="form-control ux-select-control">');
     return dom;
   }
 }

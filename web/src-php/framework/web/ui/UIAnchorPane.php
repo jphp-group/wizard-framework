@@ -2,16 +2,13 @@
 namespace framework\web\ui;
 
 /**
- * Class UXTextArea
+ * Class UXAnchorPane
  * @package framework\web\ui
  */
-class UXTextArea extends UXTextInputControl
+class UIAnchorPane extends UIContainer
 {
-    /**
-     * @return string
-     */
     public function uiSchemaClassName(): string
     {
-        return 'TextArea';
+        return 'AnchorPane';
     }
 }

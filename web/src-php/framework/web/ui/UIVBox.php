@@ -2,21 +2,32 @@
 namespace framework\web\ui;
 
 /**
- * Class UXHBox
  * @package framework\web\ui
  *
  * @property int $spacing
  */
-class UXHBox extends UXContainer
+class UIVBox extends UIContainer
 {
     /**
      * @var int
      */
     private $spacing = 0;
 
+    /**
+     * UIVBox constructor.
+     * @param UINode[] $children
+     * @param int $spacing
+     */
+    public function __construct(array $children = [], int $spacing = 0)
+    {
+        parent::__construct($children);
+
+        $this->spacing = $spacing;
+    }
+
     public function uiSchemaClassName(): string
     {
-        return 'HBox';
+        return 'VBox';
     }
 
     /**

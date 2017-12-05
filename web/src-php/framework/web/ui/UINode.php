@@ -3,20 +3,24 @@
 namespace framework\web\ui;
 
 use framework\core\Component;
+use framework\core\Event;
 use framework\web\UI;
 use php\lib\str;
 
 /**
- * Class UXNode
  * @package framework\web\ui
  *
  * @property string $id
  * @property string $uuid
  * @property mixed $width
  * @property mixed $height
+ * @property array $size
+ * @property UIContainer $parent
  *
+ * @property bool $enabled
+ * @property bool $visible
  */
-abstract class UXNode extends Component implements UXViewable
+abstract class UINode extends Component implements UIViewable
 {
     /**
      * @var string
@@ -49,10 +53,19 @@ abstract class UXNode extends Component implements UXViewable
     protected $connectedUi;
 
     /**
+     * @var UIContainer
+     */
+    private $parent;
+
+    /**
      * @return string
      */
     abstract public function uiSchemaClassName(): string;
 
+    public function uiSchemaEvents(): array
+    {
+        return [];
+    }
 
     /**
      * UXNode constructor.
@@ -70,7 +83,9 @@ abstract class UXNode extends Component implements UXViewable
         $view = ['_' => $this->uiSchemaClassName()];
 
         foreach ($this->getProperties() as $name => $value) {
-            if ($value instanceof UXViewable) {
+            if ($name === 'parent') continue;
+
+            if ($value instanceof UIViewable) {
                 $value = $value->uiSchema();
             }
 
@@ -173,6 +188,38 @@ abstract class UXNode extends Component implements UXViewable
     }
 
     /**
+     * @return UIContainer
+     */
+    public function getParent(): ?UIContainer
+    {
+        return $this->parent;
+    }
+
+    /**
+     * @param UIContainer|null $parent
+     */
+    public function __setParent(?UIContainer $parent)
+    {
+        $this->parent = $parent;
+    }
+
+    /**
+     * @return UI|null
+     */
+    public function getConnectedUI(): ?UI
+    {
+        return $this->connectedUi;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isConnectedToUI(): bool
+    {
+        return !!$this->connectedUi;
+    }
+
+    /**
      * @param UI $ui
      */
     public function connectToUI(?UI $ui)
@@ -180,6 +227,10 @@ abstract class UXNode extends Component implements UXViewable
         $this->connectedUi = $ui;
     }
 
+    public function disconnectUI()
+    {
+        $this->connectedUi = null;
+    }
 
     public function toFront()
     {
@@ -212,10 +263,33 @@ abstract class UXNode extends Component implements UXViewable
         }
     }
 
+    public function free()
+    {
+        if (!$this->isFree()) {
+            $this->trigger(new Event('free', $this));
+
+            if ($this->parent) {
+                $this->parent->remove($this);
+            }
+
+            $this->callRemoteMethod('free');
+        }
+    }
+
+    public function isFree()
+    {
+        return !!$this->parent;
+    }
+
     public function on(string $eventType, callable $handler, string $group = 'general')
     {
         parent::on($eventType, $handler, $group);
 
+        $this->addEventLink(str::lower($eventType));
+    }
+
+    protected function addEventLink($eventType)
+    {
         if ($this->connectedUi) {
             $this->connectedUi->addEventLink($this, $eventType);
         }
@@ -245,6 +319,23 @@ abstract class UXNode extends Component implements UXViewable
 
     public function provideUserInput(array $data)
     {
+        if (isset($data['visible'])) {
+            $this->setVisible($data['visible']);
+        }
+
+        if (isset($data['enabled'])) {
+            $this->setEnabled($data['enabled']);
+        }
+    }
+
+    public function synchronizeUserInput(array $data)
+    {
         // nop.
+    }
+
+
+    public function __clone()
+    {
+        $this->uuid = str::uuid();
     }
 }

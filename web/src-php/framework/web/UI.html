@@ -2,6 +2,7 @@
     <head>
         <meta charset="utf-8">
 
+        <title>{{title}}</title>
         <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
 
         <!-- bootstrap -->
@@ -16,14 +17,8 @@
         <div id="app"></div>
 
         <script>
-            uiLoader = new NX.UILoader();
-            uiMediator = new NX.UIMediator();
-
-            uiLoader.loadFromUrl('{{uiSchemaUrl}}', uiMediator, function (node) {
-              $('#app').append(node.dom);
-
-              uiMediator.startWatching(node, '{{uiSocketUrl}}', '{{sessionId}}');
-            });
+            uiMediator = new NX.UIMediator($('#app'));
+            uiMediator.startWatching('{{urlArgument}}', '{{uiSocketUrl}}', '{{sessionId}}');
         </script>
     </body>
 </html>

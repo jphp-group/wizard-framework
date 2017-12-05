@@ -150,14 +150,12 @@ abstract class Component
         $method = "get$name";
 
         if (method_exists($this, $method)) {
-            $closure = Closure::fromCallable([$this, $method]);
-            return $closure();
+            return $this->{$method}();
         }
 
         $method = "is$name";
         if (method_exists($this, $method)) {
-            $closure = Closure::fromCallable([$this, $method]);
-            return (bool) $closure();
+            return (bool) $this->{$method}();
         }
 
         throw new \Error("Property '$name' is not exists in class " . reflect::typeOf($this));

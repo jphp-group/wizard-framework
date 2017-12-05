@@ -8,6 +8,7 @@ use framework\core\Component;
 use framework\core\Event;
 use framework\core\Logger;
 use php\format\JsonProcessor;
+use php\http\HttpRedirectHandler;
 use php\http\HttpResourceHandler;
 use php\http\HttpServer;
 use php\http\HttpServerRequest;
@@ -21,6 +22,8 @@ use php\lib\str;
 use php\time\Time;
 use ReflectionClass;
 use ReflectionMethod;
+
+include "res://.inc/functions.php";
 
 /**
  * Class WebApplication
@@ -47,7 +50,40 @@ class WebApplication extends Application
     /**
      * @var array
      */
-    protected $sessionInstances = [];
+    protected $isolatedSessionInstances = [];
+
+    /**
+     * @var array
+     */
+    protected $globalSessionInstances = [];
+
+    /**
+     * @var bool
+     */
+    protected $uiSupport = false;
+
+    /**
+     * @var string
+     */
+    protected $dnextJsFile = null;
+
+    /**
+     * @var string
+     */
+    protected $dnextCssFile = null;
+
+    /**
+     * Enable rich user interface.
+     * @param string $jsFile
+     * @param string $cssFile
+     */
+    public function enableUiSupport(string $jsFile = '', string $cssFile = '')
+    {
+        $this->uiSupport = true;
+        $this->dnextCssFile = $cssFile;
+        $this->dnextJsFile = $jsFile;
+        $this->initializeWebLib();
+    }
 
     protected function initialize()
     {
@@ -60,8 +96,6 @@ class WebApplication extends Application
         Logger::addWriter(Logger::stdoutWriter(true));
 
         Logger::info("Initialize Web Application ({0})", $this->getStamp());
-
-        $this->initializeWebLib();
     }
 
     /**
@@ -84,14 +118,25 @@ class WebApplication extends Application
 
                 return $instance;
 
-            case 'session':
+            case 'isolated-session':
                 $sessionId = $this->request()->sessionId();
-
-                $instance = $this->sessionInstances[$sessionId][$class];
+                $instance = $this->isolatedSessionInstances[$sessionId][$class];
 
                 if (!$instance) {
                     $instance = new $class();
-                    $this->sessionInstances[$sessionId][$class] = $instance;
+                    $this->isolatedSessionInstances[$sessionId][$class] = $instance;
+                }
+
+                return $instance;
+
+            case 'session':
+                $sessionId = $this->request()->sessionId();
+
+                $instance = $this->globalSessionInstances[$sessionId][$class];
+
+                if (!$instance) {
+                    $instance = new $class();
+                    $this->globalSessionInstances[$sessionId][$class] = $instance;
                 }
 
                 return $instance;
@@ -158,41 +203,53 @@ class WebApplication extends Application
         $tempDir = System::getProperty('java.io.tmpdir') . "/dnext-engine/";
         fs::makeDir($tempDir);
 
-        fs::copy($jsResource, "$tempDir/engine.js");
-        fs::copy($mapResource, "$tempDir/engine.js.map");
-        fs::copy($cssResource, "$tempDir/engine.min.css");
 
-        $this->server->get($jsUrl = "/dnext/engine-{$this->getStamp()}.js", new HttpResourceHandler("$tempDir/engine.js"));
-        $this->server->get($mapUrl = "/dnext/engine-{$this->getStamp()}.js.map", new HttpResourceHandler("$tempDir/engine.js.map"));
-        $this->server->get($cssUrl = "/dnext/engine-{$this->getStamp()}.min.css", new HttpResourceHandler("$tempDir/engine.min.css"));
+        if ($this->dnextJsFile) {
+            $jsFile = $this->dnextJsFile;
+            $mapFile = $this->dnextJsFile . ".map";
+
+            if (!fs::isFile($mapFile)) $mapFile = null;
+        } else {
+            fs::copy($jsResource, $jsFile = "$tempDir/engine.js");
+            fs::copy($mapResource, $mapFile = "$tempDir/engine.js.map");
+        }
+
+        if ($this->dnextCssFile) {
+            $cssFile = $this->dnextCssFile;
+        } else {
+            fs::copy($cssResource, $cssFile = "$tempDir/engine.min.css");
+        }
+
+        $this->server->get($jsUrl = "/dnext/engine-{$this->getStamp()}.js", new HttpResourceHandler($jsFile));
+        $this->server->get($cssUrl = "/dnext/engine-{$this->getStamp()}.min.css", new HttpResourceHandler($cssFile));
+
+        if ($mapFile) {
+            $this->server->get($mapUrl = "/dnext/engine-{$this->getStamp()}.js.map", new HttpResourceHandler($mapFile));
+        }
 
         Logger::info("Add DNext Engine:");
-        Logger::info("\t-> GET {0}", $jsUrl);
-        Logger::info("\t-> GET {0}", $mapUrl);
-        Logger::info("\t-> GET {0}", $cssUrl);
-        Logger::info("\t-> WS {0}", "/dnext/ws");
+        Logger::info("\t-> GET {0} {1}", $jsUrl, $jsFile);
 
-        $this->server->addWebSocket('/dnext/ws', [
-            'onConnect' => function (WebSocketSession $session) {
-                Logger::info("WS Connect {0} ...", $session->remoteAddress());
-                $session->sendText('Hello, Mike!', null);
-            },
+        if ($mapUrl) {
+            Logger::info("\t-> GET {0} {1}", $mapUrl, $mapFile);
+        }
 
-            'onMessage' => function (WebSocketSession $session, $text) {
-                Logger::info("WS message: {0}", $text);
-            },
-
-            'onClose' => function (WebSocketSession $session, int $status, string $reason) {
-                Logger::info("WS Close.");
-            }
-        ]);
+        Logger::info("\t-> GET {0} {1}", $cssUrl, $cssFile);
     }
 
     public function addUI(string $uiClass)
     {
+        if (!$this->uiSupport) {
+            throw new \Exception("UI support is disabled");
+        }
+
         $reflectionClass = new ReflectionClass($uiClass);
 
         $path = Annotations::getOfClass('path', $reflectionClass);
+
+        if ($path === '/') {
+            $path = '';
+        }
 
         Logger::info("Add UI ({0})", $uiClass);
 
@@ -208,21 +265,19 @@ class WebApplication extends Application
                 $handler($instance, $request, $response);
 
                 $instance->trigger(new Event('afterRequest', $instance, $this));
+
+                UI::setup(null);
             });
 
             Logger::info("\t-> GET {0}", $path);
         };
 
-        $route($path, function (UI $ui, HttpServerRequest $request, HttpServerResponse $response) use ($path) {
-            $ui->show($request, $response, $path);
-        });
-
-        $route("$path/@ui-schema", function (UI $ui, HttpServerRequest $request, HttpServerResponse $response) use ($uiClass) {
+        /*$route("$path/@ui-schema", function (UI $ui, HttpServerRequest $request, HttpServerResponse $response) use ($uiClass) {
             $resource = $ui->getUISchema();
 
             $response->contentType("application/json");
             $response->body((new JsonProcessor())->format($resource));
-        });
+        });*/
 
         $this->server->addWebSocket("$path/@ws/", [
             'onConnect' => function (WebSocketSession $session) {
@@ -233,11 +288,18 @@ class WebApplication extends Application
                 $type = $message['type'];
 
                 /** @var UISocket $socket */
-                $sessionId = $message['sessionId'];
+                $sessionId = $message['sessionId'] . '_' . $message['sessionIdUuid'];
 
-                if (!($socket = $this->sessionInstances[$sessionId][UISocket::class])) {
-                    $this->sessionInstances[$sessionId][UISocket::class] = $socket = new UISocket();
+                if (!($socket = $this->isolatedSessionInstances[$sessionId][UISocket::class])) {
+                    $this->isolatedSessionInstances[$sessionId][UISocket::class] = $socket = new UISocket();
                 }
+
+                /** @var UI $ui */
+                if (!($ui = $this->isolatedSessionInstances[$sessionId][$uiClass])) {
+                    $this->isolatedSessionInstances[$sessionId][$uiClass] = $ui = new $uiClass($socket);
+                }
+
+                $ui->linkSocket($socket);
 
                 Logger::trace("New UI socket message, (type = {0}, sessionId = {1})", $type, $sessionId);
 
@@ -246,8 +308,22 @@ class WebApplication extends Application
                         $socket->initialize($uiClass, $session, $message);
                         break;
 
+                    case 'activate':
+                        $socket->activate($uiClass, $message);
+                        break;
+
                     default:
-                        $socket->receiveMessage($uiClass, new SocketMessage($message));
+                        try {
+                            $socket->receiveMessage($uiClass, new SocketMessage($message));
+                        } catch (\Throwable $e) {
+                            $errId = str::uuid();
+
+                            Logger::error("{0}, {1}", $e->getMessage(), $errId);
+                            Logger::error("\n{0}\n\t-> at {1} on line {2}", $e->getTraceAsString(), $e->getFile(), $e->getLine());
+                        } finally {
+                            UI::setup(null);
+                        }
+
                         break;
                 }
             },
@@ -258,6 +334,12 @@ class WebApplication extends Application
                 //$socket->close($uiClass);
             }
         ]);
+
+        $this->server->get($path, new HttpRedirectHandler("$path/"));
+
+        $route("$path/**", function (UI $ui, HttpServerRequest $request, HttpServerResponse $response) use ($path) {
+            $ui->show($request, $response, $path);
+        });
     }
 
     /**

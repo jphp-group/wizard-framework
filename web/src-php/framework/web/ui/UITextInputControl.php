@@ -2,7 +2,6 @@
 namespace framework\web\ui;
 
 /**
- * Class UXTextInputControl
  * @package framework\web\ui
  *
  * @property string $text
@@ -10,7 +9,7 @@ namespace framework\web\ui;
  * @property bool $editable
  * @property string $textAlign
  */
-abstract class UXTextInputControl extends UXNode
+abstract class UITextInputControl extends UINode
 {
     /**
      * @var string
@@ -101,8 +100,19 @@ abstract class UXTextInputControl extends UXNode
      */
     public function provideUserInput(array $data)
     {
+        parent::provideUserInput($data);
+
         if (isset($data['text'])) {
             $this->text = $data['text'];
+        }
+    }
+
+    public function synchronizeUserInput(array $data)
+    {
+        parent::synchronizeUserInput($data);
+
+        if (isset($data['text'])) {
+            $this->changeRemoteProperty('text', $data['text']);
         }
     }
 }

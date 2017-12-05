@@ -2,16 +2,16 @@
 namespace framework\web\ui;
 
 /**
- * Class UXTextField
+ * Class UIPasswordField
  * @package framework\web\ui
  */
-class UXTextField extends UXTextInputControl
+class UIPasswordField extends UITextInputControl
 {
     /**
      * @return string
      */
     public function uiSchemaClassName(): string
     {
-        return 'TextField';
+        return 'PasswordField';
     }
 }

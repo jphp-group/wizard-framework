@@ -7,16 +7,27 @@ class ListView extends Container {
 
     this.spacing = 0;
     this.align = ['center', 'left'];
+
+    this.dom.on('action.ListView', () => {
+      if (this.uiMediator) {
+        const data = {
+          selected: this.selected,
+          selectedIndex: this.selectedIndex
+        };
+
+        this.uiMediator.sendUserInput(this, data);
+      }
+    })
   }
 
   get selectedIndex() {
-    var index = -1;
-    var result = -1;
+    let index = -1;
+    let result = -1;
 
     this.dom.find('> .ux-slot').each(function () {
       index++;
 
-      if ($(this).hasClass('active')) {
+      if (jQuery(this).hasClass('active')) {
         result = index;
         return true;
       }
@@ -26,7 +37,7 @@ class ListView extends Container {
   }
 
   set selectedIndex(value) {
-    var children = this.children();
+    const children = this.children();
 
     if (value >= 0 && value < children.length) {
       this.selected = children[value];
@@ -36,7 +47,7 @@ class ListView extends Container {
   }
 
   get selected() {
-    var dom = this.dom.find('> .ux-slot.active').first();
+    const dom = this.dom.find('> .ux-slot.active').first();
 
     if (dom) {
       return Node.getFromDom(dom);
@@ -54,7 +65,7 @@ class ListView extends Container {
   }
 
   createDom() {
-    var dom = super.createDom();
+    const dom = super.createDom();
     dom.addClass('list-group');
     dom.addClass('ux-list-view');
     return dom;
@@ -65,13 +76,15 @@ class ListView extends Container {
       throw new TypeError('createSlotDom(): 1 argument must be instance of Node')
     }
 
-    var dom = jQuery('<a href="#" class="list-group-item ux-slot" />').append(object.dom);
+    const dom = jQuery('<a href="#" class="list-group-item ux-slot" />').append(object.dom);
 
-    dom.on('click.ListView', () => {
+    dom.on('click.ListView', (e) => {
       dom.closest('.ux-list-view').find('> .ux-slot').removeClass('active');
       dom.addClass('active');
 
       this.dom.trigger('action');
+      e.preventDefault();
+      return false;
     });
 
     dom.data('--wrapper', object);

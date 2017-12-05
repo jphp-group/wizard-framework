@@ -2,8 +2,9 @@ import Node from "./Node";
 
 class Container extends Node {
   constructor(nodes) {
-      super();
-      this.add(...arguments);
+    super();
+    this.add(...arguments);
+    this.contentDom = this.dom;
   }
 
   get align() {
@@ -63,6 +64,18 @@ class Container extends Node {
 
     dom.data('--wrapper', object);
     object.dom.data('--wrapper-dom', dom);
+
+    const width = object.data('--width-percent');
+    const height = object.data('--height-percent');
+
+    if (typeof width === 'string') {
+      dom.width(width);
+    }
+
+    if (typeof width === 'string') {
+      dom.height(height);
+    }
+
     return dom;
   }
 
@@ -74,7 +87,7 @@ class Container extends Node {
   }
 
   child(id) {
-    const dom = this.dom.find(`#${id}`);
+    const dom = this.contentDom.find(`#${id}`);
 
     if (dom && dom.length) {
       return Node.getFromDom(dom);
@@ -84,13 +97,13 @@ class Container extends Node {
   }
 
   count() {
-    return this.dom.children().length;
+    return this.contentDom.children().length;
   }
 
   children() {
     const children = [];
 
-    this.dom.children().each(function () {
+    this.contentDom.children().each(function () {
       children.push(Node.getFromDom(jQuery(this)));
     });
 
@@ -107,7 +120,7 @@ class Container extends Node {
 
   add(nodes) {
     for (let i = 0; i < arguments.length; i++) {
-      this.dom.append(this.createSlotDom(arguments[i]));
+      this.contentDom.append(this.createSlotDom(arguments[i]));
     }
 
     return this;
@@ -116,7 +129,7 @@ class Container extends Node {
   insert(index, nodes) {
     index = index | 0;
 
-    const children = this.dom.children();
+    const children = this.contentDom.children();
 
     if (!children.length || index >= children.length) {
       return this.add(...Array.prototype.slice.call(arguments, 1));
@@ -144,7 +157,7 @@ class Container extends Node {
   }
 
   clear() {
-    this.dom.empty();
+    this.contentDom.empty();
   }
 
   show() {

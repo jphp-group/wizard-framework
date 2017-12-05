@@ -7,7 +7,7 @@ namespace framework\web\ui;
  *
  * @property bool $selected
  */
-class UXCheckbox extends UXLabeled
+class UICheckbox extends UILabeled
 {
     /**
      * @var bool
@@ -40,8 +40,19 @@ class UXCheckbox extends UXLabeled
 
     public function provideUserInput(array $data)
     {
+        parent::provideUserInput($data);
+
         if (isset($data['selected'])) {
             $this->selected = $data['selected'];
+        }
+    }
+
+    public function synchronizeUserInput(array $data)
+    {
+        parent::synchronizeUserInput($data);
+
+        if (isset($data['selected'])) {
+            $this->changeRemoteProperty('selected', $data['selected']);
         }
     }
 }

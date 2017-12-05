@@ -6,7 +6,9 @@ class TextInputControl extends Node {
 
     this.dom.on('keydown.TextInputControl', (e) => {
       if (this.uiMediator) {
-        setTimeout(() => this.uiMediator.sendUserInput(this, {text: this.text}), 0);
+        this.uiMediator.sendUserInput(this, () => {
+          return { text: this.text }
+        });
       }
     });
   }

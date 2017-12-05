@@ -6,6 +6,29 @@ label {
     display: inline-block;
 }
 
+.ux-window {
+}
+
+.ux-window.ux-centered {
+  text-align: center;
+}
+
+.ux-window.ux-centered:before {
+  content: '';
+  height: 100%;
+  width: 1px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.ux-window.ux-centered .modal-dialog {
+  text-align: left;
+  margin: 10px auto;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+
 /* Labeled */
 .ux-labeled {
   display: inline-flex;
@@ -58,9 +81,11 @@ label {
 
 .ux-v-box.ux-m-halign-center { align-items: center; }
 .ux-v-box.ux-m-halign-center > .ux-slot { text-align: center; }
+.ux-v-box.ux-m-halign-center > .ux-slot > .ux-container { margin: 0 auto; }
 
 .ux-v-box.ux-m-halign-right { align-items: flex-end; }
 .ux-v-box.ux-m-halign-right > .ux-slot { text-align: right; }
+.ux-v-box.ux-m-halign-right > .ux-slot > .ux-container { margin: 0 0 0 auto; }
 
 .ux-v-box.ux-m-valign-top { justify-content: flex-start; }
 .ux-v-box.ux-m-valign-center { justify-content: center; }
@@ -96,10 +121,34 @@ label {
 .ux-h-box.ux-m-valign-center { align-items: center; }
 .ux-h-box.ux-m-valign-bottom { align-items: flex-end; }
 
+/* ImageView */
+.ux-image-view {
+  display: inline-flex;
+}
 
 /* Checkbox component */
 .ux-checkbox > input[type=checkbox] {
   margin-top: 0;
   margin-right: 4px;
+  vertical-align: middle;
+}
+
+
+.modal.ux-centered {
+  text-align: center;
+  padding: 0!important;
+}
+
+.modal.ux-centered:before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+  margin-right: -4px; /* Adjusts for spacing */
+}
+
+.modal.ux-centered .modal-dialog {
+  display: inline-block;
+  text-align: left;
   vertical-align: middle;
 }

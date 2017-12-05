@@ -5,7 +5,7 @@ namespace framework\web\ui;
  * Class UXLabel
  * @package framework\web\ui
  */
-class UXLabel extends UXLabeled
+class UILabel extends UILabeled
 {
     /**
      * @return string

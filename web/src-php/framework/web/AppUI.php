@@ -1,0 +1,221 @@
+<?php
+namespace framework\web;
+
+use framework\core\Annotations;
+use framework\core\Event;
+use framework\core\Logger;
+use framework\web\ui\UINode;
+use framework\web\ui\UIVBox;
+use php\http\HttpServerRequest;
+use php\http\HttpServerResponse;
+use php\lib\arr;
+
+/**
+ * Class AppUI
+ * @package framework\web
+ *
+ * @property UIForm $currentForm
+ * @property string $hash
+ * @property WebConsole $console
+ */
+class AppUI extends UI
+{
+    /**
+     * @var UIForm
+     */
+    protected $currentForm;
+
+    /**
+     * @var UIForm[]
+     */
+    protected $forms = [];
+
+    /**
+     * @var UIForm
+     */
+    protected $urlForms = [];
+
+    /**
+     * @var UIForm
+     */
+    protected $notFoundForm;
+
+    /**
+     * @var WebConsole
+     */
+    protected $console;
+
+    /**
+     * AppUI constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->console = new WebConsole($this);
+
+        $this->on('ready', function (Event $e) {
+            //$this->onReady($e);
+        }, __CLASS__);
+    }
+
+    /**
+     * @param string $code
+     * @return UIForm|null
+     */
+    public function form(string $code): ?UIForm
+    {
+        $form = $this->forms[$code];
+
+        if ($form) {
+            $form->connectToUI($this);
+        }
+
+        return $form;
+    }
+
+    /**
+     * @param string $code
+     * @param UIForm $form
+     */
+    public function registerForm(string $code, UIForm $form)
+    {
+        $this->forms[$code] = $form;
+
+        foreach ($form->getRoutePaths() as $routeUrl) {
+            $this->urlForms[$routeUrl] = $form;
+        }
+    }
+
+    /**
+     * @param string $code
+     * @param UIForm $form
+     */
+    public function registerNotFoundForm(string $code, UIForm $form)
+    {
+        $this->registerForm($code, $form);
+
+        $this->notFoundForm = $form;
+    }
+
+    /**
+     * @return WebConsole
+     */
+    protected function getConsole(): WebConsole
+    {
+        return $this->console;
+    }
+
+    /**
+     * @return UINode
+     */
+    protected function makeView(): UINode
+    {
+        return new UIVBox();
+    }
+
+    /**
+     * @return UIForm|null
+     */
+    public function getCurrentForm(): ?UIForm
+    {
+        return $this->currentForm;
+    }
+
+    /**
+     * @param $formOrCode
+     * @param array $args
+     */
+    public function navigateTo($formOrCode, array $args = [])
+    {
+        if ($formOrCode instanceof UIForm) {
+            $form = $formOrCode;
+        } else {
+            $form = $this->forms[$formOrCode];
+
+            if (!$form) {
+                Logger::error("Failed navigate to the '{0}' form, form is not found or registered.", $formOrCode);
+                return;
+            }
+        }
+
+        if ($this->currentForm) {
+            $this->currentForm->trigger(new Event('leave', $this->currentForm, $this));
+        }
+
+        /** @var UIVBox $view */
+        $view = $this->getView();
+        $view->clear();
+
+        if ($form) {
+            $routePath = $form->getRoutePath();
+
+            if (isset($args['hash'])) {
+                $this->hash = $args['hash'];
+            }
+
+            if ($routePath && $form !== $this->notFoundForm) {
+                $this->sendMessage('history-push', [
+                    'title' => $form->title,
+                    'url'   => "{$this->getRoutePath()}{$routePath}",
+                    'hash'  => $args['hash'],
+                ]);
+            } else {
+                $this->sendMessage('page-set-properties', [
+                    'title' => $form->title,
+                    'hash'  => $args['hash'],
+                ]);
+            }
+
+            if ($form->getConnectedUI() !== $this) {
+                $form->connectToUI($this);
+            }
+
+            $view->add($form->getLayout());
+        }
+
+        $this->currentForm = $form;
+        $form->trigger(new Event('navigate', $form, $this, $args));
+    }
+
+    public function renderView()
+    {
+        $this->currentForm = null;
+
+        $subPath = "/" . $this->location['contextUrl'];
+
+        $found = false;
+
+        foreach ($this->urlForms as $url => $form) {
+            if ($url === $subPath) {
+                $this->currentForm = $form;
+                $found = true;
+                break;
+            }
+        }
+
+        if (!$found && $this->notFoundForm) {
+            $this->currentForm = $this->notFoundForm;
+            $this->requestUrl = $subPath;
+        }
+
+        if ($this->currentForm) {
+            /** @var UIVBox $view */
+            $view = $this->getView();
+
+            $view->disconnectUI();
+            $view->clear();
+
+            if ($this->currentForm->getConnectedUI() !== $this) {
+                $this->currentForm->connectToUI($this);
+            }
+
+            $view->add($this->currentForm->getLayout());
+            $view->connectToUI($this);
+
+            $this->sendMessage('page-set-properties', ['title' => $this->currentForm->title]);
+        }
+
+        parent::renderView();
+    }
+}

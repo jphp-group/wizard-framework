@@ -17,7 +17,7 @@ const version = '1.0.0';
 
 gulp.task('compile-css', function () {
   return gulp.src('src/lib.css')
-  .pipe(cleanCSS({}))
+  //.pipe(cleanCSS({}))
   .pipe(rename('dnext-engine.min.css'))
   .pipe(gulp.dest('build/lib'));
 });
@@ -69,7 +69,7 @@ gulp.task('compile', function() {
 });
 
 gulp.task('watch', function () {
-    return watch(['src/**/*.js', 'src/**/*.css', 'build/app/**/*.js'], () => gulp.start('default'));
+    return watch(['src/**/*.js', 'src/**/*.css'], () => gulp.start('default'));
 });
 
 gulp.task('sandbox', function() {
@@ -80,4 +80,4 @@ gulp.task('sandbox', function() {
   });
 });
 
-gulp.task('default', ['compile', 'compile-sandbox', 'compile-css']);
+gulp.task('default', ['compile', 'compile-css']);

@@ -17,13 +17,14 @@ import TextInputControl from './TextInputControl';
 import TextField from './TextField';
 import PasswordField from './PasswordField';
 import TextArea from './TextArea';
+import Window from './Window';
 
 
 import Font from './paint/Font';
 import Utils from './util/Utils';
 
 export default {
-  Node,
+  Node, Window,
   ImageView,
   Button, ToggleButton,
   Labeled,

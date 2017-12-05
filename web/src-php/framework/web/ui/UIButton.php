@@ -9,7 +9,7 @@ namespace framework\web\ui;
  * @property string $kind
  *
  */
-class UXButton extends UXLabeled
+class UIButton extends UILabeled
 {
     const KIND_DEFAULT = 'default';
     const KIND_PRIMARY = 'primary';
@@ -33,7 +33,6 @@ class UXButton extends UXLabeled
         return 'Button';
     }
 
-
     /**
      * @return string
      */
@@ -48,5 +47,16 @@ class UXButton extends UXLabeled
     public function setKind(string $kind)
     {
         $this->kind = $kind;
+    }
+
+    protected function addEventLink($eventType)
+    {
+        switch ($eventType) {
+            case "action":
+                $eventType = "click";
+                break;
+        }
+
+        parent::addEventLink($eventType);
     }
 }

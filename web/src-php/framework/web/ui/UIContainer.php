@@ -4,15 +4,14 @@ namespace framework\web\ui;
 use framework\web\UI;
 
 /**
- * Class UXContainer
  * @package framework\web\ui
  *
- * @property UXNode[] $children
+ * @property UINode[] $children
  * @property string $horAlign
  * @property string $verAlign
  * @property array $align
  */
-class UXContainer extends UXNode
+class UIContainer extends UINode
 {
     /**
      * @var string
@@ -28,6 +27,17 @@ class UXContainer extends UXNode
      * @var array
      */
     private $children = [];
+
+    /**
+     * UIContainer constructor.
+     * @param UINode[] $children
+     */
+    public function __construct(array $children = [])
+    {
+        parent::__construct();
+
+        $this->children = $children;
+    }
 
     /**
      * @return string
@@ -55,14 +65,62 @@ class UXContainer extends UXNode
         return $schema;
     }
 
-    public function add(UXNode $node)
+    /**
+     * @param UINode $node
+     */
+    public function add(UINode $node)
     {
+        if ($this->connectedUi) {
+            $this->connectedUi->callNodeMethod($this, 'add', [$node]);
+        }
+
         $this->children[] = $node;
+        $node->__setParent($this);
         $node->connectToUI($this->connectedUi);
     }
 
     /**
-     * @return UXNode[]
+     * @param UINode $node
+     * @return bool
+     */
+    public function remove(UINode $node)
+    {
+        if ($this->connectedUi) {
+            $this->connectedUi->callNodeMethod($this, 'remove', [$node]);
+        }
+
+        foreach ($this->children as $i => $child) {
+            if ($child === $node) {
+                $node->__setParent(null);
+                $node->disconnectUi();
+
+                unset($this->children[$i]);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Remove All children.
+     */
+    public function clear()
+    {
+        if ($this->connectedUi) {
+            $this->connectedUi->callNodeMethod($this, 'clear');
+        }
+
+        foreach ($this->children as $i => $child) {
+            $child->__setParent(null);
+            $child->disconnectUi();
+
+            unset($this->children[$i]);
+        }
+    }
+
+    /**
+     * @return UINode[]
      */
     public function getChildren(): array
     {
@@ -125,6 +183,4 @@ class UXContainer extends UXNode
             $child->connectToUI($ui);
         }
     }
-
-
 }

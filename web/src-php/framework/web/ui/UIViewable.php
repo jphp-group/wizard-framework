@@ -2,10 +2,9 @@
 namespace framework\web\ui;
 
 /**
- * Interface UXViewable
  * @package framework\web\ui
  */
-interface UXViewable
+interface UIViewable
 {
     /**
      * @return array
