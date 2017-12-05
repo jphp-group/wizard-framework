@@ -1,8 +1,20 @@
 import Button from './Button';
 
 class ToggleButton extends Button {
+  constructor(text, graphic) {
+    super(text, graphic);
+
+    dom.on('click.ToggleButton', () => {
+      if (this.uiMediator) {
+        this.uiMediator.sendUserInput(this, () => {
+          return { 'selected': this.selected }
+        });
+      }
+    });
+  }
+
   createDom() {
-    var dom = super.createDom();
+    const dom = super.createDom();
     dom.addClass('ux-toggle-button');
     dom.attr('data-toggle', 'button');
     return dom;

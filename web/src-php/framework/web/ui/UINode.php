@@ -83,7 +83,7 @@ abstract class UINode extends Component implements UIViewable
         $view = ['_' => $this->uiSchemaClassName()];
 
         foreach ($this->getProperties() as $name => $value) {
-            if ($name === 'parent') continue;
+            if ($name === 'parent' || $name === 'connectedUi') continue;
 
             if ($value instanceof UIViewable) {
                 $value = $value->uiSchema();
