@@ -55,7 +55,7 @@ class AppUI extends UI
         $this->console = new WebConsole($this);
 
         $this->on('ready', function (Event $e) {
-            //$this->onReady($e);
+            $this->detectCurrentForm();
         }, __CLASS__);
     }
 
@@ -115,11 +115,55 @@ class AppUI extends UI
     }
 
     /**
+     * @return UINode
+     */
+    public function getView(): UINode
+    {
+        return $this->currentForm ? $this->currentForm->layout : parent::getView();
+    }
+
+
+    /**
      * @return UIForm|null
      */
     public function getCurrentForm(): ?UIForm
     {
         return $this->currentForm;
+    }
+
+    protected function detectCurrentForm()
+    {
+        /** @var UIVBox $view */
+        if ($view = $this->getView()) {
+            $view->disconnectUI();
+        }
+
+        $this->currentForm = null;
+
+        $subPath = "/" . $this->location['contextUrl'];
+
+        $found = false;
+
+        foreach ($this->urlForms as $url => $form) {
+            if ($url === $subPath) {
+                $this->currentForm = $form;
+                $found = true;
+                break;
+            }
+        }
+
+        if (!$found && $this->notFoundForm) {
+            $this->currentForm = $this->notFoundForm;
+            $this->requestUrl = $subPath;
+        }
+
+        if ($this->currentForm) {
+            if ($this->currentForm->getConnectedUI() !== $this) {
+                $this->currentForm->connectToUI($this);
+            }
+
+            $this->sendMessage('page-set-properties', ['title' => $this->currentForm->title]);
+        }
     }
 
     /**
@@ -142,10 +186,6 @@ class AppUI extends UI
         if ($this->currentForm) {
             $this->currentForm->trigger(new Event('leave', $this->currentForm, $this));
         }
-
-        /** @var UIVBox $view */
-        $view = $this->getView();
-        $view->clear();
 
         if ($form) {
             $routePath = $form->getRoutePath();
@@ -170,52 +210,11 @@ class AppUI extends UI
             if ($form->getConnectedUI() !== $this) {
                 $form->connectToUI($this);
             }
-
-            $view->add($form->getLayout());
         }
 
         $this->currentForm = $form;
+        $this->renderView();
+
         $form->trigger(new Event('navigate', $form, $this, $args));
-    }
-
-    public function renderView()
-    {
-        $this->currentForm = null;
-
-        $subPath = "/" . $this->location['contextUrl'];
-
-        $found = false;
-
-        foreach ($this->urlForms as $url => $form) {
-            if ($url === $subPath) {
-                $this->currentForm = $form;
-                $found = true;
-                break;
-            }
-        }
-
-        if (!$found && $this->notFoundForm) {
-            $this->currentForm = $this->notFoundForm;
-            $this->requestUrl = $subPath;
-        }
-
-        if ($this->currentForm) {
-            /** @var UIVBox $view */
-            $view = $this->getView();
-
-            $view->disconnectUI();
-            $view->clear();
-
-            if ($this->currentForm->getConnectedUI() !== $this) {
-                $this->currentForm->connectToUI($this);
-            }
-
-            $view->add($this->currentForm->getLayout());
-            $view->connectToUI($this);
-
-            $this->sendMessage('page-set-properties', ['title' => $this->currentForm->title]);
-        }
-
-        parent::renderView();
     }
 }

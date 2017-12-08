@@ -7,6 +7,7 @@ use framework\core\Application;
 use framework\core\Component;
 use framework\core\Event;
 use framework\core\Logger;
+use framework\core\Module;
 use php\format\JsonProcessor;
 use php\http\HttpRedirectHandler;
 use php\http\HttpResourceHandler;
@@ -83,6 +84,14 @@ class WebApplication extends Application
         $this->dnextCssFile = $cssFile;
         $this->dnextJsFile = $jsFile;
         $this->initializeWebLib();
+    }
+
+    /**
+     * Shutdown.
+     */
+    public function shutdown()
+    {
+        $this->server()->shutdown();
     }
 
     protected function initialize()
@@ -235,6 +244,10 @@ class WebApplication extends Application
         }
 
         Logger::info("\t-> GET {0} {1}", $cssUrl, $cssFile);
+    }
+
+    public function addModule(Module $module)
+    {
     }
 
     public function addUI(string $uiClass)

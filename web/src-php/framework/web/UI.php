@@ -169,7 +169,7 @@ abstract class UI extends Component
      */
     final public function getUISchema(): array
     {
-        return $this->view->uiSchema();
+        return $this->getView()->uiSchema();
     }
 
     /**
@@ -230,7 +230,7 @@ abstract class UI extends Component
 
     public function findNodeByUuidGlobally(string $uuid): ?UINode
     {
-        $found = $this->findNodeByUuid($uuid, $this->view);
+        $found = $this->findNodeByUuid($uuid, $this->getView());
 
         if (!$found) {
             foreach ($this->windows as $window) {
@@ -254,6 +254,10 @@ abstract class UI extends Component
         if ($view) {
             if ($view->uuid === $uuid) {
                 return $view;
+            }
+
+            if ($view->tooltip instanceof UINode && $view->tooltip->uuid === $uuid) {
+                return $view->tooltip;
             }
 
             if ($view instanceof UIContainer) {
@@ -320,8 +324,8 @@ abstract class UI extends Component
 
             case 'ui-ready':
                 $this->location = $message->getData()['location'];
-                $this->renderView();
                 $this->trigger(new Event('ready', $this, null, $message->getData()));
+                $this->renderView();
                 break;
 
             case "page-change-hash":

@@ -1,15 +1,22 @@
 <?php
 
-use controllers\MainController;
+use framework\web\HotDeployer;
 use framework\web\WebApplication;
+use php\lang\Thread;
 use ui\MainUI;
 
-$app = new WebApplication();
-$app->enableUiSupport(
-    './../web/src-js/build/lib/dnext-engine.js',
-    './../web/src-js/build/lib/dnext-engine.min.css'
-);
+$deployer = new HotDeployer(function () {
+    $app = new WebApplication();
+    $app->enableUiSupport(
+        './../web/src-js/build/lib/dnext-engine.js',
+        './../web/src-js/build/lib/dnext-engine.min.css'
+    );
 
-//$app->addController(MainController::class);
-$app->addUI(MainUI::class);
-$app->launch();
+    $app->addUI(MainUI::class);
+    $app->launch();
+}, function () {
+    WebApplication::current()->shutdown();
+});
+
+$deployer->addDirWatcher('./src-php');
+$deployer->run();

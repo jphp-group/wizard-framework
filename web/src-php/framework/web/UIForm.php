@@ -172,6 +172,10 @@ abstract class UIForm extends Component
     public function connectToUI(UI $ui)
     {
         $this->connectedUi = $ui;
+
+        if ($this->layout) {
+            $this->layout->connectToUI($ui);
+        }
     }
 
     /**

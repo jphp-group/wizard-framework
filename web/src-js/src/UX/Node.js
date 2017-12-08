@@ -1,4 +1,5 @@
 import Utils from './util/Utils';
+import UILoader from "../NX/UILoader";
 
 /**
  * Base HTML Node class.
@@ -216,6 +217,45 @@ class Node {
     }
   }
 
+  get tooltip() {
+    return this.dom.data('tooltip');
+  }
+
+  __setTooltip(tooltip) {
+    this.dom.data('--tooltip', tooltip);
+
+    /*if (this.dom.data('bs.tooltip')) {
+      this.dom.tooltip('dispose');
+    }*/
+
+    if (tooltip) {
+      const options = jQuery.extend({},
+        { title: tooltip instanceof Node ? tooltip.dom : tooltip },
+        this.tooltipOptions
+      );
+
+      this.dom.tooltip(options);
+    }
+  }
+
+  set tooltip(tooltip) {
+    if (this.tooltip === tooltip) return;
+    this.__triggerPropertyChange('tooltip', tooltip);
+
+    this.__setTooltip(tooltip);
+  }
+
+  get tooltipOptions() {
+    return this.dom.data('--tooltipOptions') || {};
+  }
+
+  set tooltipOptions(options) {
+    this.__triggerPropertyChange('tooltipOptions', options || {});
+
+    this.dom.data('--tooltipOptions', options || {});
+    this.__setTooltip(this.tooltip);
+  }
+
   get padding() {
     return [
       Utils.toPt(this.dom.css('padding-top')),
@@ -419,7 +459,12 @@ class Node {
           continue;
         }
 
-        const value = object[prop];
+        let value = object[prop];
+
+        if (value.hasOwnProperty('_')) {
+          const uiLoader = new UILoader();
+          value = uiLoader.load(value, this);
+        }
 
         switch (prop) {
           default:

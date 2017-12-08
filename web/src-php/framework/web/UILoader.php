@@ -53,6 +53,10 @@ class UILoader extends Component
         foreach ($data as $key => $value) {
             if ($key[0] === '_') continue;
 
+            if (isset($value['_'])) {
+                $value = $this->_load($value);
+            }
+
             $node->{$key} = $value;
         }
 

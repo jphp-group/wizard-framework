@@ -1,9 +1,12 @@
 <?php
 namespace ui;
 
+use framework\web\ui\UIButton;
 use framework\web\ui\UIHBox;
 use framework\web\ui\UIImageView;
 use framework\web\UIForm;
+use php\lib\str;
+use php\time\Timer;
 
 /**
  * Class MainForm
@@ -11,7 +14,9 @@ use framework\web\UIForm;
  *
  * @path /
  *
- * @property UIHBox $pics
+ * @property UIHBox $pane
+ * @property UIButton $button
+ *
  */
 class MainForm extends UIForm
 {
@@ -20,15 +25,6 @@ class MainForm extends UIForm
      */
     public function doButtonClick()
     {
-        //$this->appUI->navigateTo('OtherForm');
-
-        $this->button->classes = ['foobar'];
-
-        /*$dialog = new InputTextDialog(function ($text) {
-            $image = new UIImageView($text);
-            $this->pics->add($image);
-        });
-
-        $dialog->show();*/
+        alert('5555');
     }
 }

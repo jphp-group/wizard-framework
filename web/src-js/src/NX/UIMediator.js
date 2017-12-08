@@ -336,6 +336,10 @@ class UIMediator {
       return node;
     }
 
+    if (node.tooltip instanceof Node && node.tooltip.uuid === uuid) {
+      return node.tooltip;
+    }
+
     if (node instanceof Container) {
       let children = node.children();
 

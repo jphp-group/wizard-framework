@@ -8,18 +8,25 @@
 
       "_content": [
         {
-          "_": "Button",
-          "id": "button",
-          "kind": "success",
-          "text": "Добавить картинку",
-          "classes": ["foobar"]
-        },
-        {
-            "_": "HBox",
-            "id": "pics",
-            "spacing": 10,
-            "align": ["center", "center"],
-            "_content": []
+            "_": "AnchorPane",
+            "style": "border: 1px solid black;",
+            "width": 300,
+            "height": 300,
+            "id": "pane",
+            "_content": [
+                {
+                  "_": "Button",
+                  "id": "button",
+                  "kind": "success",
+                  "text": "Добавить картинку",
+                  "classes": ["foobar"],
+                  "x": 30,
+                  "y": 50,
+                  "tooltip": {
+                      "_": "Label", "text": "Нажмите на кнопку2"
+                  }
+                }
+            ]
         }
       ]
   }

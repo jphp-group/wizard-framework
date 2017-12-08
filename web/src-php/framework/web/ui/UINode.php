@@ -4,8 +4,10 @@ namespace framework\web\ui;
 
 use framework\core\Component;
 use framework\core\Event;
+use framework\core\Logger;
 use framework\web\UI;
 use php\lib\arr;
+use php\lib\reflect;
 use php\lib\str;
 
 /**
@@ -18,10 +20,15 @@ use php\lib\str;
  * @property mixed $width
  * @property mixed $height
  * @property array $size
+ * @property int $x
+ * @property int $y
+ * @property int[] $position
  * @property UIContainer $parent
  *
  * @property bool $enabled
  * @property bool $visible
+ * @property string|UINode $tooltip
+ * @property array $tooltipOptions
  */
 abstract class UINode extends Component implements UIViewable
 {
@@ -51,6 +58,16 @@ abstract class UINode extends Component implements UIViewable
     private $height;
 
     /**
+     * @var int
+     */
+    private $x = 0;
+
+    /**
+     * @var int
+     */
+    private $y = 0;
+
+    /**
      * @var bool
      */
     private $visible = true;
@@ -59,6 +76,16 @@ abstract class UINode extends Component implements UIViewable
      * @var bool
      */
     private $enabled = true;
+
+    /**
+     * @var string
+     */
+    private $tooltip = '';
+
+    /**
+     * @var array
+     */
+    private $tooltipOptions = [];
 
     /**
      * @var UI
@@ -201,6 +228,82 @@ abstract class UINode extends Component implements UIViewable
     }
 
     /**
+     * @return array
+     */
+    protected function getSize(): array
+    {
+        return [$this->width, $this->height];
+    }
+
+    /**
+     * @param array $size
+     */
+    protected function setSize(array $size)
+    {
+        if (sizeof($size) >= 2) {
+            $this->width = $size[0];
+            $this->height = $size[1];
+
+            $this->changeRemoteProperty('width', $this->width);
+            $this->changeRemoteProperty('height', $this->height);
+        }
+    }
+
+    /**
+     * @return int
+     */
+    protected function getX(): int
+    {
+        return $this->x;
+    }
+
+    /**
+     * @param int $x
+     */
+    protected function setX(int $x)
+    {
+        $this->x = $x;
+    }
+
+    /**
+     * @return int
+     */
+    protected function getY(): int
+    {
+        return $this->y;
+    }
+
+    /**
+     * @param int $y
+     */
+    protected function setY(int $y)
+    {
+        $this->y = $y;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getPosition(): array
+    {
+        return [$this->x, $this->y];
+    }
+
+    /**
+     * @param int[] $position
+     */
+    protected function setPosition(array $position)
+    {
+        if (sizeof($position) >= 2) {
+            $this->x = $position[0];
+            $this->y = $position[1];
+
+            $this->changeRemoteProperty('x', $this->x);
+            $this->changeRemoteProperty('y', $this->y);
+        }
+    }
+
+    /**
      * @return bool
      */
     protected function isVisible(): bool
@@ -230,6 +333,38 @@ abstract class UINode extends Component implements UIViewable
     protected function setEnabled(bool $enabled)
     {
         $this->enabled = $enabled;
+    }
+
+    /**
+     * @return string|UINode
+     */
+    public function getTooltip()
+    {
+        return $this->tooltip;
+    }
+
+    /**
+     * @param string|UINode $tooltip
+     */
+    public function setTooltip($tooltip)
+    {
+        $this->tooltip = $tooltip;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTooltipOptions(): array
+    {
+        return $this->tooltipOptions;
+    }
+
+    /**
+     * @param array $tooltipOptions
+     */
+    public function setTooltipOptions(array $tooltipOptions)
+    {
+        $this->tooltipOptions = $tooltipOptions;
     }
 
     /**
@@ -359,6 +494,12 @@ abstract class UINode extends Component implements UIViewable
     {
         if ($this->connectedUi) {
             $this->connectedUi->changeNodeProperty($this, $property, $value);
+        } else {
+            /*Logger::debug(
+                "Unable to change {0} property for {1} ({2}), UI is disconnected.", $property,
+                reflect::typeOf($this),
+                $this->uuid
+            );*/
         }
     }
 

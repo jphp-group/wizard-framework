@@ -11,7 +11,7 @@ use php\time\Time;
  */
 abstract class Application extends Component
 {
-    private static $instance;
+    protected static $instance;
 
     /**
      * @var Settings
