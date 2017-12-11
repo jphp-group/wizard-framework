@@ -8,6 +8,8 @@ use php\lib\str;
 /**
  * Class Component
  * @package framework\core
+ *
+ * @property string $id
  */
 abstract class Component
 {

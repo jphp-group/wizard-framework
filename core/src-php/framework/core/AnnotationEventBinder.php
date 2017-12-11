@@ -63,8 +63,10 @@ class AnnotationEventBinder
             $component = $this->lookup($id);
 
             if ($component) {
+                $method->setAccessible(true);
+
                 $component->on($event, function (Event $e) use ($method, $context) {
-                    $context->{$method->getName()}($e);
+                    $method->invokeArgs($context, [$e]);
                 });
             } else {
                 Logger::warn("Unable to bind '{0}', component not found", $bind);
@@ -76,7 +78,7 @@ class AnnotationEventBinder
     {
         $class = new \ReflectionClass($this->handler);
 
-        foreach ($class->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+        foreach ($class->getMethods() as $method) {
             $this->tryBindMethod($method, $this->handler);
         }
     }
