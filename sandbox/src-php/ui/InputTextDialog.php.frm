@@ -1,8 +1,9 @@
 {
   "title": "Input Text",
-  "view": {
+  "layout": {
     "_": "VBox",
     "spacing": 10,
+    "width": 400,
     "_content": [
         {
           "_": "Label",

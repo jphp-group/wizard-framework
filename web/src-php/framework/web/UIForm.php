@@ -52,6 +52,11 @@ abstract class UIForm extends Component
     private $window;
 
     /**
+     * @var UINode
+     */
+    private $footer;
+
+    /**
      * UIForm constructor.
      */
     public function __construct()
@@ -87,6 +92,7 @@ abstract class UIForm extends Component
         $this->window->centered = true;
         $this->window->clear();
         $this->window->add($this->layout);
+        $this->window->footer = $this->footer;
         $this->window->show();
     }
 
@@ -131,12 +137,23 @@ abstract class UIForm extends Component
         $uiLoader = new UILoader();
 
         try {
-            $data = $uiLoader->loadFromStream($stream = Stream::of($frmPath), 'view');
+            $data = $uiLoader->loadFromStream($stream = Stream::of($frmPath), 'layout');
 
             $this->setTitle($data['title']);
 
             $this->layout = $uiLoader->getNode();
+
             $this->nodesById = $uiLoader->getNodesById();
+
+            if ($data['footer']) {
+                $footerUiLoader = new UILoader();
+                $footerUiLoader->load($data['footer']);
+                $this->footer = $footerUiLoader->getNode();
+                $this->nodesById = flow($uiLoader->getNodesById())
+                    ->append($footerUiLoader->getNodesById())
+                    ->withKeys()
+                    ->toArray();
+            }
         } finally {
             if ($stream) {
                 $stream->close();

@@ -1,9 +1,8 @@
-import Container from "../UX/Container";
 import UILoader from "./UILoader";
 import Node from "../UX/Node";
 
 class UIMediator {
-  constructor(rootDom) {
+  init(rootDom) {
     this.rootDom = rootDom;
     this.activated = true;
     this._callbacks = [];
@@ -25,6 +24,8 @@ class UIMediator {
    * @param sessionId
    */
   startWatching(contextUrl, wsUrl, sessionId) {
+    this.contextUrl = contextUrl;
+    this.wsUrl = wsUrl;
     this.sessionId = sessionId;
 
     const loc = window.location;
@@ -41,7 +42,15 @@ class UIMediator {
 
     this.ws = new WebSocket(newUri);
 
+    this.ws.onerror = () => {
+      if (sessionStorage.getItem('UIMediator.reloading')) {
+        setTimeout(() => window.location.reload(true), 200);
+      }
+    };
+
     this.ws.onopen = () => {
+      sessionStorage.setItem('UIMediator.reloading', false);
+
       this.send('initialize', {});
       this.sendIfCan('ui-ready', {
         location: {
@@ -102,6 +111,10 @@ class UIMediator {
 
         case "ui-render":
           this.triggerRenderView(message);
+          break;
+
+        case "ui-reload":
+          this.triggerReload(message);
           break;
 
         case "ui-alert":
@@ -250,6 +263,10 @@ class UIMediator {
    * @param data
    */
   sendUserInput(node, data) {
+    if (!this.ws) {
+      return;
+    }
+
     if (!document.hidden) {
       setTimeout(() => {
         let newData = data;
@@ -336,23 +353,17 @@ class UIMediator {
       return node;
     }
 
-    if (node.tooltip instanceof Node && node.tooltip.uuid === uuid) {
-      return node.tooltip;
-    }
+    let children = node.innerNodes();
 
-    if (node instanceof Container) {
-      let children = node.children();
+    for (let i = 0; i < children.length; i++) {
+      if (children[i].uuid === uuid) {
+        return children[i];
+      }
 
-      for (let i = 0; i < children.length; i++) {
-        if (children[i].uuid === uuid) {
-          return children[i];
-        }
+      const found = this.findNodeByUuid(uuid, children[i]);
 
-        const found = this.findNodeByUuid(uuid, children[i]);
-
-        if (found !== null) {
-          return found;
-        }
+      if (found !== null) {
+        return found;
       }
     }
 
@@ -445,6 +456,11 @@ class UIMediator {
 
     this._nodes[node.uuid] = node;
   }
+
+  triggerReload(message) {
+    sessionStorage.setItem('UIMediator.reloading', true);
+    setTimeout(() => window.location.reload(true), 50);
+  }
 }
 
-export default UIMediator;
+export default new UIMediator();

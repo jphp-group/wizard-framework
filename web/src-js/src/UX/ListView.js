@@ -1,5 +1,6 @@
 import Container from './Container';
 import Node from './Node';
+import uiMediator from '../NX/UIMediator';
 
 class ListView extends Container {
   constructor() {
@@ -9,14 +10,12 @@ class ListView extends Container {
     this.align = ['center', 'left'];
 
     this.dom.on('action.ListView', () => {
-      if (this.uiMediator) {
-        const data = {
-          selected: this.selected,
-          selectedIndex: this.selectedIndex
-        };
+      const data = {
+        selected: this.selected,
+        selectedIndex: this.selectedIndex
+      };
 
-        this.uiMediator.sendUserInput(this, data);
-      }
+      uiMediator.sendUserInput(this, data);
     })
   }
 

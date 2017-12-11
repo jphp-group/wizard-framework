@@ -1,6 +1,6 @@
 {
   "title": "Other Form",
-  "view": {
+  "layout": {
       "_": "VBox",
       "align": ["center", "center"],
       "height": "100%",

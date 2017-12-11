@@ -110,6 +110,10 @@ class Container extends Node {
     return children;
   }
 
+  innerNodes() {
+    return this.children();
+  }
+
   removeByIndex(index) {
     const child = this.children()[index];
     

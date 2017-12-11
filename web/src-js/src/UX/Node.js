@@ -42,13 +42,6 @@ class Node {
   }
 
   /**
-   * @returns {UIMediator}
-   */
-  get uiMediator() {
-    return this.dom.data('--ui-mediator') || null;
-  }
-
-  /**
    * @returns {string}
    */
   get uuid() {
@@ -450,6 +443,14 @@ class Node {
   }
 
   /**
+   * Returns inner Nodes as array.
+   * @returns {Array}
+   */
+  innerNodes() {
+    return [];
+  }
+
+  /**
    * @param object
    */
   loadSchema(object) {
@@ -463,7 +464,7 @@ class Node {
 
         if (value.hasOwnProperty('_')) {
           const uiLoader = new UILoader();
-          value = uiLoader.load(value, this);
+          value = uiLoader.load(value);
         }
 
         switch (prop) {
@@ -477,13 +478,6 @@ class Node {
     if (object.classes) {
       this.classes = object.classes;
     }
-  }
-
-  /**
-   * @param {UIMediator} uiMediator
-   */
-  connectToMediator(uiMediator) {
-    this.dom.data('--ui-mediator', uiMediator);
   }
 
   static getFromDom(jqueryObject) {

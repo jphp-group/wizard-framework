@@ -170,6 +170,6 @@ abstract class Component
             return $closure($value);
         }
 
-        throw new \Error("Property '$name' is not exists in class or readonly" . reflect::typeOf($this));
+        throw new \Error("Property '$name' is not exists in class " . reflect::typeOf($this) . " or readonly");
     }
 }

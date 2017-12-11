@@ -64,6 +64,11 @@ class WebApplication extends Application
     protected $uiSupport = false;
 
     /**
+     * @var array
+     */
+    protected $uiClasses = [];
+
+    /**
      * @var string
      */
     protected $dnextJsFile = null;
@@ -87,10 +92,35 @@ class WebApplication extends Application
     }
 
     /**
+     * Redeploy.
+     */
+    public function redeploy()
+    {
+        foreach ($this->isolatedSessionInstances as $sid => $instances) {
+            foreach ($this->uiClasses as $class => $reflection) {
+                /** @var UI $ui */
+                $ui = $instances[$class];
+
+                if ($ui) {
+                    $ui->sendMessage('ui-reload', []);
+                }
+            }
+        }
+        $this->shutdown();
+    }
+
+    /**
      * Shutdown.
      */
     public function shutdown()
     {
+        foreach ($this->isolatedSessionInstances as $sid => $instances) {
+            /** @var UISocket $socket */
+            if ($socket = $instances[UISocket::class]) {
+                $socket->shutdown();
+            }
+        }
+
         $this->server()->shutdown();
     }
 
@@ -256,7 +286,7 @@ class WebApplication extends Application
             throw new \Exception("UI support is disabled");
         }
 
-        $reflectionClass = new ReflectionClass($uiClass);
+        $reflectionClass = $this->uiClasses[$uiClass] = new ReflectionClass($uiClass);
 
         $path = Annotations::getOfClass('path', $reflectionClass);
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace framework\web;
 
 use framework\core\Annotations;
@@ -144,7 +145,8 @@ abstract class UI extends Component
         $this->windows[$window->uuid] = $window;
 
         $window->connectToUI($this);
-        $this->socket->sendText(reflect::typeOf($this), 'ui-create-node', ['schema' => $window->uiSchema()]);
+
+        $this->sendMessage('ui-create-node', ['schema' => $window->uiSchema()]);
     }
 
     /**
@@ -222,7 +224,7 @@ abstract class UI extends Component
         }
 
         if (is_object($value)) {
-            return $this->prepareValue((array) $value);
+            return $this->prepareValue((array)$value);
         }
 
         return $value;
@@ -256,15 +258,9 @@ abstract class UI extends Component
                 return $view;
             }
 
-            if ($view->tooltip instanceof UINode && $view->tooltip->uuid === $uuid) {
-                return $view->tooltip;
-            }
-
-            if ($view instanceof UIContainer) {
-                foreach ($view->children as $child) {
-                    if ($found = $this->findNodeByUuid($uuid, $child)) {
-                        return $found;
-                    }
+            foreach ($view->innerNodes() as $child) {
+                if ($found = $this->findNodeByUuid($uuid, $child)) {
+                    return $found;
                 }
             }
         }
@@ -371,7 +367,7 @@ abstract class UI extends Component
      */
     public function sendMessage(string $type, array $message)
     {
-        $this->socket->sendText(reflect::typeOf($this), $type, $message);
+        $this->socket->sendText(reflect::typeOf($this), $type, $this->prepareValue($message));
     }
 
     /**
@@ -445,7 +441,8 @@ abstract class UI extends Component
      *
      * @throws \Exception
      */
-    public static function checkAvailable() {
+    public static function checkAvailable()
+    {
         if (!static::current()) {
             throw new \Exception("UI is not available, specify UI via the UI::setup() method");
         }
@@ -454,7 +451,8 @@ abstract class UI extends Component
     /**
      * @param UI|null $ui
      */
-    public static function setup(?UI $ui) {
+    public static function setup(?UI $ui)
+    {
         if (!static::$current) {
             static::$current = new ThreadLocal($ui);
         } else {

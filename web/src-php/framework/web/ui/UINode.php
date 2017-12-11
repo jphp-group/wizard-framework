@@ -461,6 +461,18 @@ abstract class UINode extends Component implements UIViewable
         return !!$this->parent;
     }
 
+    /**
+     * @return array
+     */
+    public function innerNodes(): array
+    {
+        if ($this->tooltip instanceof UINode) {
+            return [$this->tooltip];
+        }
+
+        return [];
+    }
+
     public function on(string $eventType, callable $handler, string $group = 'general')
     {
         parent::on($eventType, $handler, $group);

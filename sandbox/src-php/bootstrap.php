@@ -15,8 +15,10 @@ $deployer = new HotDeployer(function () {
     $app->addUI(MainUI::class);
     $app->launch();
 }, function () {
-    WebApplication::current()->shutdown();
+    $app = WebApplication::current();
+    $app->redeploy();
 });
 
 $deployer->addDirWatcher('./src-php');
+$deployer->addDirWatcher('../web/src-php');
 $deployer->run();

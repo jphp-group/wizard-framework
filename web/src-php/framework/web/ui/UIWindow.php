@@ -8,6 +8,7 @@ use framework\web\UI;
  *
  * @property string $title
  * @property bool $centered
+ * @property UINode $footer
  */
 class UIWindow extends UIContainer
 {
@@ -20,6 +21,11 @@ class UIWindow extends UIContainer
      * @var bool
      */
     private $centered = false;
+
+    /**
+     * @var UINode
+     */
+    private $footer;
 
     /**
      * UIWindow constructor.
@@ -79,6 +85,37 @@ class UIWindow extends UIContainer
     {
         $this->centered = $centered;
     }
+
+    /**
+     * @return UINode|null
+     */
+    protected function getFooter(): ?UINode
+    {
+        return $this->footer;
+    }
+
+    /**
+     * @param UINode|null $footer
+     */
+    protected function setFooter(?UINode $footer)
+    {
+        $this->footer = $footer;
+    }
+
+    /**
+     * @return array
+     */
+    public function innerNodes(): array
+    {
+        $nodes = parent::innerNodes();
+
+        if ($this->footer) {
+            $nodes[] = $this->footer;
+        }
+
+        return $nodes;
+    }
+
 
     public function show()
     {

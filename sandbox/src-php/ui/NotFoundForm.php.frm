@@ -1,6 +1,6 @@
 {
   "title": "404. Not Found",
-  "view": {
+  "layout": {
       "_": "VBox",
       "align": ["center", "center"],
       "height": "100%",

@@ -1,31 +1,26 @@
 import Node from './../UX/Node';
 import Container from './../UX/Container';
 import UX from './../UX/UX';
+import uiMediator from './UIMediator';
 
 class UILoader {
 
-  linkToMediator(node, data, uiMediator) {
-    if (uiMediator !== undefined) {
-      node.connectToMediator(uiMediator);
-
-      const watchedEvents = data['_watchedEvents'];
-      if (watchedEvents !== undefined) {
-        for (let watchedEvent of watchedEvents) {
-
-          node.on(`${watchedEvent}.UIMediator`, (e) => {
-            uiMediator.triggerEvent(node, watchedEvent, e);
-          })
-        }
+  linkToMediator(node, data) {
+    const watchedEvents = data['_watchedEvents'];
+    if (watchedEvents !== undefined) {
+      for (let watchedEvent of watchedEvents) {
+        node.on(`${watchedEvent}.UIMediator`, (e) => {
+          uiMediator.triggerEvent(node, watchedEvent, e);
+        })
       }
     }
   }
 
   /**
    * @param object
-   * @param {UIMediator} uiMediator
    * @returns {Node}
    */
-  load(object, uiMediator) {
+  load(object) {
     if (object && typeof object === "object") {
       const type = object['_'];
 
@@ -52,7 +47,7 @@ class UILoader {
         }
 
         node.loadSchema(object);
-        this.linkToMediator(node, object, uiMediator);
+        this.linkToMediator(node, object);
         return node;
       } else {
         throw new Error(`Type '${type}' is not UI component class`);
@@ -60,24 +55,22 @@ class UILoader {
     }
   }
 
-    /**
-     * @param {string} jsonString
-     * @param {UIMediator} uiMediator
-     * @returns {Node}
-     */
-  loadFromJson(jsonString, uiMediator) {
-    return this.load(JSON.parse(jsonString), uiMediator);
+  /**
+   * @param {string} jsonString
+   * @returns {Node}
+   */
+  loadFromJson(jsonString) {
+    return this.load(JSON.parse(jsonString));
   }
 
-    /**
-     *
-     * @param {string} urlToJson
-     * @param {UIMediator} uiMediator
-     * @param {function} callback
-     */
-  loadFromUrl(urlToJson, uiMediator, callback) {
+  /**
+   *
+   * @param {string} urlToJson
+   * @param {function} callback
+   */
+  loadFromUrl(urlToJson, callback) {
     jQuery.getJSON(urlToJson, (data) => {
-        callback(this.load(data, uiMediator));
+      callback(this.load(data));
     });
   }
 }

@@ -69,4 +69,18 @@ abstract class UILabeled extends UINode
     {
         $this->graphic = $graphic;
     }
+
+    /**
+     * @return array
+     */
+    public function innerNodes(): array
+    {
+        $nodes = parent::innerNodes();
+
+        if ($this->graphic) {
+            $nodes[] = $this->graphic;
+        }
+
+        return $nodes;
+    }
 }

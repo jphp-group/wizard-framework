@@ -133,15 +133,16 @@ class HotDeployer extends Component
 
         $this->env = $env = new Environment(null, Environment::CONCURRENT | Environment::HOT_RELOAD);
 
-        $dirs = flow($this->dirWatchers)->withKeys()->find(function ($watcher) { return $watcher['source']; })->toArray();
+        $dirs = flow($this->dirWatchers)->find(function ($watcher) { return $watcher['source']; })->keys()->toArray();
 
         $env->execute(function () use ($dirs) {
+            ob_implicit_flush(1);
+
             spl_autoload_register(function ($className) use ($dirs) {
-                var_dump($className);
                 $filename = str::replace($className, '\\', '/') . '.php';
 
-                foreach ($dirs as $dir => $watcher) {
-                    if ($watcher['source'] && fs::isFile("$dir/$filename")) {
+                foreach ($dirs as $dir) {
+                    if (fs::isFile("$dir/$filename")) {
                         require "$dir/$filename";
                         return true;
                     }

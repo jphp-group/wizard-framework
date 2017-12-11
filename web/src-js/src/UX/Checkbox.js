@@ -1,13 +1,12 @@
 import Labeled from './Labeled';
+import uiMediator from '../NX/UIMediator';
 
 class Checkbox extends Labeled {
   constructor(text, graphic) {
     super(text, graphic);
 
     this.dom.on('click.Checkbox', () => {
-      if (this.uiMediator) {
-        this.uiMediator.sendUserInput(this, {selected: this.selected});
-      }
+      uiMediator.sendUserInput(this, {selected: this.selected});
     });
   }
 

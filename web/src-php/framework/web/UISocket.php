@@ -193,4 +193,20 @@ class UISocket extends Component
             Logger::error("Failed to send text, session for {0} UI is not found", $uiClass);
         }
     }
+
+    /**
+     * Shutdown all ws sessions.
+     */
+    public function shutdown()
+    {
+        foreach ($this->sessions as $uiClass => $sessions) {
+            foreach ($sessions as $uuid => $session) {
+                if ($session->isOpen()) {
+                    Logger::info("Shutdown WS Session (uuid = {0})", $uuid);
+                    $session->close();
+                }
+            }
+        }
+    }
+
 }

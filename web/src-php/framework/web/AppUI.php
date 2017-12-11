@@ -154,7 +154,6 @@ class AppUI extends UI
 
         if (!$found && $this->notFoundForm) {
             $this->currentForm = $this->notFoundForm;
-            $this->requestUrl = $subPath;
         }
 
         if ($this->currentForm) {

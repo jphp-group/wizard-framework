@@ -14,10 +14,13 @@ class UIButton extends UILabeled
     const KIND_DEFAULT = 'default';
     const KIND_PRIMARY = 'primary';
     const KIND_SUCCESS = 'success';
+    const KIND_SECONDARY = 'secondary';
     const KIND_INFO    = 'info';
     const KIND_WARNING = 'warning';
     const KIND_DANGER  = 'danger';
     const KIND_LINK    = 'link';
+    const KIND_LIGHT   = 'light';
+    const KIND_DARK    = 'dark';
 
     /**
      * default, primary, success, info, warning, danger, link
@@ -26,11 +29,32 @@ class UIButton extends UILabeled
     private $kind = 'default';
 
     /**
+     * @var bool
+     */
+    private $outline = false;
+
+    /**
      * @return string
      */
     public function uiSchemaClassName(): string
     {
         return 'Button';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOutline(): bool
+    {
+        return $this->outline;
+    }
+
+    /**
+     * @param bool $outline
+     */
+    public function setOutline(bool $outline)
+    {
+        $this->outline = $outline;
     }
 
     /**

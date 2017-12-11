@@ -1,21 +1,27 @@
 import Labeled from './Labeled';
 
+const kinds = [
+  'success', 'primary', 'secondary', 'info', 'warning', 'danger', 'link', 'dark', 'light'
+];
+
 class Button extends Labeled {
+  get outline() {
+    return !!this.dom.data('--outline');
+  }
+
+  set outline(value) {
+    const kind = this.kind;
+    this.dom.data('--outline', !!value);
+    this.kind = kind;
+  }
+
   get kind() {
     const dom = this.dom;
 
-    if (dom.hasClass('btn-primary')) {
-      return 'primary';
-    } else if (dom.hasClass('btn-success')) {
-      return 'success';
-    } else if (dom.hasClass('btn-info')) {
-      return 'info';
-    } else if (dom.hasClass('btn-warning')) {
-      return 'warning';
-    } else if (dom.hasClass('btn-danger')) {
-      return 'danger';
-    } else if (dom.hasClass('btn-link')) {
-      return 'link';
+    for (let kind of kinds) {
+      if (dom.hasClass(`btn-${kind}`) || dom.hasClass(`btn-outline-${kind}`)) {
+        return kind;
+      }
     }
 
     return 'default';
@@ -23,7 +29,13 @@ class Button extends Labeled {
 
   set kind(value) {
     this.dom.removeClass(`btn-${this.kind}`);
-    this.dom.addClass(`btn-${value}`);
+    this.dom.removeClass(`btn-outline-${this.kind}`);
+
+    if (this.outline) {
+      this.dom.addClass(`btn-outline-${value}`);
+    } else {
+      this.dom.addClass(`btn-${value}`);
+    }
   }
 
   createDom() {

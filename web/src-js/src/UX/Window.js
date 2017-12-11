@@ -1,5 +1,6 @@
 import Node from './Node';
 import Container from "./Container";
+import uiMediator from '../NX/UIMediator';
 
 class Window extends Container {
   constructor() {
@@ -8,14 +9,12 @@ class Window extends Container {
     this.contentDom = this.dom.find('.modal-body');
     this.dom.modal();
     this.dom.on('hide.bs.modal.Window', () => {
-      if (this.uiMediator) {
-        const data = {
-          visible: false,
-          close: true,
-        };
+      const data = {
+        visible: false,
+        close: true,
+      };
 
-        this.uiMediator.sendUserInput(this, data);
-      }
+      uiMediator.sendUserInput(this, data);
     });
   }
 
@@ -57,6 +56,25 @@ class Window extends Container {
     this.dom.find('.modal-dialog').height(value);
   }
 
+  get footer() {
+    const footer = this.dom.find('.modal-footer > *').first();
+    return Node.getFromDom(footer);
+  }
+
+  set footer(value) {
+    const footer = this.dom.find('.modal-footer');
+    footer.empty();
+
+    if (value instanceof Node) {
+      footer.append(value.dom);
+      footer.show();
+    } else if (value === null) {
+      footer.hide();
+    } else {
+      throw new Error("footer value must be Node or null, passed " + (typeof value));
+    }
+  }
+
   hide() {
     this.dom.modal('hide');
   }
@@ -78,12 +96,24 @@ class Window extends Container {
   createDom() {
     const dom = jQuery('<div class="modal fade in ux-window" role="dialog" aria-hidden="true"><div class="modal-dialog"><div class="modal-content">' +
       '<div class="modal-header">' +
-        '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>' +
-        '<h5 class="modal-title ux-window-title"></h4></div>' +
+        '<h5 class="modal-title ux-window-title"></h5>' +
+        '<button type="button" class="close" data-dismiss="modal" aria-hidden="Close">×</button>' +
+      '</div>' +
       '<div class="modal-body"></div>' +
+      '<div class="modal-footer" style="display: none;"></div>' +
       '</div></div></div>');
 
     return dom;
+  }
+
+  innerNodes() {
+    const result = super.innerNodes();
+
+    if (this.footer) {
+      result.push(this.footer);
+    }
+
+    return result;
   }
 }
 

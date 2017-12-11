@@ -19,7 +19,8 @@
         <div id="app"></div>
 
         <script>
-            uiMediator = new NX.UIMediator($('#app'));
+            uiMediator = NX.UIMediator;
+            uiMediator.init($('#app'));
             uiMediator.startWatching('{{urlArgument}}', '{{uiSocketUrl}}', '{{sessionId}}');
         </script>
     </body>

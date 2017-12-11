@@ -1,15 +1,14 @@
 import Node from './Node';
+import uiMediator from '../NX/UIMediator';
 
 class TextInputControl extends Node {
   constructor() {
     super();
 
     this.dom.on('keydown.TextInputControl', (e) => {
-      if (this.uiMediator) {
-        this.uiMediator.sendUserInput(this, () => {
+        uiMediator.sendUserInput(this, () => {
           return { text: this.text }
         });
-      }
     });
   }
 

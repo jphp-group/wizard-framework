@@ -175,6 +175,16 @@ class UIContainer extends UINode
         [$this->verAlign, $this->horAlign] = $value;
     }
 
+    /**
+     * @return array
+     */
+    public function innerNodes(): array
+    {
+        $nodes = parent::innerNodes();
+
+        return $nodes + $this->children;
+    }
+
     public function connectToUI(?UI $ui)
     {
         parent::connectToUI($ui);

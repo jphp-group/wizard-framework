@@ -25,6 +25,8 @@ class MainForm extends UIForm
      */
     public function doButtonClick()
     {
-        alert('5555');
+        $alert = new UIAlert();
+        $alert->text = 'Привет мир!';
+        $alert->show();
     }
 }
