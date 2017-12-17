@@ -4,6 +4,7 @@ mainClassName = 'php.runtime.launcher.Launcher'
 
 dependencies {
     compile project(":web")
+    compile project(":web-ui")
     compile "org.develnext.jphp:jphp-core:${jphpVersion}"
     compile "org.develnext.jphp:jphp-zend-ext:${jphpVersion}"
 }

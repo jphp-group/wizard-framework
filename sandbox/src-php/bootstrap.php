@@ -2,17 +2,20 @@
 
 use framework\web\HotDeployer;
 use framework\web\WebApplication;
-use php\lang\Thread;
+use framework\web\WebUI;
 use ui\MainUI;
 
 $deployer = new HotDeployer(function () {
-    $app = new WebApplication();
-    $app->enableUiSupport(
-        './../web/src-js/build/lib/dnext-engine.js',
-        './../web/src-js/build/lib/dnext-engine.min.css'
+
+    $webUi = new WebUI();
+    $webUi->setupResources(
+        './../web-ui/src-js/build/lib/dnext-engine.js', './../web-ui/src-js/build/lib/dnext-engine.min.css'
     );
 
-    $app->addUI(MainUI::class);
+    $app = new WebApplication();
+    $app->addModule($webUi);
+    $webUi->addUI(MainUI::class);
+
     $app->launch();
 }, function () {
     $app = WebApplication::current();
@@ -21,4 +24,5 @@ $deployer = new HotDeployer(function () {
 
 $deployer->addDirWatcher('./src-php');
 $deployer->addDirWatcher('../web/src-php');
+$deployer->addDirWatcher('../web-ui/src-php');
 $deployer->run();

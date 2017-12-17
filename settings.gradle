@@ -1,8 +1,9 @@
 
 rootProject.name = 'framework'
 
-include 'core';
+include 'core'
 include 'web'
+include 'web-ui'
 
 include 'sandbox'
 

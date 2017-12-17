@@ -408,23 +408,25 @@ class Node {
 
   show() {
     let dom = this.dom;
+    dom.css('display', '');
 
     if (this.dom.data('--wrapper-dom')) {
       dom = this.dom.data('--wrapper-dom');
+      dom.css('display', '');
     }
 
-    dom.css('display', '');
     return this;
   }
 
   hide() {
     let dom = this.dom;
+    dom.hide();
 
     if (this.dom.data('--wrapper-dom')) {
       dom = this.dom.data('--wrapper-dom');
+      dom.hide();
     }
 
-    dom.hide();
     return this;
   }
 
