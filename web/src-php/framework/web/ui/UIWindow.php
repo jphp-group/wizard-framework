@@ -8,6 +8,7 @@ use framework\web\UI;
  *
  * @property string $title
  * @property bool $centered
+ * @property bool $closable
  * @property UINode $footer
  */
 class UIWindow extends UIContainer
@@ -21,6 +22,11 @@ class UIWindow extends UIContainer
      * @var bool
      */
     private $centered = false;
+
+    /**
+     * @var bool
+     */
+    private $closable = true;
 
     /**
      * @var UINode
@@ -73,7 +79,7 @@ class UIWindow extends UIContainer
     /**
      * @return bool
      */
-    public function isCentered(): bool
+    protected function isCentered(): bool
     {
         return $this->centered;
     }
@@ -81,9 +87,25 @@ class UIWindow extends UIContainer
     /**
      * @param bool $centered
      */
-    public function setCentered(bool $centered)
+    protected function setCentered(bool $centered)
     {
         $this->centered = $centered;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isClosable(): bool
+    {
+        return $this->closable;
+    }
+
+    /**
+     * @param bool $closable
+     */
+    protected function setClosable(bool $closable)
+    {
+        $this->closable = $closable;
     }
 
     /**

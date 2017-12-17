@@ -30,6 +30,8 @@ class MainForm extends UIForm
         // Создаем диалог типа confirm (вопросительный).
         $alert = new UIAlert('confirm');
 
+        $alert->layout->
+
         // Заголовок диалога.
         $alert->title = 'Вопрос';
 

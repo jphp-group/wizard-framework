@@ -6,7 +6,7 @@ namespace framework\web\ui;
  *
  * @property string $text
  * @property UINode $graphic
- *
+ * @property UIFont $font
  */
 abstract class UILabeled extends UINode
 {
@@ -14,6 +14,11 @@ abstract class UILabeled extends UINode
      * @var string
      */
     private $text = '';
+
+    /**
+     * @var UIFont
+     */
+    private $font;
 
     /**
      * @var UINode|null
@@ -29,6 +34,8 @@ abstract class UILabeled extends UINode
     {
         parent::__construct();
 
+        $this->font = new UIFont();
+
         if ($text) {
             $this->setText($text);
         }
@@ -41,7 +48,7 @@ abstract class UILabeled extends UINode
     /**
      * @return string
      */
-    public function getText(): string
+    protected function getText(): string
     {
         return $this->text;
     }
@@ -49,7 +56,7 @@ abstract class UILabeled extends UINode
     /**
      * @param string $text
      */
-    public function setText(string $text)
+    protected function setText(string $text)
     {
         $this->text = $text;
     }
@@ -57,7 +64,7 @@ abstract class UILabeled extends UINode
     /**
      * @return UINode
      */
-    public function getGraphic(): ?UINode
+    protected function getGraphic(): ?UINode
     {
         return $this->graphic;
     }
@@ -65,9 +72,26 @@ abstract class UILabeled extends UINode
     /**
      * @param UINode $graphic
      */
-    public function setGraphic(?UINode $graphic)
+    protected function setGraphic(?UINode $graphic)
     {
         $this->graphic = $graphic;
+    }
+
+    /**
+     * @return UIFont
+     */
+    protected function getFont(): UIFont
+    {
+        return UIFont::wrapper($this, 'font', $this->font);
+    }
+
+    /**
+     * @param UIFont|array|string $font
+     * @throws \TypeError
+     */
+    protected function setFont($font)
+    {
+        $this->font = UIFont::fetch($font);
     }
 
     /**

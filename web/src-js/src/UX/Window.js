@@ -7,7 +7,11 @@ class Window extends Container {
     super();
 
     this.contentDom = this.dom.find('.modal-body');
-    this.dom.modal();
+    this.dom.modal({
+      backdrop: 'static',
+      keyboard: false
+    });
+
     this.dom.on('hide.bs.modal.Window', () => {
       const data = {
         visible: false,
@@ -27,6 +31,18 @@ class Window extends Container {
       this.dom.addClass('ux-centered');
     } else {
       this.dom.removeClass('ux-centered')
+    }
+  }
+
+  get closable() {
+    return this.dom.hasClass('ux-closable')
+  }
+
+  set closable(value) {
+    if (value) {
+      this.dom.addClass('ux-closable');
+    } else {
+      this.dom.removeClass('ux-closable');
     }
   }
 
@@ -94,7 +110,7 @@ class Window extends Container {
   }
 
   createDom() {
-    const dom = jQuery('<div class="modal fade in ux-window" role="dialog" aria-hidden="true"><div class="modal-dialog"><div class="modal-content">' +
+    const dom = jQuery('<div class="modal fade in ux-window ux-closable" role="dialog" aria-hidden="true"><div class="modal-dialog"><div class="modal-content">' +
       '<div class="modal-header">' +
         '<h5 class="modal-title ux-window-title"></h5>' +
         '<button type="button" class="close" data-dismiss="modal" aria-hidden="Close">×</button>' +

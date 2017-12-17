@@ -55,7 +55,7 @@ class UIAlert extends UIForm
             $this->setType($type);
         }
     }
-
+    
     /**
      * @return string
      */

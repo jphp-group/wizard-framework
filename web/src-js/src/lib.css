@@ -28,6 +28,12 @@ label {
   vertical-align: middle;
 }
 
+.ux-window .close {
+  display: none;
+}
+.ux-window.ux-closable .close {
+  display: block;
+}
 
 /* Labeled */
 .ux-labeled {

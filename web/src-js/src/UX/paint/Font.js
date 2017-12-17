@@ -70,38 +70,69 @@ class Font {
   static applyToDom(dom, font) {
     if (font instanceof Font) {
       dom.css('font-family', font.name);
-      dom.css('font-size', font.size);
+
+      if (font.size) {
+        dom.css('font-size', font.size);
+      } else {
+        dom.css('font-size', '');
+      }
 
       if (font.bold) {
         dom.css('font-weight', 'bold');
+      } else {
+        dom.css('font-weight', '');
       }
 
       if (font.italic) {
         dom.css('font-style', 'italic');
+      } else {
+        dom.css('font-style', '');
       }
 
       if (font.underline) {
         dom.css('text-decoration', 'underline');
+      } else {
+        dom.css('text-decoration', '');
       }
     } else if (typeof font === 'object') {
-      if (font['family']) {
-        dom.css('font-family', font.family);
+      if (font.hasOwnProperty('name')) {
+        if (font.name) {
+          dom.css('font-family', font.name);
+        } else {
+          dom.css('font-family', '');
+        }
       }
 
-      if (font['size']) {
-        dom.css('font-size', font.size);
+      if (font.hasOwnProperty('size')) {
+        if (font.size) {
+          dom.css('font-size', font.size);
+        } else {
+          dom.css('font-size', '');
+        }
       }
 
-      if (font['bold']) {
-        dom.css('font-weight', 'bold');
+      if (font.hasOwnProperty('bold')) {
+        if (font.bold) {
+          dom.css('font-weight', 'bold');
+        } else {
+          dom.css('font-weight', '');
+        }
       }
 
-      if (font['italic']) {
-        dom.css('font-style', 'italic');
+      if (font.hasOwnProperty('italic')) {
+        if (font.italic) {
+          dom.css('font-style', 'italic');
+        } else {
+          dom.css('font-style', '');
+        }
       }
 
-      if (font['underline']) {
-        dom.css('text-decoration', 'underline');
+      if (font.hasOwnProperty('underline')) {
+        if (font.underline) {
+          dom.css('text-decoration', 'underline');
+        } else {
+          dom.css('text-decoration', '');
+        }
       }
     }
   }

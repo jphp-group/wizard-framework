@@ -22,6 +22,8 @@ use php\lib\str;
  * @property UIContainer|UINode $layout
  * @property AppUI $appUI
  * @property string $title
+ * @property bool $closable
+ * @property bool $centered
  *
  */
 abstract class UIForm extends Component
@@ -57,6 +59,16 @@ abstract class UIForm extends Component
     private $footer;
 
     /**
+     * @var bool
+     */
+    private $closable = true;
+
+    /**
+     * @var bool
+     */
+    private $centered = true;
+
+    /**
      * UIForm constructor.
      */
     public function __construct()
@@ -89,7 +101,9 @@ abstract class UIForm extends Component
         $this->window->connectToUI($this->appUI);
 
         $this->window->title = $this->title;
-        $this->window->centered = true;
+        $this->window->centered = $this->centered;
+        $this->window->closable = $this->closable;
+
         $this->window->clear();
         $this->window->add($this->layout);
         $this->window->footer = $this->footer;
@@ -140,6 +154,14 @@ abstract class UIForm extends Component
             $data = $uiLoader->loadFromStream($stream = Stream::of($frmPath), 'layout');
 
             $this->setTitle($data['title']);
+
+            if (isset($data['closable'])) {
+                $this->setClosable($data['closable']);
+            }
+
+            if (isset($data['centered'])) {
+                $this->setCentered($data['centered']);
+            }
 
             $this->layout = $uiLoader->getNode();
 
@@ -225,6 +247,38 @@ abstract class UIForm extends Component
     protected function getTitle(): string
     {
         return $this->title;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isClosable(): bool
+    {
+        return $this->closable;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isCentered(): bool
+    {
+        return $this->centered;
+    }
+
+    /**
+     * @param bool $centered
+     */
+    protected function setCentered(bool $centered)
+    {
+        $this->centered = $centered;
+    }
+
+    /**
+     * @param bool $closable
+     */
+    protected function setClosable(bool $closable)
+    {
+        $this->closable = $closable;
     }
 
     /**

@@ -67,6 +67,7 @@ class Container extends Node {
 
     const width = object.data('--width-percent');
     const height = object.data('--height-percent');
+    const visible = object.css('display') !== 'none';
 
     if (typeof width === 'string') {
       dom.width(width);
@@ -74,6 +75,10 @@ class Container extends Node {
 
     if (typeof width === 'string') {
       dom.height(height);
+    }
+
+    if (!visible) {
+      dom.hide();
     }
 
     return dom;

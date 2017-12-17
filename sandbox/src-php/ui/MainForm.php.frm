@@ -10,12 +10,9 @@
             {
               "_": "Button",
               "id": "button",
-              "kind": "primary",
+              "kind": "info",
               "text": "Посмотреть картинку",
-              "classes": ["foobar"],
-              "height": 45,
-              "x": 30,
-              "y": 50
+              "height": 45
             },
             {
               "_": "ImageView",

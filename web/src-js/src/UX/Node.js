@@ -105,7 +105,13 @@ class Node {
   }
 
   get visible() {
-    return this.dom.is(':visible');
+    let dom = this.dom;
+
+    if (this.dom.data('--wrapper-dom')) {
+      dom = this.dom.data('--wrapper-dom');
+    }
+
+    return dom.is(':visible');
   }
 
   set visible(value) {
@@ -134,6 +140,14 @@ class Node {
   set enabled(value) {
     this.__triggerPropertyChange('enabled', value);
     this.dom.prop('disabled', !value);
+  }
+
+  get selectionEnabled() {
+    return this.dom.css('user-select') !== 'none';
+  }
+
+  set selectionEnabled(value) {
+    this.dom.css('user-select', value ? '' : 'none');
   }
 
   get focused() {
@@ -393,17 +407,34 @@ class Node {
   }
 
   show() {
-    this.dom.css('display', '');
+    let dom = this.dom;
+
+    if (this.dom.data('--wrapper-dom')) {
+      dom = this.dom.data('--wrapper-dom');
+    }
+
+    dom.css('display', '');
     return this;
   }
 
   hide() {
-    this.dom.hide();
+    let dom = this.dom;
+
+    if (this.dom.data('--wrapper-dom')) {
+      dom = this.dom.data('--wrapper-dom');
+    }
+
+    dom.hide();
     return this;
   }
 
   toggle() {
-    this.dom.toggle();
+    if (this.visible) {
+      this.show();
+    } else {
+      this.hide();
+    }
+
     return this;
   }
 

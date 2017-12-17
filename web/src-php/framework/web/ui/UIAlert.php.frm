@@ -1,5 +1,7 @@
 {
   "title": "Message",
+  "centered": false,
+  "closable": false,
   "layout": {
     "_": "HBox",
     "id": "textBox",

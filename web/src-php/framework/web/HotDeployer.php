@@ -110,7 +110,7 @@ class HotDeployer extends Component
                         $this->redeploy();
                     }))->start();
                 } finally {
-                    sleep(1);
+                    Thread::sleep(500);
                 }
             }
         });

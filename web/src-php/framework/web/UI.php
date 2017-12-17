@@ -9,6 +9,7 @@ use framework\core\Event;
 use framework\core\Logger;
 use framework\web\ui\UIContainer;
 use framework\web\ui\UINode;
+use framework\web\ui\UIViewable;
 use framework\web\ui\UIWindow;
 use php\format\JsonProcessor;
 use php\http\HttpServerRequest;
@@ -224,7 +225,11 @@ abstract class UI extends Component
         }
 
         if (is_object($value)) {
-            return $this->prepareValue((array)$value);
+            if ($value instanceof UIViewable) {
+                $value = $value->uiSchema();
+            } else {
+                return $this->prepareValue((array)$value);
+            }
         }
 
         return $value;

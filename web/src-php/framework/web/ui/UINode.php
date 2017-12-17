@@ -78,6 +78,11 @@ abstract class UINode extends Component implements UIViewable
     private $enabled = true;
 
     /**
+     * @var bool
+     */
+    private $selectionEnabled = true;
+
+    /**
      * @var string
      */
     private $tooltip = '';
@@ -333,6 +338,22 @@ abstract class UINode extends Component implements UIViewable
     protected function setEnabled(bool $enabled)
     {
         $this->enabled = $enabled;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isSelectionEnabled(): bool
+    {
+        return $this->selectionEnabled;
+    }
+
+    /**
+     * @param bool $selectionEnabled
+     */
+    protected function setSelectionEnabled(bool $selectionEnabled)
+    {
+        $this->selectionEnabled = $selectionEnabled;
     }
 
     /**
