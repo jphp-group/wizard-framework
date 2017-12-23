@@ -440,6 +440,14 @@ class Node {
     return this;
   }
 
+  /**
+   * @param {object} properties
+   * @param {object} options
+   */
+  animate(properties, options) {
+    this.dom.animate(properties, options);
+  }
+
   on(event, callback) {
     this.dom.on(event, (event) => {
       event.sender = this;

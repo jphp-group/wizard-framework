@@ -45,6 +45,11 @@ abstract class UI extends Component
     private $windows = [];
 
     /**
+     * @var callable[]
+     */
+    private $callbacks = [];
+
+    /**
      * @var UISocket
      */
     protected $socket;
@@ -214,22 +219,23 @@ abstract class UI extends Component
             }
 
             return $value;
-        }
-
-        if ($value instanceof UINode) {
+        } else if ($value instanceof UINode) {
             if ($this->findNodeByUuidGlobally($value->uuid)) {
                 return ['$node' => $value->uuid];
             } else {
                 return ['$createNode' => $value->uiSchema()];
             }
-        }
-
-        if (is_object($value)) {
+        } else if (is_object($value)) {
             if ($value instanceof UIViewable) {
                 $value = $value->uiSchema();
             } else {
                 return $this->prepareValue((array)$value);
             }
+        } else if (is_callable($value)) {
+            $uuid = str::uuid();
+            $this->callbacks[$uuid] = $value;
+
+            return ['$callable' => $uuid];
         }
 
         return $value;
@@ -281,6 +287,23 @@ abstract class UI extends Component
         $message = $e->message();
 
         switch ($message->getType()) {
+            case "callback-trigger":
+                ['uuid' => $uuid, 'args' => $args] = $message->getData();
+
+                if ($callback = $this->callbacks[$uuid]) {
+                    try {
+                        if (is_callable($callback)) {
+                            $args = (array)$args;
+
+                            $callback(...$args);
+                        }
+                    } finally {
+                        unset($this->callbacks[$uuid]);
+                    }
+                }
+
+                break;
+
             case 'ui-trigger':
                 ['uuid' => $uuid, 'event' => $event, 'data' => $data] = $message->getData();
                 $node = $this->findNodeByUuidGlobally($uuid);
@@ -364,6 +387,15 @@ abstract class UI extends Component
 
         $response->contentType('text/html');
         $response->body($body);
+    }
+
+    /**
+     * @param string $jsScript
+     * @param callable|null $callback
+     */
+    public function executeScript(string $jsScript, callable $callback = null)
+    {
+        $this->sendMessage('system-eval', ['script' => $jsScript, 'callback' => $callback]);
     }
 
     /**

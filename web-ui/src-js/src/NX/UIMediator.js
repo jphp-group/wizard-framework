@@ -109,6 +109,16 @@ class UIMediator {
 
           break;
 
+        case "system-eval":
+          const { script, callback } = message;
+          const result = eval(script);
+
+          if (callback) {
+            callback(result);
+          }
+
+          break;
+
         case "ui-render":
           this.triggerRenderView(message);
           break;
@@ -199,8 +209,15 @@ class UIMediator {
 
         const uiLoader = new UILoader();
         return uiLoader.load(schema, this);
-      } else if (value.hasOwnProperty('$callback')) {
+      } else if (value.hasOwnProperty('$callable')) {
+        const uuid = value['$callable'];
 
+        return () => {
+          this.sendIfCan('callback-trigger', {
+            'uuid': uuid,
+            'args': arguments
+          });
+        };
       }
     }
 

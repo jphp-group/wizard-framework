@@ -62,20 +62,6 @@ class WebApplication extends Application
     protected $modules = [];
 
     /**
-     * Redeploy.
-     */
-    public function redeploy()
-    {
-        $this->trigger(new Event('redeploy', $this));
-
-        foreach ($this->modules as $module) {
-            $module->trigger(new Event('redeploy', $module, $this));
-        }
-
-        $this->shutdown();
-    }
-
-    /**
      * Shutdown.
      */
     public function shutdown()

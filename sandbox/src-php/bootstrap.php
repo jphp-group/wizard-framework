@@ -18,7 +18,7 @@ $deployer = new HotDeployer(function () {
     $app->launch();
 }, function () {
     $app = WebApplication::current();
-    $app->redeploy();
+    $app->shutdown();
 });
 
 $deployer->addDirWatcher('./src-php');

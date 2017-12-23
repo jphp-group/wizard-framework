@@ -464,9 +464,47 @@ abstract class UINode extends Component implements UIViewable
         }
     }
 
-    public function fadeOut(int $duration = 400, callable $callback)
+    /**
+     * @param int $duration
+     * @param float $opacity
+     * @param callable|null $complete
+     */
+    public function fadeTo(int $duration, float $opacity, callable $complete = null)
     {
-        $this->callRemoteMethod('fadeOut', [$duration, $callback]);
+        $this->animate(['opacity' => $opacity], ['duration' => $duration, 'complete' => function () use ($opacity, $complete) {
+            $this->provideUserInput(['opacity' => $opacity]);
+
+            if ($complete) {
+                $complete();
+            }
+        }]);
+    }
+
+    /**
+     * @param int $duration
+     * @param callable|null $complete
+     */
+    public function fadeIn(int $duration = 400, callable $complete = null)
+    {
+        $this->fadeTo($duration, 1.0, $complete);
+    }
+
+    /**
+     * @param int $duration
+     * @param callable|null $complete
+     */
+    public function fadeOut(int $duration = 400, callable $complete = null)
+    {
+        $this->fadeTo($duration, 0.0, $complete);
+    }
+
+    /**
+     * @param array $properties
+     * @param array $options
+     */
+    public function animate(array $properties, array $options)
+    {
+        $this->callRemoteMethod('animate', [$properties, $options]);
     }
 
     public function free()

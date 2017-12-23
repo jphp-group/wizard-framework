@@ -54,6 +54,8 @@ class MainForm extends UIForm
      */
     public function doImageClick()
     {
-        $this->image->hide();
+        $this->image->fadeOut(1000, function () {
+            $this->image->hide();
+        });
     }
 }
