@@ -464,6 +464,11 @@ abstract class UINode extends Component implements UIViewable
         }
     }
 
+    public function fadeOut(int $duration = 400, callable $callback)
+    {
+        $this->callRemoteMethod('fadeOut', [$duration, $callback]);
+    }
+
     public function free()
     {
         if (!$this->isFree()) {

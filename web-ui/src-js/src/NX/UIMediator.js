@@ -199,6 +199,8 @@ class UIMediator {
 
         const uiLoader = new UILoader();
         return uiLoader.load(schema, this);
+      } else if (value.hasOwnProperty('$callback')) {
+
       }
     }
 

@@ -6,7 +6,6 @@ use framework\web\WebUI;
 use ui\MainUI;
 
 $deployer = new HotDeployer(function () {
-
     $webUi = new WebUI();
     $webUi->setupResources(
         './../web-ui/src-js/build/lib/dnext-engine.js', './../web-ui/src-js/build/lib/dnext-engine.min.css'
