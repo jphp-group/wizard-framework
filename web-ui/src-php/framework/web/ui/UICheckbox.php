@@ -43,7 +43,7 @@ class UICheckbox extends UILabeled
         parent::provideUserInput($data);
 
         if (isset($data['selected'])) {
-            $this->selected = $data['selected'];
+            $this->__set('selected', $data['selected']);
         }
     }
 

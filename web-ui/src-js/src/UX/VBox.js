@@ -41,6 +41,13 @@ class VBox extends Container {
 
   createSlotDom(object) {
     const dom = super.createSlotDom(object);
+
+    if (this.spacing !== 0) {
+      const slots = this.dom.find('> div');
+      slots.last().css('margin-bottom', this.spacing);
+      dom.css('margin-bottom', 0);
+    }
+
     return dom;
   }
 }

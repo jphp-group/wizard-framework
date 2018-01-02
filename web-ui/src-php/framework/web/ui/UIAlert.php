@@ -9,8 +9,10 @@ use framework\web\UIForm;
  * @package ui
  *
  * @property string $text
+ * @property string $textType
  * @property string $textAlign
  * @property array $buttons
+ * @property bool $preFormatted
  */
 class UIAlert extends UIForm
 {
@@ -35,8 +37,17 @@ class UIAlert extends UIForm
      */
     private $buttons = ['ok' => 'OK'];
 
+    /**
+     * @var bool
+     */
+    private $preFormatted = false;
+
+    /**
+     * @var array
+     */
     private static $kinds = [
         'info' => ['info', 'text-info'],
+        'information' => ['info', 'text-info'],
         'error' => ['error', 'text-danger'],
         'warning' => ['warning', 'text-warning'],
         'success' => ['done', 'text-success'],
@@ -46,14 +57,36 @@ class UIAlert extends UIForm
     /**
      * UIAlert constructor.
      * @param string $type
+     * @param array $buttons
      */
-    public function __construct(string $type = '')
+    public function __construct(string $type = '', array $buttons = ['ok' => 'OK'])
     {
         parent::__construct();
 
         if ($type) {
             $this->setType($type);
         }
+
+        if ($buttons) {
+            $this->setButtons($buttons);
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isPreFormatted(): bool
+    {
+        return $this->preFormatted;
+    }
+
+    /**
+     * @param bool $preFormatted
+     */
+    protected function setPreFormatted(bool $preFormatted)
+    {
+        $this->preFormatted = $preFormatted;
+        $this->{'label'}->textPreFormatted = $preFormatted;
     }
     
     /**
@@ -122,6 +155,22 @@ class UIAlert extends UIForm
     protected function getButtons(): array
     {
         return $this->buttons;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getTextType(): string
+    {
+        return $this->{'label'}->textType;
+    }
+
+    /**
+     * @param string $textType
+     */
+    protected function setTextType(string $textType)
+    {
+        $this->{'label'}->textType = $textType;
     }
 
     /**

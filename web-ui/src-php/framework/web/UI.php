@@ -7,6 +7,7 @@ use framework\core\Application;
 use framework\core\Component;
 use framework\core\Event;
 use framework\core\Logger;
+use framework\core\Module;
 use framework\web\ui\UIContainer;
 use framework\web\ui\UINode;
 use framework\web\ui\UIViewable;
@@ -58,6 +59,11 @@ abstract class UI extends Component
      * @var ThreadLocal
      */
     private static $current;
+
+    /**
+     * @var callable
+     */
+    private $alertFunction;
 
     /**
      * UI constructor.
@@ -165,6 +171,14 @@ abstract class UI extends Component
     }
 
     /**
+     * @param callable|null $function
+     */
+    public function setAlertFunction(?callable $function)
+    {
+        $this->alertFunction = $function;
+    }
+
+    /**
      * @return UINode
      */
     public function getView(): UINode
@@ -213,7 +227,12 @@ abstract class UI extends Component
      */
     protected function prepareValue($value)
     {
-        if (is_array($value)) {
+        if (is_callable($value)) {
+            $uuid = str::uuid();
+            $this->callbacks[$uuid] = $value;
+
+            return ['$callable' => $uuid];
+        } else if (is_array($value)) {
             foreach ($value as &$one) {
                 $one = $this->prepareValue($one);
             }
@@ -231,11 +250,6 @@ abstract class UI extends Component
             } else {
                 return $this->prepareValue((array)$value);
             }
-        } else if (is_callable($value)) {
-            $uuid = str::uuid();
-            $this->callbacks[$uuid] = $value;
-
-            return ['$callable' => $uuid];
         }
 
         return $value;
@@ -342,7 +356,7 @@ abstract class UI extends Component
                     $node->synchronizeUserInput($parseValue);
                     $this->socket->setExcludeActivated(false);
                 } else {
-                    Logger::warn('Failed to provide user input, node with uid = {1} is not found', $uuid);
+                    Logger::warn('Failed to provide user input, node with uid = "{0}" is not found', $uuid);
                 }
                 break;
 
@@ -366,8 +380,9 @@ abstract class UI extends Component
      * @param HttpServerRequest $request
      * @param HttpServerResponse $response
      * @param string $path
+     * @param array $resources
      */
-    public function show(HttpServerRequest $request, HttpServerResponse $response, string $path)
+    public function show(HttpServerRequest $request, HttpServerResponse $response, string $path, array $resources = [])
     {
         $moduleFile = reflect::typeModule(__CLASS__)->getName();
         $ext = fs::ext($moduleFile);
@@ -384,6 +399,22 @@ abstract class UI extends Component
         $body = str::replace($body, '{{title}}', $request->attribute('~title'));
 
         $body = str::replace($body, '{{urlArgument}}', $request->attribute('**'));
+
+        $head = [];
+        foreach ($resources as $resource) {
+            $ext = fs::ext($resource);
+
+            switch ($ext) {
+                case "js":
+                    $head[] = "<script type='text/javascript' src='$resource'></script>";
+                    break;
+                case "css":
+                    $head[] = "<link rel='stylesheet' href='$resource'>";
+                    break;
+            }
+        }
+
+        $body = str::replace($body, '{{head}}', str::join($head, "\n"));
 
         $response->contentType('text/html');
         $response->body($body);
@@ -419,10 +450,15 @@ abstract class UI extends Component
 
     /**
      * @param string $message
+     * @param array $options
      */
-    public function alert(string $message)
+    public function alert(string $message, array $options = [])
     {
-        $this->socket->sendText(reflect::typeOf($this), 'ui-alert', ['text' => $message]);
+        if ($this->alertFunction) {
+            call_user_func($this->alertFunction, $message, $options);
+        } else {
+            $this->socket->sendText(reflect::typeOf($this), 'ui-alert', ['text' => $message, 'options' => $options]);
+        }
     }
 
     /**

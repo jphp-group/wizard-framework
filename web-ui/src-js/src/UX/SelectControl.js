@@ -1,5 +1,5 @@
 import Node from './Node';
-import uiMediator from '../NX/UIMediator';
+import AppMediator from '../NX/AppMediator';
 
 export default class SelectControl extends Node {
   constructor(items) {
@@ -10,7 +10,7 @@ export default class SelectControl extends Node {
     }
 
     this.dom.on('change.SelectControl', (e) => {
-      uiMediator.sendUserInput(this, {selected: this.selected, selectedText: this.selectedText});
+      AppMediator.sendUserInput(this, {selected: this.selected, selectedText: this.selectedText});
     });
   }
 

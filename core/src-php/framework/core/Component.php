@@ -167,6 +167,24 @@ abstract class Component
     {
         $method = "set$name";
 
+        $data = [
+            'property' => $name, 'value' => $value, 'oldValue' => $oldValue = $this->__get($name)
+        ];
+
+        $event = new Event("change-any", $this, null, $data);
+        $this->trigger($event);
+
+        if ($event->isConsumed()) {
+            return $oldValue;
+        }
+
+        $event = new Event("change-$name", $this,null, $data);
+        $this->trigger($event);
+
+        if ($event->isConsumed()) {
+            return $oldValue;
+        }
+
         if (method_exists($this, $method)) {
             $closure = Closure::fromCallable([$this, $method]);
             return $closure($value);

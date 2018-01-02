@@ -5,6 +5,8 @@ namespace framework\web\ui;
  * @package framework\web\ui
  *
  * @property string $text
+ * @property string $textType
+ * @property bool $textPreFormatted
  * @property UINode $graphic
  * @property UIFont $font
  */
@@ -14,6 +16,17 @@ abstract class UILabeled extends UINode
      * @var string
      */
     private $text = '';
+
+    /**
+     * text or html
+     * @var string
+     */
+    private $textType = 'text';
+
+    /**
+     * @var bool
+     */
+    private $textPreFormatted = false;
 
     /**
      * @var UIFont
@@ -59,6 +72,38 @@ abstract class UILabeled extends UINode
     protected function setText(string $text)
     {
         $this->text = $text;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getTextType(): string
+    {
+        return $this->textType;
+    }
+
+    /**
+     * @param string $textType
+     */
+    protected function setTextType(string $textType)
+    {
+        $this->textType = $textType;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isTextPreFormatted(): bool
+    {
+        return $this->textPreFormatted;
+    }
+
+    /**
+     * @param bool $textPreFormatted
+     */
+    protected function setTextPreFormatted(bool $textPreFormatted)
+    {
+        $this->textPreFormatted = $textPreFormatted;
     }
 
     /**

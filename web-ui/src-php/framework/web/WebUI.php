@@ -14,8 +14,8 @@ use php\http\WebSocketSession;
 use php\io\ResourceStream;
 use php\lang\System;
 use php\lib\fs;
+use php\lib\reflect;
 use php\lib\str;
-
 
 include "res://.inc/ui-functions.php";
 
@@ -42,6 +42,11 @@ class WebUI extends Module
     protected $dnextCssFile = null;
 
     /**
+     * @var array
+     */
+    protected $dnextResources = [];
+
+    /**
      * @var WebApplication
      */
     protected $app;
@@ -51,31 +56,32 @@ class WebUI extends Module
         $this->on('inject', function (Event $event) {
             if ($event->context instanceof WebApplication) {
                 $this->app = $event->context;
+
+                $this->app->on('shutdown', function (Event $event) {
+                    Logger::warn("Shutdown Web UI");
+
+                    foreach ($this->isolatedSessionInstances as $sid => $instances) {
+                        foreach ($this->uiClasses as $class => $reflection) {
+                            /** @var UI $ui */
+                            $ui = $instances[$class];
+
+                            if ($ui) {
+                                $ui->sendMessage('ui-reload', []);
+                            }
+                        }
+                    }
+
+                    foreach ($this->isolatedSessionInstances as $sid => $instances) {
+                        /** @var UISocket $socket */
+                        if ($socket = $instances[UISocket::class]) {
+                            $socket->shutdown();
+                        }
+                    }
+                }, __CLASS__);
+
                 $this->initializeWebLib($event->context);
             } else {
                 throw new \Exception("WebUI module only for Web Applications");
-            }
-        });
-
-        $this->on('redeploy', function (Event $event) {
-            foreach ($this->isolatedSessionInstances as $sid => $instances) {
-                foreach ($this->uiClasses as $class => $reflection) {
-                    /** @var UI $ui */
-                    $ui = $instances[$class];
-
-                    if ($ui) {
-                        $ui->sendMessage('ui-reload', []);
-                    }
-                }
-            }
-        });
-
-        $this->on('shutdown', function (Event $event) {
-            foreach ($this->isolatedSessionInstances as $sid => $instances) {
-                /** @var UISocket $socket */
-                if ($socket = $instances[UISocket::class]) {
-                    $socket->shutdown();
-                }
             }
         });
     }
@@ -187,7 +193,7 @@ class WebUI extends Module
         $this->app->server()->get($path, new HttpRedirectHandler("$path/"));
 
         $route("$path/**", function (UI $ui, HttpServerRequest $request, HttpServerResponse $response) use ($path) {
-            $ui->show($request, $response, $path);
+            $ui->show($request, $response, $path, $this->dnextResources);
         });
 
         return $this;
@@ -201,7 +207,7 @@ class WebUI extends Module
         $cssResource = new ResourceStream('/dnext-engine.min.css');
         $mapResource = new ResourceStream('/dnext-engine.js.map');
 
-        $tempDir = System::getProperty('java.io.tmpdir') . "/dnext-engine/";
+        $tempDir = str::replace(fs::abs(System::getProperty('java.io.tmpdir') . "/dnext-engine/"), '\\', '/');
         fs::makeDir($tempDir);
 
 
@@ -231,13 +237,64 @@ class WebUI extends Module
         }
 
         Logger::info("Add DNext Engine:");
-        Logger::info("\t-> GET {0} {1}", $jsUrl, $jsFile);
+        Logger::info("\t-> GET {0} --> {1}", $jsUrl, $jsFile);
 
         if ($mapUrl) {
-            Logger::info("\t-> GET {0} {1}", $mapUrl, $mapFile);
+            Logger::info("\t-> GET {0} --> {1}", $mapUrl, $mapFile);
         }
 
-        Logger::info("\t-> GET {0} {1}", $cssUrl, $cssFile);
+        Logger::info("\t-> GET {0} --> {1}", $cssUrl, $cssFile);
+
+
+        if ($this->getModules()) {
+            Logger::info("Add DNext Modules:");
+            foreach ($this->getModules() as $module) {
+                if ($module instanceof UIModule) {
+                    $moduleName = str::replace(reflect::typeOf($module), '\\', '/');
+                    $prefix = "/dnext/module/" . $moduleName;
+
+                    foreach ($module->getResources() as $resource) {
+                        $file = "$tempDir/$moduleName/"  . fs::name($resource);
+
+                        fs::ensureParent($file);
+                        $result = fs::copy($resource, $file);
+
+                        if ($result <= 0) {
+                            Logger::warn("Failed to add module resource ({0}), not found", $resource);
+                            continue;
+                        }
+
+                        $server->get(
+                            $path = $prefix . "/" . fs::name($resource),
+                            new HttpResourceHandler($file)
+                        );
+
+                        //Logger::debug("\t-> GET {0} --> {1}", $path, $resource);
+                    }
+
+                    foreach ($module->getRequiredResources() as $resource) {
+                        $file = "$tempDir/$moduleName/"  . fs::name($resource);
+
+                        fs::ensureParent($file);
+                        $result = fs::copy($resource, $file);
+
+                        if ($result <= 0) {
+                            Logger::error("Failed to add module resource ({0}), not found", $resource);
+                            continue;
+                        }
+
+                        $server->get(
+                            $path = $prefix . "/" . fs::name($resource),
+                            new HttpResourceHandler($file)
+                        );
+
+                        Logger::info("\t-> GET {0} --> {1}", $path, $resource);
+
+                        $this->dnextResources[$path] = $path;
+                    }
+                }
+            }
+        }
     }
 
 }

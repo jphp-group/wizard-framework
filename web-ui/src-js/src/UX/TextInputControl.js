@@ -1,12 +1,13 @@
 import Node from './Node';
-import uiMediator from '../NX/UIMediator';
+import AppMediator from '../NX/AppMediator';
+import Font from "./paint/Font";
 
 class TextInputControl extends Node {
   constructor() {
     super();
 
     this.dom.on('keydown.TextInputControl', (e) => {
-        uiMediator.sendUserInput(this, () => {
+        AppMediator.sendUserInput(this, () => {
           return { text: this.text }
         });
     });
@@ -41,7 +42,7 @@ class TextInputControl extends Node {
   }
 
   set font(value) {
-    Font.applyToDom(value);
+    Font.applyToDom(this.dom, value);
   }
 
   get text() {

@@ -1,18 +1,18 @@
 import UILoader from "./UILoader";
 import Node from "../UX/Node";
 
-class UIMediator {
+class AppMediator {
   init(rootDom) {
     this.rootDom = rootDom;
     this.activated = true;
     this._callbacks = [];
     this._nodes = {};
 
-    const uuid = sessionStorage.getItem('UIMediator.uuid');
+    const uuid = sessionStorage.getItem('AppMediator.uuid');
 
     if (!uuid) {
       this.uuid = Math.random().toString(36).substring(7);
-      sessionStorage.setItem('UIMediator.uuid', this.uuid);
+      sessionStorage.setItem('AppMediator.uuid', this.uuid);
     } else {
       this.uuid = uuid;
     }
@@ -43,13 +43,13 @@ class UIMediator {
     this.ws = new WebSocket(newUri);
 
     this.ws.onerror = () => {
-      if (sessionStorage.getItem('UIMediator.reloading')) {
+      if (sessionStorage.getItem('AppMediator.reloading')) {
         setTimeout(() => window.location.reload(true), 200);
       }
     };
 
     this.ws.onopen = () => {
-      sessionStorage.setItem('UIMediator.reloading', false);
+      sessionStorage.setItem('AppMediator.reloading', false);
 
       this.send('initialize', {});
       this.sendIfCan('ui-ready', {
@@ -73,86 +73,81 @@ class UIMediator {
       }
     };
 
+    const handlers = {
+      'ui-render': this.triggerRenderView,
+      'ui-reload': this.triggerReload,
+      'ui-alert' : this.triggerAlert,
+      'ui-set-property': this.triggerSetProperty,
+      'ui-call-method': this.triggerCallMethod,
+      'ui-event-link': this.triggerOnEventLink,
+      'ui-create-node': this.triggerCreateNode,
+    };
+
     this.ws.onmessage = (event) => {
       const message = JSON.parse(event.data);
       const type = message.type;
 
-      console.debug("UIMediator.receive", message);
+      console.debug("AppMediator.receive", message);
 
-      switch (type) {
-        case "system-console-log":
-          const text = message['message'];
+      if (handlers.hasOwnProperty(type)) {
+        handlers[type].call(this, message);
+      } else {
+        switch (type) {
+          case "system-console-log":
+            const text = message['message'];
 
-          switch (message['kind']) {
-            case 'warn':
-              console.warn(text);
+            switch (message['kind']) {
+              case 'warn':
+                console.warn(text);
+                break;
+              case 'error':
+                console.error(text);
+                break;
+              case 'info':
+                console.info(text);
+                break;
+              case 'debug':
+                console.debug(text);
+                break;
+              case 'trace':
+                console.trace(text);
+                break;
+              case 'clear':
+                console.clear();
+                break;
+              default:
+                console.log(text);
+                break;
+            }
+
+            break;
+          case "system-eval":
+            const {script, callback} = message;
+            const result = eval(script);
+
+            if (callback) {
+              callback(result);
+            }
+
+            break;
+          case "history-push":
+            const url = message['url'];
+            const title = message['title'];
+            const hash = message['hash'];
+
+            if (window.location.pathname === url) {
+              if (title !== undefined) {
+                document.title = title;
+              }
+              if (hash !== undefined) {
+                window.location.hash = hash;
+              }
+
               break;
-            case 'error':
-              console.error(text);
-              break;
-            case 'info':
-              console.info(text);
-              break;
-            case 'debug':
-              console.debug(text);
-              break;
-            case 'trace':
-              console.trace(text);
-              break;
-            case 'clear':
-              console.clear();
-              break;
-            default:
-              console.log(text);
-              break;
-          }
+            }
 
-          break;
+            window.history.pushState(null, message['title'], url);
 
-        case "system-eval":
-          const { script, callback } = message;
-          const result = eval(script);
-
-          if (callback) {
-            callback(result);
-          }
-
-          break;
-
-        case "ui-render":
-          this.triggerRenderView(message);
-          break;
-
-        case "ui-reload":
-          this.triggerReload(message);
-          break;
-
-        case "ui-alert":
-          this.triggerAlert(message);
-          break;
-
-        case "ui-set-property":
-          this.triggerSetProperty(message);
-          break;
-
-        case "ui-call-method":
-          this.triggerCallMethod(message);
-          break;
-
-        case "ui-event-link":
-          this.triggerOnEventLink(message);
-          break;
-
-        case "ui-create-node":
-          this.triggerCreateNode(message);
-          break;
-
-        case "history-push":
-          const url = message['url'];
-          const title = message['title'];
-          const hash = message['hash'];
-
-          if (window.location.pathname === url) {
             if (title !== undefined) {
               document.title = title;
             }
@@ -161,29 +156,18 @@ class UIMediator {
             }
 
             break;
-          }
 
-          window.history.pushState(null, message['title'], url);
+          case "page-set-properties":
+            if (message['title'] !== undefined) {
+              document.title = message['title'];
+            }
 
-          if (title !== undefined) {
-            document.title = title;
-          }
-          if (hash !== undefined) {
-            window.location.hash = hash;
-          }
+            if (message['hash'] !== undefined) {
+              window.location.hash = message['hash'];
+            }
 
-          break;
-
-        case "page-set-properties":
-          if (message['title'] !== undefined) {
-            document.title = message['title'];
-          }
-
-          if (message['hash'] !== undefined) {
-            window.location.hash = message['hash'];
-          }
-
-          break;
+            break;
+        }
       }
     };
 
@@ -208,7 +192,7 @@ class UIMediator {
         const schema = value['$createNode'];
 
         const uiLoader = new UILoader();
-        return uiLoader.load(schema, this);
+        return uiLoader.load(schema);
       } else if (value.hasOwnProperty('$callable')) {
         const uuid = value['$callable'];
 
@@ -338,7 +322,7 @@ class UIMediator {
       this._callbacks[message.id] = callback;
     }
 
-    console.debug("UIMediator.send", message);
+    console.debug("AppMediator.send", message);
 
     this.ws.send(JSON.stringify(message));
   }
@@ -457,9 +441,9 @@ class UIMediator {
     const node = this.findNodeByUuidGlobally(uuid);
 
     if (node !== null) {
-      node.off(`${event}.UIMediator`);
+      node.off(`${event}.AppMediator`);
 
-      node.on(`${event}.UIMediator`, (e) => {
+      node.on(`${event}.AppMediator`, (e) => {
         this.triggerEvent(node, event, e);
       })
     } else {
@@ -477,9 +461,9 @@ class UIMediator {
   }
 
   triggerReload(message) {
-    sessionStorage.setItem('UIMediator.reloading', true);
+    sessionStorage.setItem('AppMediator.reloading', true);
     setTimeout(() => window.location.reload(true), 50);
   }
 }
 
-export default new UIMediator();
+export default new AppMediator();

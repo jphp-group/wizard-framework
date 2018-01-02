@@ -8,6 +8,7 @@ namespace framework\web\ui;
  * @property string $placeholder
  * @property bool $editable
  * @property string $textAlign
+ * @property UIFont $font
  */
 abstract class UITextInputControl extends UINode
 {
@@ -30,6 +31,35 @@ abstract class UITextInputControl extends UINode
      * @var string
      */
     private $text = '';
+
+    /**
+     * @var UIFont
+     */
+    private $font;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->font = new UIFont();
+    }
+
+    /**
+     * @return UIFont
+     */
+    protected function getFont(): UIFont
+    {
+        return UIFont::wrapper($this, 'font', $this->font);
+    }
+
+    /**
+     * @param UIFont|array|string $font
+     * @throws \TypeError
+     */
+    protected function setFont($font)
+    {
+        $this->font = UIFont::fetch($font);
+    }
 
     /**
      * @return string

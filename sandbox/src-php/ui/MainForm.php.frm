@@ -1,25 +1,71 @@
 {
   "title": "MainForm",
   "layout": {
-      "_": "VBox",
-      "align": ["center", "center"],
-      "height": "100%",
-      "spacing": 10,
-
+    "_": "VBox",
+    "align": [
+      "top",
+      "center"
+    ],
+    "padding": 30,
+    "height": "100%",
+    "spacing": 10,
+    "_content": [
+      {
+        "_": "Label",
+        "text": "Список заданий",
+        "font": {"size": 45}
+      },
+      {
+        "_": "HBox",
+        "spacing": 10,
+        "width": 400,
         "_content": [
-            {
-              "_": "Button",
-              "id": "button",
-              "kind": "info",
-              "text": "Посмотреть картинку",
-              "height": 45
-            },
-            {
-              "_": "ImageView",
-              "id": "image",
-              "source": "https://images-na.ssl-images-amazon.com/images/I/8191LmLELeL._SL1500_.jpg",
-              "visible": false
-            }
+          {
+            "_": "TextField",
+            "id": "input",
+            "placeholder": "Введите текст задания",
+            "width": "100%"
+          },
+          {
+            "_": "Button",
+            "id": "button",
+            "kind": "info",
+            "text": "Добавить"
+          }
         ]
+      },
+      {
+        "_": "bundle\\aceeditor\\ui\\UIAceEditor",
+        "id": "editor",
+        "theme": "monokai",
+        "mode": "php",
+        "height": 300,
+        "width": 800,
+        "font": {"size": 14},
+        "editable": false
+      },
+      {
+        "_": "VBox",
+        "spacing": 10,
+        "width": 400,
+        "horAlign": "left",
+        "id": "quests"
+      },
+      {
+        "_": "Button",
+        "id": "clear",
+        "kind": "danger",
+        "text": "Удалить все записи",
+        "width": 400,
+        "graphic": {"_": "Icon", "kind": "clear"},
+        "visible": false
+      },
+      {
+        "_": "Hyperlink",
+        "text": "Автор - Дмитрий Зайцев",
+        "href": "http://develnext.org",
+        "target": "_blank"
+      }
+    ]
   }
 }

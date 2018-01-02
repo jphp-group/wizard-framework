@@ -4,6 +4,7 @@ namespace framework\web;
 use framework\core\Annotations;
 use framework\core\Event;
 use framework\core\Logger;
+use framework\web\ui\UIAlert;
 use framework\web\ui\UINode;
 use framework\web\ui\UIVBox;
 use php\http\HttpServerRequest;
@@ -57,6 +58,15 @@ class AppUI extends UI
         $this->on('ready', function (Event $e) {
             $this->detectCurrentForm();
         }, __CLASS__);
+
+        $this->setAlertFunction(function ($message, array $options) {
+           $alert = new UIAlert($options['type'] ?? 'info');
+
+           $alert->preFormatted = $options['pre'];
+           $alert->text = $message;
+           $alert->title = $options['title'] ?? 'Message';
+           $alert->show();
+        });
     }
 
     /**

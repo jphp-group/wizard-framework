@@ -5,9 +5,13 @@ namespace ui;
 use framework\core\Event;
 use framework\web\ui\UIAlert;
 use framework\web\ui\UIButton;
+use framework\web\ui\UICheckbox;
 use framework\web\ui\UIHBox;
 use framework\web\ui\UIImageView;
+use framework\web\ui\UIListView;
+use framework\web\ui\UITextField;
 use framework\web\UIForm;
+use php\time\Timer;
 
 /**
  * Class MainForm
@@ -17,45 +21,65 @@ use framework\web\UIForm;
  *
  * @property UIHBox $pane
  * @property UIButton $button
- * @property UIImageView $image
+ * @property UIListView $quests
+ * @property UITextField $input
  *
  */
 class MainForm extends UIForm
 {
     /**
-     * @event button.click
+     * @param Event $e
+     * @event input.keyUp
      */
-    public function doButtonClick()
+    public function doInputKeyUp(Event $e)
     {
-        // Создаем диалог типа confirm (вопросительный).
-        $alert = new UIAlert('confirm');
-
-        // Заголовок диалога.
-        $alert->title = 'Вопрос';
-
-        // Текст диалога.
-        $alert->text = 'Вам есть 18 лет? (контент для взрослых)';
-
-        // Определяем кнопки диалога.
-        $alert->buttons = ['close' => 'Нет, отмена', 'yes' => 'Мне 18'];
-
-        // Навешиваем на кнопку yes событие.
-        $alert->on('action-yes', function () {
-            // Показываем картинку, если ответили "Мне 18".
-            $this->image->show();
-        });
-
-        // Показываем диалог.
-        $alert->show();
+        if ($e->data['which'] === 13) {
+            $this->doButtonClick($e);
+        }
     }
 
     /**
-     * @event image.click
+     * @event button.click
+     * @param Event $e
      */
-    public function doImageClick()
+    public function doButtonClick(Event $e)
     {
-        $this->image->fadeOut(1000, function () {
-            $this->image->hide();
+        $text = $this->input->text;
+
+        if ($text == '') {
+            alert('Введите текст задания', ['type' => 'warning', 'title' => 'Сообщение']);
+            return;
+        }
+
+        $line = new UICheckbox($text);
+
+        $line->on('change-selected', function (Event $e) {
+            /** @var UICheckbox $checkbox */
+           $checkbox = $e->sender;
+           $checkbox->font->linethrough = $e->data['value'];
         });
+
+        $this->quests->add($line);
+        $this->input->text = '';
+        $this->clear->visible = true;
+    }
+
+    /**
+     * @event clear.click
+     */
+    public function doClear()
+    {
+        $alert = new UIAlert('confirm');
+        $alert->text = 'Вы уверены, что хотите удалить все записи?';
+        $alert->title = 'Вопрос';
+        $alert->buttons = ['no' => 'Нет, отмена', 'yes' => 'Да, удалить'];
+
+        $alert->on('action-yes', function () {
+            $this->quests->clear();
+
+            $this->clear->visible = false;
+        });
+
+        $alert->show();
     }
 }

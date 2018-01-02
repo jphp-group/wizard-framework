@@ -23,6 +23,7 @@ use php\lib\str;
  * @property int $x
  * @property int $y
  * @property int[] $position
+ * @property float $opacity
  * @property UIContainer $parent
  *
  * @property bool $enabled
@@ -83,6 +84,11 @@ abstract class UINode extends Component implements UIViewable
     private $selectionEnabled = true;
 
     /**
+     * @var float
+     */
+    private $opacity = 1.0;
+
+    /**
      * @var string
      */
     private $tooltip = '';
@@ -91,6 +97,11 @@ abstract class UINode extends Component implements UIViewable
      * @var array
      */
     private $tooltipOptions = [];
+
+    /**
+     * @var array
+     */
+    private $padding = [0, 0, 0, 0];
 
     /**
      * @var UI
@@ -127,11 +138,22 @@ abstract class UINode extends Component implements UIViewable
     {
         $view = ['_' => $this->uiSchemaClassName()];
 
+        $class = new \ReflectionClass($this);
+        $defaultProperties = $class->getDefaultProperties();
+
         foreach ($this->getProperties() as $name => $value) {
             if ($name === 'parent' || $name === 'connectedUi') continue;
 
             if ($value instanceof UIViewable) {
                 $value = $value->uiSchema();
+            }
+
+            if (isset($defaultProperties[$name])) {
+                $default = $defaultProperties[$name];
+
+                if ($default === $value) {
+                    continue;
+                }
             }
 
             $view[$name] = $value;
@@ -357,9 +379,70 @@ abstract class UINode extends Component implements UIViewable
     }
 
     /**
+     * @return float
+     */
+    protected function getOpacity(): float
+    {
+        return $this->opacity;
+    }
+
+    /**
+     * @param float $opacity
+     */
+    protected function setOpacity(float $opacity)
+    {
+        $this->opacity = $opacity;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getPadding(): array
+    {
+        return $this->padding;
+    }
+
+    /**
+     * @param array|mixed $padding
+     */
+    protected function setPadding($padding)
+    {
+        if (!is_array($padding)) {
+            $padding = [$padding, $padding, $padding, $padding];
+        } else {
+            switch (sizeof($padding)) {
+                case 0:
+                    $padding = [0, 0, 0, 0];
+                    break;
+
+                case 1:
+                    $padding = [$padding[0], $padding[0], $padding[0], $padding[0]];
+                    break;
+
+                case 2:
+                    $padding = [$padding[0], $padding[1], $padding[0], $padding[1]];
+                    break;
+
+                case 3:
+                    $padding = [$padding[0], $padding[1], $padding[2], $padding[1]];
+                    break;
+
+                case 4:
+                    break;
+
+                default:
+                    $padding = [$padding[0], $padding[1], $padding[2], $padding[3]];
+                    break;
+            }
+        }
+
+        $this->padding = $padding;
+    }
+
+    /**
      * @return string|UINode
      */
-    public function getTooltip()
+    protected function getTooltip()
     {
         return $this->tooltip;
     }
@@ -367,7 +450,7 @@ abstract class UINode extends Component implements UIViewable
     /**
      * @param string|UINode $tooltip
      */
-    public function setTooltip($tooltip)
+    protected function setTooltip($tooltip)
     {
         $this->tooltip = $tooltip;
     }
@@ -375,7 +458,7 @@ abstract class UINode extends Component implements UIViewable
     /**
      * @return array
      */
-    public function getTooltipOptions(): array
+    protected function getTooltipOptions(): array
     {
         return $this->tooltipOptions;
     }
@@ -383,7 +466,7 @@ abstract class UINode extends Component implements UIViewable
     /**
      * @param array $tooltipOptions
      */
-    public function setTooltipOptions(array $tooltipOptions)
+    protected function setTooltipOptions(array $tooltipOptions)
     {
         $this->tooltipOptions = $tooltipOptions;
     }

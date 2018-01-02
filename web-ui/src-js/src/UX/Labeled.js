@@ -6,6 +6,7 @@ import Utils from './util/Utils';
 class Labeled extends Node {
   constructor(text, graphic) {
     super();
+    this.textPreFormatted = false;
     this.textType = 'text';
     this.contentDisplay = 'left';
     this.graphicTextGap = 4;
@@ -75,28 +76,57 @@ class Labeled extends Node {
   }
 
   get text() {
+    let dom = this.dom.find('> span.ux-labeled-text');
+
+    if (this.textPreFormatted) {
+      dom = dom.find('> pre');
+    }
+
     switch (this.textType) {
       case 'text':
-        return this.dom.find('> span.ux-labeled-text').text();
+        return dom.text();
       case 'html':
-        return this.dom.find('> span.ux-labeled-text').html();
+        return dom.html();
     }
 
     return '';
   }
 
   set text(value) {
+    let dom = this.dom.find('> span.ux-labeled-text');
+
+    if (this.textPreFormatted) {
+      dom = dom.find('> pre');
+    }
+
     switch (this.textType) {
       case 'text':
-        this.dom.find('> span.ux-labeled-text').text(value);
+        dom.text(value);
         break;
 
       case 'html':
-        this.dom.find('> span.ux-labeled-text').html(value);
+        dom.html(value);
         break;
     }
 
     this.__triggerPropertyChange('text', value);
+  }
+
+  get textPreFormatted() {
+    return this.dom.find('> span.ux-labeled-text').has('> pre').length > 0;
+  }
+
+  set textPreFormatted(value) {
+    if (this.textPreFormatted === value) {
+      return;
+    }
+
+    const dom = this.dom.find('> span.ux-labeled-text');
+    if (value) {
+      dom.html('<pre>' + dom.html() + '</pre>');
+    } else {
+      dom.html(dom.find('> pre').html());
+    }
   }
 
   get textColor() {

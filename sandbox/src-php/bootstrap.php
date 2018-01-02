@@ -1,5 +1,7 @@
 <?php
 
+use bundle\aceeditor\AceEditorModule;
+use framework\core\Event;
 use framework\web\HotDeployer;
 use framework\web\WebApplication;
 use framework\web\WebUI;
@@ -7,6 +9,7 @@ use ui\MainUI;
 
 $deployer = new HotDeployer(function () {
     $webUi = new WebUI();
+    $webUi->addModule(new AceEditorModule());
     $webUi->setupResources(
         './../web-ui/src-js/build/lib/dnext-engine.js', './../web-ui/src-js/build/lib/dnext-engine.min.css'
     );
@@ -18,6 +21,7 @@ $deployer = new HotDeployer(function () {
     $app->launch();
 }, function () {
     $app = WebApplication::current();
+    $app->trigger(new Event('restart', $app));
     $app->shutdown();
 });
 

@@ -5,6 +5,7 @@ mainClassName = 'php.runtime.launcher.Launcher'
 dependencies {
     compile project(":web")
     compile project(":web-ui")
+    compile project(":web-ui/components/ace-editor")
     compile "org.develnext.jphp:jphp-core:${jphpVersion}"
     compile "org.develnext.jphp:jphp-zend-ext:${jphpVersion}"
 }

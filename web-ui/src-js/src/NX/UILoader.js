@@ -1,7 +1,7 @@
 import Node from './../UX/Node';
 import Container from './../UX/Container';
 import UX from './../UX/UX';
-import uiMediator from './UIMediator';
+import AppMediator from './AppMediator';
 
 class UILoader {
 
@@ -9,8 +9,8 @@ class UILoader {
     const watchedEvents = data['_watchedEvents'];
     if (watchedEvents !== undefined) {
       for (let watchedEvent of watchedEvents) {
-        node.on(`${watchedEvent}.UIMediator`, (e) => {
-          uiMediator.triggerEvent(node, watchedEvent, e);
+        node.on(`${watchedEvent}.AppMediator`, (e) => {
+          AppMediator.triggerEvent(node, watchedEvent, e);
         })
       }
     }
@@ -28,7 +28,11 @@ class UILoader {
         throw new Error("Type is not defined in '_' property!");
       }
 
-      const cls = UX[type];
+      let cls = UX[type];
+
+      if (!cls) {
+        cls = window[type];
+      }
 
       if (!cls) {
         throw new Error(`Type '${type}' is not defined`);
@@ -41,7 +45,7 @@ class UILoader {
           const children = object['_content'];
 
           for (let i = 0; i < children.length; i++) {
-            const child = this.load(children[i], uiMediator);
+            const child = this.load(children[i], AppMediator);
             node.add(child);
           }
         }

@@ -3,17 +3,26 @@
 use framework\web\UI;
 
 /**
- * @param string $message
+ * @param string $url
  */
-function alert(string $message) {
-    UI::currentRequired()->alert($message);
+function browse(string $url)
+{
+    UI::currentRequired()->executeScript("window.location = '$url';");
+}
+
+/**
+ * @param string $message
+ * @param array $options
+ */
+function alert(string $message, array $options = []) {
+    UI::currentRequired()->alert($message, $options);
 }
 
 /**
  * @param mixed $data
  */
 function pre($data) {
-    alert(print_r($data, true));
+    alert(print_r($data, true), ['type' => '', 'pre' => true, 'title' => '[DEBUG]: pre()']);
 }
 
 /**
@@ -25,5 +34,5 @@ function dump($arg) {
     $msg = ob_get_contents();
     ob_end_clean();
 
-    alert($msg);
+    alert($msg, ['type' => '', 'pre' => true, 'title' => '[DEBUG]: dump()']);
 }

@@ -1,6 +1,6 @@
 import Container from './Container';
 import Node from './Node';
-import uiMediator from '../NX/UIMediator';
+import AppMediator from '../NX/AppMediator';
 
 class ListView extends Container {
   constructor() {
@@ -15,7 +15,7 @@ class ListView extends Container {
         selectedIndex: this.selectedIndex
       };
 
-      uiMediator.sendUserInput(this, data);
+      AppMediator.sendUserInput(this, data);
     })
   }
 

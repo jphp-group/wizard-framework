@@ -13,6 +13,7 @@ use php\lib\str;
  * @property bool $bold
  * @property bool $italic
  * @property bool $underline
+ * @property bool $linethrough
  */
 class UIFont extends Component implements UIViewable
 {
@@ -35,6 +36,11 @@ class UIFont extends Component implements UIViewable
      * @var bool
      */
     private $underline = false;
+
+    /**
+     * @var bool
+     */
+    private $linethrough = false;
 
     /**
      * @var bool
@@ -136,7 +142,31 @@ class UIFont extends Component implements UIViewable
      */
     protected function setUnderline(bool $underline)
     {
-        $this->underline = $underline;
+        if ($this->underline = $underline) {
+            $this->linethrough = false;
+        }
+
+        if ($this->onChange) {
+            call_user_func($this->onChange, $this);
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLinethrough(): bool
+    {
+        return $this->linethrough;
+    }
+
+    /**
+     * @param bool $linethrough
+     */
+    public function setLinethrough(bool $linethrough)
+    {
+        if ($this->linethrough = $linethrough) {
+            $this->underline = false;
+        }
 
         if ($this->onChange) {
             call_user_func($this->onChange, $this);
@@ -172,7 +202,7 @@ class UIFont extends Component implements UIViewable
         if (is_array($value)) {
             $font = new UIFont();
 
-            foreach (['name', 'size', 'bold', 'italic', 'underline'] as $prop) {
+            foreach (['name', 'size', 'bold', 'italic', 'underline', 'linethrough'] as $prop) {
                 if (isset($value[$prop])) {
                     $font->{$prop} = $value[$prop];
                 }
@@ -207,8 +237,9 @@ class UIFont extends Component implements UIViewable
     {
         $schema = [];
 
-        foreach (['name', 'size', 'bold', 'italic', 'underline'] as $prop) {
-            $schema[$prop] = $this->{$prop};
+        foreach (['name', 'size', 'bold', 'italic', 'underline', 'linethrough'] as $prop) {
+            $value = $this->{$prop};
+            $schema[$prop] = $value;
         }
 
         return $schema;

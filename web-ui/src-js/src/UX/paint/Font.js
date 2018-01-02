@@ -62,8 +62,28 @@ class Font {
   set underline(value) {
     this._underline = value | false;
 
+    if (this._underline) {
+      this._linethrough = false;
+    }
+
     if (this._dom) {
       this._dom.css('text-decoration', this._underline ? 'underline' : 'none');
+    }
+  }
+
+  get linethrough() {
+    return this._linethrough | false;
+  }
+
+  set linethrough(value) {
+    this._linethrough = value | false;
+
+    if (this._linethrough) {
+      this._underline = false;
+    }
+
+    if (this._dom) {
+      this.dom.css('text-decoration', this._linethrough ? 'line-through' : 'none')
     }
   }
 
@@ -91,6 +111,12 @@ class Font {
 
       if (font.underline) {
         dom.css('text-decoration', 'underline');
+      } else {
+        dom.css('text-decoration', '');
+      }
+
+      if (font.linethrough) {
+        dom.css('text-decoration', 'line-through')
       } else {
         dom.css('text-decoration', '');
       }
@@ -134,6 +160,14 @@ class Font {
           dom.css('text-decoration', '');
         }
       }
+
+      if (font.hasOwnProperty('linethrough')) {
+        if (font.linethrough) {
+          dom.css('text-decoration', 'line-through');
+        } else {
+          dom.css('text-decoration', '');
+        }
+      }
     }
   }
 
@@ -144,11 +178,15 @@ class Font {
 
       const bold = dom.css('font-weight') === 'bold';
       const italic = dom.css('font-style') === 'italic';
+      const linethrough = dom.css('text-decoration') === 'line-through';
+      const underline = dom.css('text-decoration') === 'underline';
 
       const font = new Font(family, size);
 
       if (bold) font.bold = true;
       if (italic) font.italic = true;
+      if (underline) font.underline = true;
+      if (linethrough) font.linethrough = true;
 
       font._dom = dom;
       return font;

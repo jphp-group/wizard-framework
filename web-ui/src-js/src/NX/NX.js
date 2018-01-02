@@ -1,8 +1,8 @@
 import App from './App';
 import UILoader from './UILoader';
-import UIMediator from "./UIMediator";
+import AppMediator from "./AppMediator";
 
 
 export default {
-  App, UILoader, UIMediator
+  App, UILoader, AppMediator
 }

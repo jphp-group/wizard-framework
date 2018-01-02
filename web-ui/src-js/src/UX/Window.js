@@ -1,6 +1,6 @@
 import Node from './Node';
 import Container from "./Container";
-import uiMediator from '../NX/UIMediator';
+import AppMediator from '../NX/AppMediator';
 
 class Window extends Container {
   constructor() {
@@ -18,7 +18,7 @@ class Window extends Container {
         close: true,
       };
 
-      uiMediator.sendUserInput(this, data);
+      AppMediator.sendUserInput(this, data);
     });
   }
 

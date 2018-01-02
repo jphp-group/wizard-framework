@@ -2,8 +2,10 @@
 rootProject.name = 'framework'
 
 include 'core'
+include 'core-legacy'
 include 'web'
 include 'web-ui'
+include 'web-ui/components/ace-editor'
 
 include 'sandbox'
 

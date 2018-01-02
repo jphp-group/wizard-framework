@@ -1,12 +1,12 @@
 import Button from './Button';
-import uiMediator from '../NX/UIMediator';
+import AppMediator from '../NX/AppMediator';
 
 class ToggleButton extends Button {
   constructor(text, graphic) {
     super(text, graphic);
 
     this.dom.on('click.ToggleButton', () => {
-      uiMediator.sendUserInput(this, () => {
+      AppMediator.sendUserInput(this, () => {
         return {'selected': this.selected}
       });
     });

@@ -1,7 +1,9 @@
 
 out/
-/.gradle/
+.gradle/
 .idea/
 
 *.log
 *.tmp
+
+build/
