@@ -10,6 +10,8 @@ use php\time\Timer;
 /**
  * Class OtherForm
  * @package ui
+ *
+ * @path /other
  */
 class OtherForm extends UIForm
 {

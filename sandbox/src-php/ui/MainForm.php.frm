@@ -12,6 +12,14 @@
     "_content": [
       {
         "_": "Label",
+        "text": "Wizard Framework (Демонстрация)",
+        "font": {"size": 22},
+        "width": "100%",
+        "style": "border-bottom: 1px solid silver; color: gray;",
+        "padding": [0, 0, 30, 0]
+      },
+      {
+        "_": "Label",
         "text": "Список заданий",
         "font": {"size": 45}
       },
@@ -42,7 +50,8 @@
         "height": 300,
         "width": 800,
         "font": {"size": 14},
-        "editable": false
+        "editable": false,
+        "visible": false
       },
       {
         "_": "VBox",
@@ -65,6 +74,12 @@
         "text": "Автор - Дмитрий Зайцев",
         "href": "http://develnext.org",
         "target": "_blank"
+      },
+      {
+        "_": "Button",
+        "id": "myButton",
+        "kind": "success",
+        "text": "Моя кнопка"
       }
     ]
   }

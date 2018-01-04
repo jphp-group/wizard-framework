@@ -9,6 +9,7 @@ use framework\web\ui\UICheckbox;
 use framework\web\ui\UIHBox;
 use framework\web\ui\UIImageView;
 use framework\web\ui\UIListView;
+use framework\web\ui\UINode;
 use framework\web\ui\UITextField;
 use framework\web\UIForm;
 use php\time\Timer;
@@ -81,5 +82,13 @@ class MainForm extends UIForm
         });
 
         $alert->show();
+    }
+
+    /**
+     * @event myButton.click
+     */
+    public function doMyButtonClick(Event $e)
+    {
+
     }
 }
