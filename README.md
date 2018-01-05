@@ -12,10 +12,10 @@ cd <path_to_wizard_dir>
 
 // for linux
 chmod +x gradlew
-./gradlew npmInstall gulpInstall
+./gradlew npmInstall installGulp
 
 // for windows
-gradlew.bat npmInstall gulpInstall
+gradlew.bat npmInstall installGulp
 ```
 
 Then you can run wizard sandbox:
