@@ -6,16 +6,16 @@ Wizard Framework is a jphp framework for the web/mobile/desktop.
 
 If you want to see our framework in action, you can use the `sandbox` project in the `sandbox/` directory.
 
-Before you should install Java 8 and run the `npmInstall` gradle task (it can take a lot of time):
+Before you should install Java 8 and run the `npmInstall gulpInstall` gradle task (it can take a lot of time):
 ```
 cd <path_to_wizard_dir>
 
 // for linux
 chmod +x gradlew
-./gradlew npmInstall
+./gradlew npmInstall gulpInstall
 
 // for windows
-gradlew.bat npmInstall
+gradlew.bat npmInstall gulpInstall
 ```
 
 Then you can run wizard sandbox:
