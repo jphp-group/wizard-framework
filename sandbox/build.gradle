@@ -1,6 +1,7 @@
 apply plugin: 'application'
 
 mainClassName = 'php.runtime.launcher.Launcher'
+applicationDefaultJvmArgs = ['-Dfile.encoding=UTF-8']
 
 dependencies {
     compile project(":web")
