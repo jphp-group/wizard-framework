@@ -6,6 +6,7 @@ include 'core-legacy'
 include 'web'
 include 'web-ui'
 include 'web-ui/components/ace-editor'
+include 'web-ui/components/slider'
 
 include 'sandbox'
 

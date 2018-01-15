@@ -83,12 +83,4 @@ class MainForm extends UIForm
 
         $alert->show();
     }
-
-    /**
-     * @event myButton.click
-     */
-    public function doMyButtonClick(Event $e)
-    {
-
-    }
 }

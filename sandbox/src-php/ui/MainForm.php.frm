@@ -76,10 +76,9 @@
         "target": "_blank"
       },
       {
-        "_": "Button",
-        "id": "myButton",
-        "kind": "success",
-        "text": "Моя кнопка"
+        "_": "bundle\\slider\\ui\\UISlider",
+        "id": "slider",
+        "tooltipVisibility": "show"
       }
     ]
   }

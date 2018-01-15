@@ -1,6 +1,6 @@
 
 
-class AceEditor extends UX.TextInputControl {
+class bundle_aceeditor_AceEditor extends UX.TextInputControl {
   get theme() {
     return this._theme;
   }
@@ -114,4 +114,4 @@ class AceEditor extends UX.TextInputControl {
   }
 }
 
-window['bundle.AceEditor'] = AceEditor;
+window['bundle.AceEditor'] = bundle_aceeditor_AceEditor;

@@ -1,6 +1,7 @@
 <?php
 
 use bundle\aceeditor\AceEditorModule;
+use bundle\slider\SliderModule;
 use framework\core\Event;
 use framework\web\HotDeployer;
 use framework\web\WebApplication;
@@ -9,6 +10,7 @@ use ui\MainUI;
 
 $deployer = new HotDeployer(function () {
     $webUi = new WebUI();
+    $webUi->addModule(new SliderModule());
     $webUi->addModule(new AceEditorModule());
     $webUi->setupResources(
         './../web-ui/src-js/build/lib/dnext-engine.js', './../web-ui/src-js/build/lib/dnext-engine.min.css'

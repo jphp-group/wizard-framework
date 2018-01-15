@@ -664,12 +664,15 @@ abstract class UINode extends Component implements UIViewable
 
     public function provideUserInput(array $data)
     {
-        if (isset($data['visible'])) {
-            $this->setVisible($data['visible']);
-        }
+        $this->provideUserInputProperties(['visible', 'enabled'], $data);
+    }
 
-        if (isset($data['enabled'])) {
-            $this->setEnabled($data['enabled']);
+    protected function provideUserInputProperties(array $props, array $data)
+    {
+        foreach ($props as $prop) {
+            if (isset($data[$prop])) {
+                $this->__set($prop, $data[$prop]);
+            }
         }
     }
 
