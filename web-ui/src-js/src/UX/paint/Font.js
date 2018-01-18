@@ -111,12 +111,8 @@ class Font {
 
       if (font.underline) {
         dom.css('text-decoration', 'underline');
-      } else {
-        dom.css('text-decoration', '');
-      }
-
-      if (font.linethrough) {
-        dom.css('text-decoration', 'line-through')
+      } else if (font.linethrough) {
+        dom.css('text-decoration', 'line-through');
       } else {
         dom.css('text-decoration', '');
       }
@@ -153,20 +149,12 @@ class Font {
         }
       }
 
-      if (font.hasOwnProperty('underline')) {
-        if (font.underline) {
-          dom.css('text-decoration', 'underline');
-        } else {
-          dom.css('text-decoration', '');
-        }
-      }
-
-      if (font.hasOwnProperty('linethrough')) {
-        if (font.linethrough) {
-          dom.css('text-decoration', 'line-through');
-        } else {
-          dom.css('text-decoration', '');
-        }
+      if (font.hasOwnProperty('underline') && font.underline) {
+        dom.css('text-decoration', 'underline');
+      } else if (font.hasOwnProperty('linethrough') && font.linethrough) {
+        dom.css('text-decoration', 'line-through');
+      } else {
+        dom.css('text-decoration', '');
       }
     }
   }

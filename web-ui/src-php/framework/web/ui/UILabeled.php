@@ -9,6 +9,9 @@ namespace framework\web\ui;
  * @property bool $textPreFormatted
  * @property UINode $graphic
  * @property UIFont $font
+ * @property array $align
+ * @property string $horAlign
+ * @property string $verAlign
  */
 abstract class UILabeled extends UINode
 {
@@ -37,6 +40,21 @@ abstract class UILabeled extends UINode
      * @var UINode|null
      */
     private $graphic = null;
+
+    /**
+     * @var array
+     */
+    private $align = ['center', 'center'];
+
+    /**
+     * @var string
+     */
+    private $horAlign = 'center';
+
+    /**
+     * @var string
+     */
+    private $verAlign = 'center';
 
     /**
      * UXButton constructor.
@@ -137,6 +155,55 @@ abstract class UILabeled extends UINode
     protected function setFont($font)
     {
         $this->font = UIFont::fetch($font);
+    }
+
+    /**
+     * @return array
+     */
+    protected function getAlign(): array
+    {
+        return [$this->verAlign, $this->horAlign];
+    }
+
+    /**
+     * @param array $align
+     */
+    protected function setAlign(array $align)
+    {
+        $this->__set('verAlign', $align[0]);
+        $this->__set('horAlign', $align[1]);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getHorAlign(): string
+    {
+        return $this->horAlign;
+    }
+
+    /**
+     * @param string $horAlign
+     */
+    protected function setHorAlign(string $horAlign)
+    {
+        $this->horAlign = $horAlign;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getVerAlign(): string
+    {
+        return $this->verAlign;
+    }
+
+    /**
+     * @param string $verAlign
+     */
+    protected function setVerAlign(string $verAlign)
+    {
+        $this->verAlign = $verAlign;
     }
 
     /**

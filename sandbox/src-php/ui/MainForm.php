@@ -32,12 +32,12 @@ class MainForm extends UIForm
      * @param Event $e
      * @event input.keyUp
      */
-    public function doInputKeyUp(Event $e)
+    /*public function doInputKeyUp(Event $e)
     {
         if ($e->data['which'] === 13) {
             $this->doButtonClick($e);
         }
-    }
+    }*/
 
     /**
      * @event button.click
@@ -68,7 +68,7 @@ class MainForm extends UIForm
     /**
      * @event clear.click
      */
-    public function doClear()
+    /*public function doClear()
     {
         $alert = new UIAlert('confirm');
         $alert->text = 'Вы уверены, что хотите удалить все записи?';
@@ -82,5 +82,5 @@ class MainForm extends UIForm
         });
 
         $alert->show();
-    }
+    }*/
 }
