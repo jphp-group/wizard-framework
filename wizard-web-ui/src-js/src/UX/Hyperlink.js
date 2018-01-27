@@ -21,7 +21,17 @@ class Hyperlink extends Labeled {
   }
 
   createDom() {
-    return jQuery('<a class="ux-hyperlink"><span class="ux-labeled-text"></span></a>');
+    const dom = jQuery('<a class="ux-labeled ux-hyperlink" href><span class="ux-labeled-text"></span></a>');
+    dom.on('click.Hyperlink', (e) => {
+      if (this.href === '#') {
+        e.preventDefault();
+        return false;
+      }
+
+      return true;
+    });
+
+    return dom;
   }
 }
 

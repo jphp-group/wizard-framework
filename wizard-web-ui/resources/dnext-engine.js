@@ -1416,7 +1416,19 @@ var Hyperlink = function (_Labeled) {
   _createClass(Hyperlink, [{
     key: 'createDom',
     value: function createDom() {
-      return jQuery('<a class="ux-hyperlink"><span class="ux-labeled-text"></span></a>');
+      var _this2 = this;
+
+      var dom = jQuery('<a class="ux-labeled ux-hyperlink" href><span class="ux-labeled-text"></span></a>');
+      dom.on('click.Hyperlink', function (e) {
+        if (_this2.href === '#') {
+          e.preventDefault();
+          return false;
+        }
+
+        return true;
+      });
+
+      return dom;
     }
   }, {
     key: 'href',
