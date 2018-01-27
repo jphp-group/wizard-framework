@@ -44,7 +44,7 @@ class UIButton extends UILabeled
     /**
      * @return bool
      */
-    public function isOutline(): bool
+    protected function isOutline(): bool
     {
         return $this->outline;
     }
@@ -52,7 +52,7 @@ class UIButton extends UILabeled
     /**
      * @param bool $outline
      */
-    public function setOutline(bool $outline)
+    protected function setOutline(bool $outline)
     {
         $this->outline = $outline;
     }
@@ -60,7 +60,7 @@ class UIButton extends UILabeled
     /**
      * @return string
      */
-    public function getKind(): string
+    protected function getKind(): string
     {
         return $this->kind;
     }
@@ -68,7 +68,7 @@ class UIButton extends UILabeled
     /**
      * @param string $kind
      */
-    public function setKind(string $kind)
+    protected function setKind(string $kind)
     {
         $this->kind = $kind;
     }

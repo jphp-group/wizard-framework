@@ -134,7 +134,7 @@ abstract class Component
     /**
      * @return string
      */
-    public function getId(): string
+    protected function getId(): string
     {
         return $this->id;
     }
@@ -142,7 +142,7 @@ abstract class Component
     /**
      * @param string $id
      */
-    public function setId(string $id)
+    protected function setId(string $id)
     {
         $this->id = $id;
     }

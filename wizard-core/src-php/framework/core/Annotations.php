@@ -82,9 +82,10 @@ class Annotations
 
     /**
      * @param string $comment
+     * @param callable|null $callback
      * @return array
      */
-    public static function parse(string $comment): array
+    public static function parse(string $comment, callable $callback = null): array
     {
         $regex = new Regex('\\@([a-z0-9\\-\\_]+)([ ]+(.+))?', 'im', $comment);
 
@@ -95,6 +96,12 @@ class Annotations
 
             $name = $groups[1];
             $value = $groups[3] ?: true;
+
+            if ($callback) {
+                if (!$callback($name, $value)) {
+                    break;
+                }
+            }
 
             if ($result[$name]) {
                 if (!is_array($result[$name])) {

@@ -5,6 +5,7 @@ use bundle\slider\SliderModule;
 use framework\core\Event;
 use framework\web\HotDeployer;
 use framework\web\WebApplication;
+use framework\web\WebAssets;
 use framework\web\WebUI;
 use ui\MainUI;
 
@@ -21,6 +22,7 @@ $deployer = new HotDeployer(function () {
     $app->addModule($webUi);
     $webUi->addUI(MainUI::class);
 
+    $app->addModule(new WebAssets('/assets', './assets'));
     $app->launch();
 }, function () {
     $app = WebApplication::current();
