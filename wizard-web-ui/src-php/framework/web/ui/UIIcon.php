@@ -27,6 +27,22 @@ class UIIcon extends UINode
     private $color = 'black';
 
     /**
+     * UIIcon constructor.
+     * @param string $kind
+     * @param int $imageSize
+     * @param string $color
+     */
+    public function __construct(string $kind = '', $imageSize = 32, string $color = 'black')
+    {
+        parent::__construct();
+        
+        $this->kind = $kind;
+        $this->imageSize = $imageSize;
+        $this->color = $color;
+    }
+
+
+    /**
      * @return string
      */
     public function uiSchemaClassName(): string

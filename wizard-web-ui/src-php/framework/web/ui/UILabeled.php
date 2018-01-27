@@ -8,6 +8,8 @@ namespace framework\web\ui;
  * @property string $textType
  * @property bool $textPreFormatted
  * @property UINode $graphic
+ * @property int $graphicTextGap
+ * @property string $contentDisplay
  * @property UIFont $font
  * @property array $align
  * @property string $horAlign
@@ -40,6 +42,16 @@ abstract class UILabeled extends UINode
      * @var UINode|null
      */
     private $graphic = null;
+
+    /**
+     * @var int
+     */
+    private $graphicTextGap = 4;
+
+    /**
+     * @var string
+     */
+    private $contentDisplay = 'left';
 
     /**
      * @var array
@@ -141,11 +153,43 @@ abstract class UILabeled extends UINode
     }
 
     /**
+     * @return string
+     */
+    protected function getContentDisplay(): string
+    {
+        return $this->contentDisplay;
+    }
+
+    /**
+     * @param string $contentDisplay
+     */
+    protected function setContentDisplay(string $contentDisplay)
+    {
+        $this->contentDisplay = $contentDisplay;
+    }
+
+    /**
      * @return UIFont
      */
     protected function getFont(): UIFont
     {
         return UIFont::wrapper($this, 'font', $this->font);
+    }
+
+    /**
+     * @return int
+     */
+    protected function getGraphicTextGap(): int
+    {
+        return $this->graphicTextGap;
+    }
+
+    /**
+     * @param int $graphicTextGap
+     */
+    protected function setGraphicTextGap(int $graphicTextGap)
+    {
+        $this->graphicTextGap = $graphicTextGap;
     }
 
     /**
