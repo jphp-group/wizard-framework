@@ -13,7 +13,8 @@ $deployer = new HotDeployer(function () {
     $webUi->addModule(new SliderModule());
     $webUi->addModule(new AceEditorModule());
     $webUi->setupResources(
-        './../web-ui/src-js/build/lib/dnext-engine.js', './../web-ui/src-js/build/lib/dnext-engine.min.css'
+        './../wizard-web-ui/src-js/build/lib/dnext-engine.js',
+        './../wizard-web-ui/src-js/build/lib/dnext-engine.min.css'
     );
 
     $app = new WebApplication();
@@ -28,6 +29,6 @@ $deployer = new HotDeployer(function () {
 });
 
 $deployer->addDirWatcher('./src-php');
-$deployer->addDirWatcher('../web/src-php');
-$deployer->addDirWatcher('../web-ui/src-php');
+$deployer->addDirWatcher('../wizard-web/src-php');
+$deployer->addDirWatcher('../wizard-web-ui/src-php');
 $deployer->run();

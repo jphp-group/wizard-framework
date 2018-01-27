@@ -7,6 +7,7 @@ use php\lang\Environment;
 use php\lang\IllegalArgumentException;
 use php\lang\InterruptedException;
 use php\lang\Thread;
+use php\lang\ThreadPool;
 use php\lib\fs;
 use php\lib\str;
 use php\time\Timer;
@@ -33,6 +34,11 @@ class HotDeployer extends Component
     private $dirWatchers = [];
 
     /**
+     * @var ThreadPool
+     */
+    private $deployThreadPool;
+
+    /**
      * @var Environment
      */
     private $env;
@@ -46,6 +52,7 @@ class HotDeployer extends Component
     {
         $this->deployHandler = $deployHandler;
         $this->undeployHandler = $undeployHandler;
+        $this->deployThreadPool = ThreadPool::createSingle();
 
         Logger::addWriter(Logger::stdoutWriter(true));
     }
@@ -106,9 +113,11 @@ class HotDeployer extends Component
                 } catch (InterruptedException $e) {
                     $this->updateWatcherStats();
 
-                    (new Thread(function () {
-                        $this->redeploy();
-                    }))->start();
+                    $this->undeploy();
+
+                    $this->deployThreadPool->submit(function () {
+                        $this->deploy();
+                    });
                 } finally {
                     Thread::sleep(500);
                 }
@@ -120,17 +129,20 @@ class HotDeployer extends Component
         //$this->updateWatcherStats();
     }
 
-    /**
-     * Redeploy.
-     */
-    public function redeploy()
+    public function undeploy()
     {
         if ($this->env) {
             Logger::info("Un-deploy old env ({0})", spl_object_hash($this->env));
             $this->env->execute($this->undeployHandler);
             Logger::info("-------------------------------------------------");
         }
+    }
 
+    /**
+     * Redeploy.
+     */
+    public function deploy()
+    {
         $this->env = $env = new Environment(null, Environment::CONCURRENT | Environment::HOT_RELOAD);
 
         $dirs = flow($this->dirWatchers)->find(function ($watcher) { return $watcher['source']; })->keys()->toArray();

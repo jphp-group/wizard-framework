@@ -20,6 +20,8 @@ use php\lang\System;
 use php\lang\ThreadLocal;
 use php\lib\fs;
 use php\lib\str;
+use php\net\ServerSocket;
+use php\net\Socket;
 use php\time\Time;
 use ReflectionClass;
 use ReflectionMethod;
@@ -162,6 +164,15 @@ class WebApplication extends Application
         $this->response->set($response);
     }
 
+    /**
+     * @return bool
+     */
+    public function isHttpPortAvailable(): bool
+    {
+        $port = $this->settings->get('web.server.port', '5000');
+        return ServerSocket::isAvailableLocalPort($port);
+    }
+
     public function launch(): void
     {
         parent::launch();
@@ -173,6 +184,18 @@ class WebApplication extends Application
             $response->status(404);
             $response->body("404. Page not found (/{$request->attribute('**')}).");
         });
+
+        $tryCount = 10;
+
+        while (!ServerSocket::isAvailableLocalPort($port)) {
+            sleep(1);
+            Logger::trace("Port {0} is busy, waiting ...", $port);
+            $tryCount--;
+
+            if ($tryCount <= 0) {
+                break;
+            }
+        }
 
         $this->server->listen($host . ":" . $port);
 

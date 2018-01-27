@@ -1,13 +1,13 @@
 
 rootProject.name = 'framework'
 
-include 'core'
-include 'core-legacy'
-include 'web'
-include 'web-ui'
-include 'web-ui/components/ace-editor'
-include 'web-ui/components/slider'
-include 'web-ui/components/craft-game-engine'
+include 'wizard-core'
+include 'wizard-core-legacy'
+include 'wizard-web'
+include 'wizard-web-ui'
+include 'wizard-web-ui/components/ace-editor'
+include 'wizard-web-ui/components/slider'
+include 'wizard-web-ui/components/craft-game-engine'
 
 include 'sandbox'
 

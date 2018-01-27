@@ -1,5 +1,5 @@
 dependencies {
-    compile project(":core")
+    compile project(":wizard-core")
     compile "org.develnext.jphp:jphp-httpserver-ext:${jphpVersion}"
 }
 
