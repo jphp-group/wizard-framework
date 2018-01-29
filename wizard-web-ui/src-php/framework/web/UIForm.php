@@ -1,9 +1,11 @@
 <?php
+
 namespace framework\web;
 
 use framework\core\AnnotationEventBinder;
 use framework\core\Annotations;
 use framework\core\Component;
+use framework\core\EventSignal;
 use framework\core\Logger;
 use framework\web\ui\UIContainer;
 use framework\web\ui\UINode;
@@ -69,10 +71,22 @@ abstract class UIForm extends Component
     private $centered = true;
 
     /**
+     * @var EventSignal
+     */
+    public $onNavigate;
+
+    /**
+     * @var EventSignal
+     */
+    public $onShow;
+
+    /**
      * UIForm constructor.
      */
     public function __construct()
     {
+        parent::__construct();
+
         $this->window = new UIWindow();
 
         $this->loadFrm($this->getFrmPath());
@@ -143,7 +157,18 @@ abstract class UIForm extends Component
 
     protected function getFrmPath()
     {
-        return reflect::typeModule(reflect::typeOf($this))->getName() . ".frm";
+        switch ($this->getFrmFormat()) {
+            case "yml":
+            case "yaml":
+                return reflect::typeModule(reflect::typeOf($this))->getName() . ".yml";
+            default:
+                return reflect::typeModule(reflect::typeOf($this))->getName() . ".frm";
+        }
+    }
+
+    protected function getFrmFormat()
+    {
+        return 'json';
     }
 
     protected function loadFrm(string $frmPath)
@@ -151,7 +176,7 @@ abstract class UIForm extends Component
         $uiLoader = new UILoader();
 
         try {
-            $data = $uiLoader->loadFromStream($stream = Stream::of($frmPath), 'layout');
+            $data = $uiLoader->loadFromStream($stream = Stream::of($frmPath), 'layout', $this->getFrmFormat());
 
             $this->setTitle($data['title']);
 
@@ -164,7 +189,6 @@ abstract class UIForm extends Component
             }
 
             $this->layout = $uiLoader->getNode();
-
             $this->nodesById = $uiLoader->getNodesById();
 
             if ($data['footer']) {
@@ -176,6 +200,8 @@ abstract class UIForm extends Component
                     ->withKeys()
                     ->toArray();
             }
+
+            $this->layout->connectToUI($this->connectedUi);
         } finally {
             if ($stream) {
                 $stream->close();

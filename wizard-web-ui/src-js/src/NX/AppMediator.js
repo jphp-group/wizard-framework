@@ -264,8 +264,9 @@ class AppMediator {
   /**
    * @param node
    * @param data
+   * @param callback
    */
-  sendUserInput(node, data) {
+  sendUserInput(node, data, callback = null) {
     if (!this.ws) {
       return;
     }
@@ -281,7 +282,7 @@ class AppMediator {
         this.sendIfCan('ui-user-input', {
           'uuid': node.uuid,
           'data': this.prepareValue(newData)
-        })
+        }, callback)
       }, 0);
     } else {
       console.warn('Ignore User input');

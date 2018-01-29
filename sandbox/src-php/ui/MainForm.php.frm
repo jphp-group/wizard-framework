@@ -72,14 +72,19 @@
       {
         "_": "Hyperlink",
         "text": "Автор - Дмитрий Зайцев",
-        "href": "http://develnext.org",
+        "href": "#",
         "target": "_blank"
       },
       {
         "_": "Button",
         "id": "myButton",
         "kind": "dark",
-        "text": "Моя кнопка"
+        "text": "Моя кнопка",
+        "height": 100,
+        "width": 300,
+        "align": ["top", "center"],
+        "contentDisplay": "left",
+        "graphic": {"_": "Icon", "kind": "exit_to_app", "imageSize": 24}
       }
     ]
   }

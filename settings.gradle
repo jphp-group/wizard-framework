@@ -10,4 +10,5 @@ include 'wizard-web-ui/components/slider'
 include 'wizard-web-ui/components/craft-game-engine'
 
 include 'sandbox'
+include 'sandbox-game'
 

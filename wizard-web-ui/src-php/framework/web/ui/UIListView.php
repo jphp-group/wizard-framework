@@ -1,6 +1,8 @@
 <?php
 namespace framework\web\ui;
 
+use framework\core\EventSignal;
+
 /**
  * Class UIListView
  * @package framework\web\ui
@@ -19,6 +21,16 @@ class UIListView extends UIContainer
      * @var int
      */
     private $selectedIndex = -1;
+
+    /**
+     * @var EventSignal
+     */
+    public $onChange;
+
+    /**
+     * @var EventSignal
+     */
+    public $onAction;
 
     /**
      * UIListView constructor.

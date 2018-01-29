@@ -10,6 +10,7 @@ use php\lib\str;
  * @package framework\core
  *
  * @property string $id
+ * @property Behaviour[] $behaviours
  */
 abstract class Component
 {
@@ -17,6 +18,11 @@ abstract class Component
      * @var string
      */
     private $id;
+
+    /**
+     * @var Behaviour[]
+     */
+    public $__behaviours = [];
 
     /**
      * @var array
@@ -27,6 +33,32 @@ abstract class Component
      * @var array
      */
     private $data = [];
+
+    /**
+     * @var EventSignal[]
+     */
+    private $eventSignals = [];
+
+    /**
+     * Component constructor.
+     */
+    public function __construct()
+    {
+        $reflect = new \ReflectionClass($this);
+        $props = $reflect->getProperties();
+
+        foreach ($props as $prop) {
+            if ($prop->isPublic() && !$prop->isStatic() && str::startsWith($prop->getName(), "on")) {
+                if (str::contains($prop->getDocComment(), "@var EventSignal")) {
+                    unset($this->{$prop->getName()});
+
+                    $eventName = str::lowerFirst(str::sub($prop->getName(), 2));
+                    $this->eventSignals[$prop->getName()] = new EventSignal($this, $eventName);
+                }
+            }
+        }
+    }
+
 
     /**
      * @return array
@@ -147,6 +179,14 @@ abstract class Component
         $this->id = $id;
     }
 
+    /**
+     * @return Behaviour[]
+     */
+    protected function getBehaviours(): array
+    {
+        return $this->behaviours;
+    }
+
     public function __get(string $name)
     {
         $method = "get$name";
@@ -160,11 +200,21 @@ abstract class Component
             return (bool) $this->{$method}();
         }
 
+        if ($signal = $this->eventSignals[$name]) {
+            return $signal;
+        }
+
         throw new \Error("Property '$name' is not exists in class " . reflect::typeOf($this));
     }
 
     public function __set(string $name, $value)
     {
+        if ($signal = $this->eventSignals[$name]) {
+            $signal->set($value);
+            return $value;
+            //throw new \Exception("Property '$name' is readonly, to set event use ->\$name->set() method");
+        }
+
         $method = "set$name";
 
         $data = [

@@ -1,0 +1,15 @@
+title: Welcome To Quester
+
+layout:
+  _: VBox
+  width: 100%
+  height: 100%
+  align: [center, center]
+  _content:
+    - _: Label
+      id: label
+      text: Добро пожаловать
+      font: {size: 32}
+      opacity: 0
+
+

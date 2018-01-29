@@ -296,6 +296,14 @@ class Node {
     }
   }
 
+  get cursor() {
+    return this.dom.css('cursor');
+  }
+
+  set cursor(value) {
+    this.dom.css('cursor', value);
+  }
+
   get parent() {
     let parent = null;
 

@@ -71,6 +71,8 @@ abstract class UI extends Component
      */
     public function __construct(?UISocket $socket = null)
     {
+        parent::__construct();
+
         $this->view = $this->makeView();
         $this->view->connectToUI($this);
 
@@ -432,10 +434,11 @@ abstract class UI extends Component
     /**
      * @param string $type
      * @param array $message
+     * @param callable|null $callback
      */
-    public function sendMessage(string $type, array $message)
+    public function sendMessage(string $type, array $message, callable $callback = null)
     {
-        $this->socket->sendText(reflect::typeOf($this), $type, $this->prepareValue($message));
+        $this->socket->sendText(reflect::typeOf($this), $type, $this->prepareValue($message), $callback);
     }
 
     /**

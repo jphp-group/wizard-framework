@@ -1,6 +1,8 @@
 <?php
 namespace framework\web\ui;
 
+use framework\core\EventSignal;
+
 /**
  * Class UISelectControl
  * @package framework\web\ui
@@ -25,6 +27,16 @@ abstract class UISelectControl extends UINode
      * @var array
      */
     private $items = [];
+
+    /**
+     * @var EventSignal
+     */
+    public $onChange;
+
+    /**
+     * @var EventSignal
+     */
+    public $onAction;
 
     /**
      * UISelectControl constructor.

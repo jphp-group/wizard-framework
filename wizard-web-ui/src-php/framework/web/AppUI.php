@@ -1,4 +1,5 @@
 <?php
+
 namespace framework\web;
 
 use framework\core\Annotations;
@@ -10,6 +11,7 @@ use framework\web\ui\UIVBox;
 use php\http\HttpServerRequest;
 use php\http\HttpServerResponse;
 use php\lib\arr;
+use php\time\Timer;
 
 /**
  * Class AppUI
@@ -57,15 +59,20 @@ class AppUI extends UI
 
         $this->on('ready', function (Event $e) {
             $this->detectCurrentForm();
+
+            if ($this->currentForm) {
+                $this->currentForm->connectToUI($this);
+                $this->currentForm->onNavigate->trigger();
+            }
         }, __CLASS__);
 
         $this->setAlertFunction(function ($message, array $options) {
-           $alert = new UIAlert($options['type'] ?? 'info');
+            $alert = new UIAlert($options['type'] ?? 'info');
 
-           $alert->preFormatted = $options['pre'];
-           $alert->text = $message;
-           $alert->title = $options['title'] ?? 'Message';
-           $alert->show();
+            $alert->preFormatted = $options['pre'];
+            $alert->text = $message;
+            $alert->title = $options['title'] ?? 'Message';
+            $alert->show();
         });
     }
 
@@ -141,6 +148,19 @@ class AppUI extends UI
         return $this->currentForm;
     }
 
+    public function renderView()
+    {
+        $this->sendMessage('ui-render', [
+            'schema' => $this->getUISchema()
+        ], function () {
+            Timer::after(100, function () {
+                if ($this->currentForm) {
+                    $this->currentForm->onShow->trigger();
+                }
+            });
+        });
+    }
+
     protected function detectCurrentForm()
     {
         /** @var UIVBox $view */
@@ -167,9 +187,7 @@ class AppUI extends UI
         }
 
         if ($this->currentForm) {
-            if ($this->currentForm->getConnectedUI() !== $this) {
-                $this->currentForm->connectToUI($this);
-            }
+            $this->currentForm->connectToUI($this);
 
             $this->sendMessage('page-set-properties', ['title' => $this->currentForm->title]);
         }
@@ -203,27 +221,25 @@ class AppUI extends UI
                 $this->hash = $args['hash'];
             }
 
-            if ($routePath && $form !== $this->notFoundForm) {
+            if ($routePath && $form !== $this->notFoundForm && !($formOrCode instanceof UIForm)) {
                 $this->sendMessage('history-push', [
                     'title' => $form->title,
-                    'url'   => "{$this->getRoutePath()}{$routePath}",
-                    'hash'  => $args['hash'],
+                    'url' => "{$this->getRoutePath()}{$routePath}",
+                    'hash' => $args['hash'],
                 ]);
             } else {
                 $this->sendMessage('page-set-properties', [
                     'title' => $form->title,
-                    'hash'  => $args['hash'],
+                    'hash' => $args['hash'],
                 ]);
             }
 
-            if ($form->getConnectedUI() !== $this) {
-                $form->connectToUI($this);
-            }
+            $form->connectToUI($this);
         }
 
         $this->currentForm = $form;
         $this->renderView();
 
-        $form->trigger(new Event('navigate', $form, $this, $args));
+        $form->onNavigate->trigger($args);
     }
 }

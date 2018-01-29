@@ -10,7 +10,9 @@ export default class SelectControl extends Node {
     }
 
     this.dom.on('change.SelectControl', (e) => {
-      AppMediator.sendUserInput(this, {selected: this.selected, selectedText: this.selectedText});
+      AppMediator.sendUserInput(this, {selected: this.selected, selectedText: this.selectedText}, () => {
+        this.trigger('action', e);
+      });
     });
   }
 

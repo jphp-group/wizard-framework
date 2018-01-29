@@ -1,6 +1,7 @@
 <?php
 namespace framework\core;
 
+use php\io\IOException;
 use php\io\Stream;
 use php\lib\str;
 use php\time\Time;
@@ -103,7 +104,12 @@ abstract class Application extends Component
     {
         $this->trigger(new Event('initialize', $this));
         $this->settings = new Settings();
-        $this->settings->load(Stream::of('res://application.conf'));
+
+        try {
+            $this->settings->load(Stream::of('res://application.conf'));
+        } catch (IOException $e) {
+            Logger::warn("Failed to load res://application.conf");
+        }
     }
 
     /**

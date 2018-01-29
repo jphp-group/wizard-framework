@@ -9,13 +9,15 @@ class ListView extends Container {
     this.spacing = 0;
     this.align = ['center', 'left'];
 
-    this.dom.on('action.ListView', () => {
+    this.dom.on('change.ListView', () => {
       const data = {
         selected: this.selected,
         selectedIndex: this.selectedIndex
       };
 
-      AppMediator.sendUserInput(this, data);
+      AppMediator.sendUserInput(this, data, () => {
+        this.dom.trigger('action');
+      });
     })
   }
 
@@ -81,7 +83,7 @@ class ListView extends Container {
       dom.closest('.ux-list-view').find('> .ux-slot').removeClass('active');
       dom.addClass('active');
 
-      this.dom.trigger('action');
+      this.trigger('change');
       e.preventDefault();
       return false;
     });

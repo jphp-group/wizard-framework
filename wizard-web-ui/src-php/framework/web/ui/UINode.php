@@ -4,11 +4,13 @@ namespace framework\web\ui;
 
 use framework\core\Component;
 use framework\core\Event;
+use framework\core\EventSignal;
 use framework\core\Logger;
 use framework\web\UI;
 use php\lib\arr;
 use php\lib\reflect;
 use php\lib\str;
+use php\time\Timer;
 
 /**
  * @package framework\web\ui
@@ -104,6 +106,11 @@ abstract class UINode extends Component implements UIViewable
     private $padding = [0, 0, 0, 0];
 
     /**
+     * @var string
+     */
+    private $cursor = 'default';
+
+    /**
      * @var UI
      */
     protected $connectedUi;
@@ -112,6 +119,36 @@ abstract class UINode extends Component implements UIViewable
      * @var UIContainer
      */
     private $parent;
+
+    /**
+     * @var EventSignal
+     */
+    public $onClick;
+
+    /**
+     * @var EventSignal
+     */
+    public $onMouseDown;
+
+    /**
+     * @var EventSignal
+     */
+    public $onMouseUp;
+
+    /**
+     * @var EventSignal
+     */
+    public $onKeyDown;
+
+    /**
+     * @var EventSignal
+     */
+    public $onKeyUp;
+
+    /**
+     * @var EventSignal
+     */
+    public $onKeyPress;
 
     /**
      * @return string
@@ -128,6 +165,8 @@ abstract class UINode extends Component implements UIViewable
      */
     public function __construct()
     {
+        parent::__construct();
+
         $this->uuid = str::uuid();
     }
 
@@ -341,7 +380,7 @@ abstract class UINode extends Component implements UIViewable
     /**
      * @param bool $visible
      */
-    public function setVisible(bool $visible)
+    protected function setVisible(bool $visible)
     {
         $this->visible = $visible;
     }
@@ -472,6 +511,22 @@ abstract class UINode extends Component implements UIViewable
     }
 
     /**
+     * @return string
+     */
+    protected function getCursor(): string
+    {
+        return $this->cursor;
+    }
+
+    /**
+     * @param string $cursor
+     */
+    protected function setCursor(string $cursor)
+    {
+        $this->cursor = $cursor;
+    }
+
+    /**
      * @return UIContainer
      */
     protected function getParent(): ?UIContainer
@@ -548,11 +603,11 @@ abstract class UINode extends Component implements UIViewable
     }
 
     /**
-     * @param int $duration
+     * @param int|string $duration
      * @param float $opacity
      * @param callable|null $complete
      */
-    public function fadeTo(int $duration, float $opacity, callable $complete = null)
+    public function fadeTo($duration, float $opacity, callable $complete = null)
     {
         $this->animate(['opacity' => $opacity], ['duration' => $duration, 'complete' => function () use ($opacity, $complete) {
             $this->provideUserInput(['opacity' => $opacity]);
@@ -564,19 +619,19 @@ abstract class UINode extends Component implements UIViewable
     }
 
     /**
-     * @param int $duration
+     * @param int|string $duration
      * @param callable|null $complete
      */
-    public function fadeIn(int $duration = 400, callable $complete = null)
+    public function fadeIn($duration = 400, callable $complete = null)
     {
         $this->fadeTo($duration, 1.0, $complete);
     }
 
     /**
-     * @param int $duration
+     * @param int|string $duration
      * @param callable|null $complete
      */
-    public function fadeOut(int $duration = 400, callable $complete = null)
+    public function fadeOut($duration = 400, callable $complete = null)
     {
         $this->fadeTo($duration, 0.0, $complete);
     }
@@ -587,6 +642,10 @@ abstract class UINode extends Component implements UIViewable
      */
     public function animate(array $properties, array $options)
     {
+        if (isset($options['duration'])) {
+            $options['duration'] = Timer::parsePeriod($options['duration']);
+        }
+
         $this->callRemoteMethod('animate', [$properties, $options]);
     }
 
@@ -635,13 +694,31 @@ abstract class UINode extends Component implements UIViewable
     }
 
     /**
-     * @param string$method
+     * @param string $method
      * @param array $args
+     * @param bool $waitConnect
      */
-    public function callRemoteMethod(string $method, array $args = [])
+    public function callRemoteMethod(string $method, array $args = [], bool $waitConnect = false)
     {
         if ($this->connectedUi) {
             $this->connectedUi->callNodeMethod($this, $method, $args);
+        } else {
+            if ($waitConnect) {
+                Timer::after(100, function () use ($method, $args) {
+                    $this->callRemoteMethod($method, $args, true);
+                });
+            } else {
+                Logger::warn("Failed to UINode::callRemoteMethod({0}, args), ui is not connected", $method);
+            }
+        }
+    }
+
+    public function callRemoteMethod2(string $method, array $args = [])
+    {
+        if ($this->connectedUi) {
+            $this->callRemoteMethod($method, $args);
+        } else {
+
         }
     }
 
