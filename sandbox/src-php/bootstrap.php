@@ -6,6 +6,7 @@ use framework\core\Event;
 use framework\web\HotDeployer;
 use framework\web\WebApplication;
 use framework\web\WebAssets;
+use framework\web\WebDevModule;
 use framework\web\WebUI;
 use ui\MainUI;
 
@@ -23,13 +24,17 @@ $deployer = new HotDeployer(function () {
     $webUi->addUI(MainUI::class);
 
     $app->addModule(new WebAssets('/assets', './assets'));
+    $app->addModule(new WebDevModule());
     $app->launch();
 }, function () {
-    $app = WebApplication::current();
-    $app->trigger(new Event('restart', $app));
-    $app->shutdown();
+    if (WebApplication::isInitialized()) {
+        $app = WebApplication::current();
+        $app->trigger(new Event('restart', $app));
+        $app->shutdown();
+    }
 });
 
+//$deployer->addFileWatcher('application.watcher');
 $deployer->addDirWatcher('./src-php');
 $deployer->addDirWatcher('../wizard-web/src-php');
 $deployer->addDirWatcher('../wizard-web-ui/src-php');

@@ -1,6 +1,8 @@
 <?php
 namespace framework\web\ui;
 
+use framework\core\EventSignal;
+
 /**
  * Class UXCheckbox
  * @package framework\web\ui
@@ -13,6 +15,16 @@ class UICheckbox extends UILabeled
      * @var bool
      */
     private $selected = false;
+
+    /**
+     * @var EventSignal
+     */
+    public $onAction;
+
+    /**
+     * @var EventSignal
+     */
+    public $onChange;
 
     /**
      * @return string

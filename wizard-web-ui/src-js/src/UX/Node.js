@@ -1,6 +1,35 @@
 import Utils from './util/Utils';
 import UILoader from "../NX/UILoader";
 
+const KEY_CODES = {
+  Enter: 13,
+  Backspace: 8,
+  Tab: 9,
+  Cancel: 0x03,
+  Clear: 0x0C,
+  Shift: 0x10,
+  Ctrl: 0x11,
+  Alt: 0x12,
+  Pause: 0x13,
+  CapsLock: 0x14,
+  Esc: 0x1B,
+  Escape: 0x1B,
+  Space: 0x20,
+  PageUp: 0x21,
+  PageDown: 0x22,
+  End: 0x23,
+  Home: 0x24,
+  Left: 0x25,
+  Up: 0x26,
+  Right: 0x27,
+  Down: 0x28,
+  Comma:0x2C,
+  Delete: 0x7F,
+  F1: 0x70, F2: 0x71, F3: 0x72, F4: 0x73, F5: 0x74, F6: 0x75, F7: 0x76, F8: 0x77, F9: 0x78, F10: 0x79, F11: 0x7A, F12: 0x7B,
+  PrintScreen: 0x9A,
+  Insert: 0x9B
+};
+
 /**
  * Base HTML Node class.
  **/
@@ -23,6 +52,83 @@ class Node {
     }
 
     this.dom.data('--wrapper', this);
+
+    this.dom.on('dblclick.Node', (e) => {
+      this.trigger('click-2x', e);
+    });
+
+    this.dom.on('click.Node', (e) => {
+      switch (e.which) {
+        case 1:
+          this.trigger('click-left', e); break;
+        case 2:
+          this.trigger('click-middle', e); break;
+        case 3:
+          this.trigger('click-right', e); break;
+      }
+    });
+
+    const keyEventBuilder = (event) => {
+      return (e) => {
+        let found = false;
+
+        for (let key in KEY_CODES) {
+          const value = KEY_CODES[key];
+
+          if (value === e.keyCode) {
+            this.trigger(event + '-' + key.toLowerCase(), e);
+
+            if (event.shiftKey) this.trigger(`${event}-shift+${key.toLowerCase()}`, e);
+            if (event.ctrlKey) this.trigger(`${event}-ctrl+${key.toLowerCase()}`, e);
+            if (event.altKey) this.trigger(`${event}-alt+${key.toLowerCase()}`, e);
+
+            found = true;
+          }
+        }
+
+        switch (event.keyCode) {
+          case KEY_CODES.Up:
+          case KEY_CODES.Right:
+          case KEY_CODES.Down:
+          case KEY_CODES.Left:
+            this.trigger(event + '-anydirection', e);
+
+            if (event.shiftKey) this.trigger(`${event}-shift+anydirection`, e);
+            if (event.ctrlKey) this.trigger(`${event}-ctrl+anydirection`, e);
+            if (event.altKey) this.trigger(`${event}-alt+anydirection`, e);
+
+            break;
+        }
+
+        if (event.hasOwnProperty('char') && !found) {
+          const char = event.char.toString().toLowerCase();
+          this.trigger(event + '-' + char, e);
+
+          if (event.shiftKey) this.trigger(`${event}-shift+${char}`, e);
+          if (event.ctrlKey) this.trigger(`${event}-ctrl+${char}`, e);
+          if (event.altKey) this.trigger(`${event}-alt+${char}`, e);
+
+          if ('0123456789'.indexOf(char) > -1) {
+            this.trigger(event + '-anydigit', e);
+
+            if (event.shiftKey) this.trigger(`${event}-shift+anydigit`, e);
+            if (event.ctrlKey) this.trigger(`${event}-ctrl+anydigit`, e);
+            if (event.altKey) this.trigger(`${event}-alt+anydigit`, e);
+          }
+
+          if ('qwertyuiopasdfghjklzxcvbnm'.indexOf(char) > -1) {
+            this.trigger(event + '-anyletter', e);
+
+            if (event.shiftKey) this.trigger(`${event}-shift+anyletter`, e);
+            if (event.ctrlKey) this.trigger(`${event}-ctrl+anyletter`, e);
+            if (event.altKey) this.trigger(`${event}-alt+anyletter`, e);
+          }
+        }
+      };
+    };
+
+    this.dom.on('keydown.Node', keyEventBuilder('keydown'));
+    this.dom.on('keyup.Node', keyEventBuilder('keyup'));
   }
 
   /**

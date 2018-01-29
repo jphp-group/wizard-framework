@@ -65,7 +65,7 @@ class StoryForm extends UIForm
 
         $box = new UIVBox();
         $box->align = ['center', 'center'];
-        $box->height = '100%';
+        $box->height = '50%';
         $box->spacing = 0;
         $box->opacity = 0;
         $box->style = 'line-height: 28px;';

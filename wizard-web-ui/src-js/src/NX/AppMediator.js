@@ -121,6 +121,7 @@ class AppMediator {
             }
 
             break;
+
           case "system-eval":
             const {script, callback} = message;
             const result = eval(script);
@@ -130,6 +131,17 @@ class AppMediator {
             }
 
             break;
+
+          case "system-callback":
+            const { id } = message;
+
+            if (this._callbacks[id]) {
+              this._callbacks[id].apply(message);
+              delete this._callbacks[id];
+            }
+
+            break;
+
           case "history-push":
             const url = message['url'];
             const title = message['title'];
@@ -321,6 +333,7 @@ class AppMediator {
 
     if (callback) {
       this._callbacks[message.id] = callback;
+      message.needCallback = true;
     }
 
     console.debug("AppMediator.send", message);
@@ -446,7 +459,7 @@ class AppMediator {
 
       node.on(`${event}.AppMediator`, (e) => {
         this.triggerEvent(node, event, e);
-      })
+      });
     } else {
       console.warn(`Failed to link event ${event}, node with uuid = ${uuid} is not found`);
     }

@@ -59,7 +59,7 @@ class UIListView extends UIContainer
     /**
      * @return UINode
      */
-    public function getSelected(): ?UINode
+    protected function getSelected(): ?UINode
     {
         return $this->selected;
     }
@@ -67,7 +67,7 @@ class UIListView extends UIContainer
     /**
      * @param UINode $selected
      */
-    public function setSelected(?UINode $selected)
+    protected function setSelected(?UINode $selected)
     {
         $this->selected = $selected;
     }
@@ -75,7 +75,7 @@ class UIListView extends UIContainer
     /**
      * @return int
      */
-    public function getSelectedIndex(): int
+    protected function getSelectedIndex(): int
     {
         return $this->selectedIndex;
     }
@@ -83,7 +83,7 @@ class UIListView extends UIContainer
     /**
      * @param int $selectedIndex
      */
-    public function setSelectedIndex(int $selectedIndex)
+    protected function setSelectedIndex(int $selectedIndex)
     {
         $this->selectedIndex = $selectedIndex;
     }

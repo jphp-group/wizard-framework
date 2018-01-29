@@ -302,6 +302,8 @@ abstract class UI extends Component
     {
         $message = $e->message();
 
+        $needCallback = (bool) $message->getData()['needCallback'];
+
         switch ($message->getType()) {
             case "callback-trigger":
                 ['uuid' => $uuid, 'args' => $args] = $message->getData();
@@ -375,6 +377,10 @@ abstract class UI extends Component
             default:
                 Logger::warn('Unknown socket message (type = {0})', $message->getType());
                 break;
+        }
+
+        if ($needCallback) {
+            $this->sendMessage('system-callback', ['id' => $message->getId()]);
         }
     }
 

@@ -40,7 +40,7 @@ class MainForm extends UIForm
     }*/
 
     /**
-     * @event button.click
+     * @event button.click-left
      * @param Event $e
      */
     public function doButtonClick(Event $e)
@@ -64,6 +64,14 @@ class MainForm extends UIForm
         $this->input->text = '';
         $this->clear->visible = true;
     }
+
+    /**
+     * @event my.change
+     */
+    /*public function test()
+    {
+        alert($this->my->selected);
+    }*/
 
     /**
      * @event clear.click

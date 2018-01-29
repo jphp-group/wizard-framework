@@ -5,8 +5,12 @@ class Checkbox extends Labeled {
   constructor(text, graphic) {
     super(text, graphic);
 
-    this.dom.on('click.Checkbox', () => {
-      AppMediator.sendUserInput(this, {selected: this.selected});
+    this.dom.on('click.Checkbox', (e) => {
+      if (e.target.tagName === 'INPUT') {
+        AppMediator.sendUserInput(this, {selected: this.selected}, () => {
+          this.trigger('action', e);
+        });
+      }
     });
   }
 

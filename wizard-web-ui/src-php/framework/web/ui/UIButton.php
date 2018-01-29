@@ -1,5 +1,6 @@
 <?php
 namespace framework\web\ui;
+use framework\core\EventSignal;
 
 /**
  * Class UXButton
@@ -32,6 +33,11 @@ class UIButton extends UILabeled
      * @var bool
      */
     private $outline = false;
+
+    /**
+     * @var EventSignal
+     */
+    public $onAction;
 
     /**
      * @return string

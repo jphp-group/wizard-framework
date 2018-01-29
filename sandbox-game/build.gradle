@@ -12,6 +12,6 @@ dependencies {
     compile "org.develnext.jphp:jphp-xml-ext:${jphpVersion}"
 }
 
-task sandbox(dependsOn: ['run']) {
+task game(dependsOn: ['run']) {
 
 }

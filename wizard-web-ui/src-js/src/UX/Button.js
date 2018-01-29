@@ -5,6 +5,15 @@ const kinds = [
 ];
 
 class Button extends Labeled {
+
+  constructor(text, graphic) {
+    super(text, graphic);
+
+    this.on('click.Button', function () {
+      this.trigger('action');
+    });
+  }
+
   get outline() {
     return !!this.dom.data('--outline');
   }

@@ -39,6 +39,8 @@ abstract class Application extends Component
      */
     public function __construct()
     {
+        parent::__construct();
+
         self::$instance = $this;
         $this->stamp = str::random();
         $this->initializeTime = Time::millis();
@@ -131,5 +133,13 @@ abstract class Application extends Component
         }
 
         return static::$instance;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isInitialized(): bool
+    {
+        return !!static::$instance;
     }
 }

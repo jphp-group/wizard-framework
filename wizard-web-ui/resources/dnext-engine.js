@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\NX\\App.js":[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\NX\\App.js":[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -62,7 +62,7 @@ var App = function () {
 
 exports.default = App;
 
-},{}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\NX\\AppMediator.js":[function(require,module,exports){
+},{}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\NX\\AppMediator.js":[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -216,6 +216,7 @@ var AppMediator = function () {
               }
 
               break;
+
             case "system-eval":
               var script = message.script,
                   callback = message.callback;
@@ -227,6 +228,18 @@ var AppMediator = function () {
               }
 
               break;
+
+            case "system-callback":
+              var id = message.id;
+
+
+              if (_this._callbacks[id]) {
+                _this._callbacks[id].apply(message);
+                delete _this._callbacks[id];
+              }
+
+              break;
+
             case "history-push":
               var url = message['url'];
               var title = message['title'];
@@ -366,12 +379,15 @@ var AppMediator = function () {
     /**
      * @param node
      * @param data
+     * @param callback
      */
 
   }, {
     key: "sendUserInput",
     value: function sendUserInput(node, data) {
       var _this3 = this;
+
+      var callback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
       if (!this.ws) {
         return;
@@ -388,7 +404,7 @@ var AppMediator = function () {
           _this3.sendIfCan('ui-user-input', {
             'uuid': node.uuid,
             'data': _this3.prepareValue(newData)
-          });
+          }, callback);
         }, 0);
       } else {
         console.warn('Ignore User input');
@@ -433,6 +449,7 @@ var AppMediator = function () {
 
       if (callback) {
         this._callbacks[message.id] = callback;
+        message.needCallback = true;
       }
 
       console.debug("AppMediator.send", message);
@@ -600,7 +617,7 @@ var AppMediator = function () {
 
 exports.default = new AppMediator();
 
-},{"../UX/Node":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js","./UILoader":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\NX\\UILoader.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\NX\\NX.js":[function(require,module,exports){
+},{"../UX/Node":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js","./UILoader":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\NX\\UILoader.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\NX\\NX.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -625,7 +642,7 @@ exports.default = {
   App: _App2.default, UILoader: _UILoader2.default, AppMediator: _AppMediator2.default
 };
 
-},{"./App":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\NX\\App.js","./AppMediator":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\NX\\AppMediator.js","./UILoader":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\NX\\UILoader.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\NX\\UILoader.js":[function(require,module,exports){
+},{"./App":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\NX\\App.js","./AppMediator":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\NX\\AppMediator.js","./UILoader":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\NX\\UILoader.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\NX\\UILoader.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -778,7 +795,7 @@ var UILoader = function () {
 
 exports.default = UILoader;
 
-},{"./../UX/Container":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Container.js","./../UX/Node":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js","./../UX/UX":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\UX.js","./AppMediator":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\NX\\AppMediator.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\AnchorPane.js":[function(require,module,exports){
+},{"./../UX/Container":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Container.js","./../UX/Node":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js","./../UX/UX":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\UX.js","./AppMediator":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\NX\\AppMediator.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\AnchorPane.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -845,7 +862,7 @@ var AnchorPane = function (_Container) {
 
 exports.default = AnchorPane;
 
-},{"./Container":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Container.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Button.js":[function(require,module,exports){
+},{"./Container":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Container.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Button.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -871,10 +888,15 @@ var kinds = ['success', 'primary', 'secondary', 'info', 'warning', 'danger', 'li
 var Button = function (_Labeled) {
   _inherits(Button, _Labeled);
 
-  function Button() {
+  function Button(text, graphic) {
     _classCallCheck(this, Button);
 
-    return _possibleConstructorReturn(this, (Button.__proto__ || Object.getPrototypeOf(Button)).apply(this, arguments));
+    var _this = _possibleConstructorReturn(this, (Button.__proto__ || Object.getPrototypeOf(Button)).call(this, text, graphic));
+
+    _this.on('click.Button', function () {
+      this.trigger('action');
+    });
+    return _this;
   }
 
   _createClass(Button, [{
@@ -950,7 +972,7 @@ var Button = function (_Labeled) {
 
 exports.default = Button;
 
-},{"./Labeled":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Labeled.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Checkbox.js":[function(require,module,exports){
+},{"./Labeled":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Labeled.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Checkbox.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -983,8 +1005,12 @@ var Checkbox = function (_Labeled) {
 
     var _this = _possibleConstructorReturn(this, (Checkbox.__proto__ || Object.getPrototypeOf(Checkbox)).call(this, text, graphic));
 
-    _this.dom.on('click.Checkbox', function () {
-      _AppMediator2.default.sendUserInput(_this, { selected: _this.selected });
+    _this.dom.on('click.Checkbox', function (e) {
+      if (e.target.tagName === 'INPUT') {
+        _AppMediator2.default.sendUserInput(_this, { selected: _this.selected }, function () {
+          _this.trigger('action', e);
+        });
+      }
     });
     return _this;
   }
@@ -1020,7 +1046,7 @@ var Checkbox = function (_Labeled) {
 
 exports.default = Checkbox;
 
-},{"../NX/AppMediator":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\NX\\AppMediator.js","./Labeled":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Labeled.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Combobox.js":[function(require,module,exports){
+},{"../NX/AppMediator":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\NX\\AppMediator.js","./Labeled":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Labeled.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Combobox.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1066,7 +1092,7 @@ var Combobox = function (_SelectControl) {
 
 exports.default = Combobox;
 
-},{"./SelectControl":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\SelectControl.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Container.js":[function(require,module,exports){
+},{"./SelectControl":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\SelectControl.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Container.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1287,7 +1313,7 @@ var Container = function (_Node) {
 
 exports.default = Container;
 
-},{"./Node":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\HBox.js":[function(require,module,exports){
+},{"./Node":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\HBox.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1380,7 +1406,7 @@ var HBox = function (_Container) {
 
 exports.default = HBox;
 
-},{"./Container":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Container.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Hyperlink.js":[function(require,module,exports){
+},{"./Container":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Container.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Hyperlink.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1453,7 +1479,7 @@ var Hyperlink = function (_Labeled) {
 
 exports.default = Hyperlink;
 
-},{"./Labeled":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Labeled.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Icon.js":[function(require,module,exports){
+},{"./Labeled":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Labeled.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Icon.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1523,7 +1549,7 @@ var Icon = function (_Node) {
 
 exports.default = Icon;
 
-},{"./Node":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js","./util/Utils":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\util\\Utils.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\ImageView.js":[function(require,module,exports){
+},{"./Node":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js","./util/Utils":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\util\\Utils.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\ImageView.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1654,7 +1680,7 @@ var ImageView = function (_Node) {
 
 exports.default = ImageView;
 
-},{"./Node":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Label.js":[function(require,module,exports){
+},{"./Node":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Label.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1697,7 +1723,7 @@ var Label = function (_Labeled) {
 
 exports.default = Label;
 
-},{"./Labeled":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Labeled.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Labeled.js":[function(require,module,exports){
+},{"./Labeled":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Labeled.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Labeled.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2038,7 +2064,7 @@ var Labeled = function (_Node) {
 
 exports.default = Labeled;
 
-},{"./ImageView":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\ImageView.js","./Node":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js","./paint/Font":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\paint\\Font.js","./util/Utils":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\util\\Utils.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\ListView.js":[function(require,module,exports){
+},{"./ImageView":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\ImageView.js","./Node":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js","./paint/Font":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\paint\\Font.js","./util/Utils":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\util\\Utils.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\ListView.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2080,13 +2106,15 @@ var ListView = function (_Container) {
     _this.spacing = 0;
     _this.align = ['center', 'left'];
 
-    _this.dom.on('action.ListView', function () {
+    _this.dom.on('change.ListView', function () {
       var data = {
         selected: _this.selected,
         selectedIndex: _this.selectedIndex
       };
 
-      _AppMediator2.default.sendUserInput(_this, data);
+      _AppMediator2.default.sendUserInput(_this, data, function () {
+        _this.dom.trigger('action');
+      });
     });
     return _this;
   }
@@ -2114,7 +2142,7 @@ var ListView = function (_Container) {
         dom.closest('.ux-list-view').find('> .ux-slot').removeClass('active');
         dom.addClass('active');
 
-        _this2.dom.trigger('action');
+        _this2.trigger('change');
         e.preventDefault();
         return false;
       });
@@ -2174,7 +2202,7 @@ var ListView = function (_Container) {
 
 exports.default = ListView;
 
-},{"../NX/AppMediator":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\NX\\AppMediator.js","./Container":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Container.js","./Node":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Listbox.js":[function(require,module,exports){
+},{"../NX/AppMediator":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\NX\\AppMediator.js","./Container":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Container.js","./Node":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Listbox.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2221,7 +2249,7 @@ var Listbox = function (_SelectControl) {
 
 exports.default = Listbox;
 
-},{"./SelectControl":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\SelectControl.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js":[function(require,module,exports){
+},{"./SelectControl":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\SelectControl.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js":[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2242,11 +2270,43 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var KEY_CODES = {
+  Enter: 13,
+  Backspace: 8,
+  Tab: 9,
+  Cancel: 0x03,
+  Clear: 0x0C,
+  Shift: 0x10,
+  Ctrl: 0x11,
+  Alt: 0x12,
+  Pause: 0x13,
+  CapsLock: 0x14,
+  Esc: 0x1B,
+  Escape: 0x1B,
+  Space: 0x20,
+  PageUp: 0x21,
+  PageDown: 0x22,
+  End: 0x23,
+  Home: 0x24,
+  Left: 0x25,
+  Up: 0x26,
+  Right: 0x27,
+  Down: 0x28,
+  Comma: 0x2C,
+  Delete: 0x7F,
+  F1: 0x70, F2: 0x71, F3: 0x72, F4: 0x73, F5: 0x74, F6: 0x75, F7: 0x76, F8: 0x77, F9: 0x78, F10: 0x79, F11: 0x7A, F12: 0x7B,
+  PrintScreen: 0x9A,
+  Insert: 0x9B
+};
+
 /**
  * Base HTML Node class.
  **/
+
 var Node = function () {
   function Node(dom) {
+    var _this = this;
+
     _classCallCheck(this, Node);
 
     this.__observers = [];
@@ -2266,6 +2326,83 @@ var Node = function () {
     }
 
     this.dom.data('--wrapper', this);
+
+    this.dom.on('dblclick.Node', function (e) {
+      _this.trigger('click-2x', e);
+    });
+
+    this.dom.on('click.Node', function (e) {
+      switch (e.which) {
+        case 1:
+          _this.trigger('click-left', e);break;
+        case 2:
+          _this.trigger('click-middle', e);break;
+        case 3:
+          _this.trigger('click-right', e);break;
+      }
+    });
+
+    var keyEventBuilder = function keyEventBuilder(event) {
+      return function (e) {
+        var found = false;
+
+        for (var key in KEY_CODES) {
+          var value = KEY_CODES[key];
+
+          if (value === e.keyCode) {
+            _this.trigger(event + '-' + key.toLowerCase(), e);
+
+            if (event.shiftKey) _this.trigger(event + "-shift+" + key.toLowerCase(), e);
+            if (event.ctrlKey) _this.trigger(event + "-ctrl+" + key.toLowerCase(), e);
+            if (event.altKey) _this.trigger(event + "-alt+" + key.toLowerCase(), e);
+
+            found = true;
+          }
+        }
+
+        switch (event.keyCode) {
+          case KEY_CODES.Up:
+          case KEY_CODES.Right:
+          case KEY_CODES.Down:
+          case KEY_CODES.Left:
+            _this.trigger(event + '-anydirection', e);
+
+            if (event.shiftKey) _this.trigger(event + "-shift+anydirection", e);
+            if (event.ctrlKey) _this.trigger(event + "-ctrl+anydirection", e);
+            if (event.altKey) _this.trigger(event + "-alt+anydirection", e);
+
+            break;
+        }
+
+        if (event.hasOwnProperty('char') && !found) {
+          var char = event.char.toString().toLowerCase();
+          _this.trigger(event + '-' + char, e);
+
+          if (event.shiftKey) _this.trigger(event + "-shift+" + char, e);
+          if (event.ctrlKey) _this.trigger(event + "-ctrl+" + char, e);
+          if (event.altKey) _this.trigger(event + "-alt+" + char, e);
+
+          if ('0123456789'.indexOf(char) > -1) {
+            _this.trigger(event + '-anydigit', e);
+
+            if (event.shiftKey) _this.trigger(event + "-shift+anydigit", e);
+            if (event.ctrlKey) _this.trigger(event + "-ctrl+anydigit", e);
+            if (event.altKey) _this.trigger(event + "-alt+anydigit", e);
+          }
+
+          if ('qwertyuiopasdfghjklzxcvbnm'.indexOf(char) > -1) {
+            _this.trigger(event + '-anyletter', e);
+
+            if (event.shiftKey) _this.trigger(event + "-shift+anyletter", e);
+            if (event.ctrlKey) _this.trigger(event + "-ctrl+anyletter", e);
+            if (event.altKey) _this.trigger(event + "-alt+anyletter", e);
+          }
+        }
+      };
+    };
+
+    this.dom.on('keydown.Node', keyEventBuilder('keydown'));
+    this.dom.on('keyup.Node', keyEventBuilder('keyup'));
   }
 
   /**
@@ -2304,10 +2441,10 @@ var Node = function () {
   }, {
     key: "__triggerPropertyChange",
     value: function __triggerPropertyChange(name, newValue) {
-      var _this = this;
+      var _this2 = this;
 
       this.__forEachObservers(function (observer) {
-        var oldValue = _this[name];
+        var oldValue = _this2[name];
         observer.triggerPropertyChange(name, oldValue, newValue);
       });
     }
@@ -2391,12 +2528,12 @@ var Node = function () {
   }, {
     key: "lookupAll",
     value: function lookupAll(selector) {
-      var _this2 = this;
+      var _this3 = this;
 
       var nodes = [];
 
       this.dom.find(selector).each(function () {
-        nodes.push(Node.getFromDom(_this2));
+        nodes.push(Node.getFromDom(_this3));
       });
 
       return nodes;
@@ -2487,11 +2624,11 @@ var Node = function () {
   }, {
     key: "on",
     value: function on(event, callback) {
-      var _this3 = this;
+      var _this4 = this;
 
       this.dom.on(event, function (event) {
-        event.sender = _this3;
-        callback.call(_this3, event);
+        event.sender = _this4;
+        callback.call(_this4, event);
       });
 
       return this;
@@ -2813,6 +2950,14 @@ var Node = function () {
       }
     }
   }, {
+    key: "cursor",
+    get: function get() {
+      return this.dom.css('cursor');
+    },
+    set: function set(value) {
+      this.dom.css('cursor', value);
+    }
+  }, {
     key: "parent",
     get: function get() {
       var parent = null;
@@ -2859,7 +3004,7 @@ var Node = function () {
 
 exports.default = Node;
 
-},{"../NX/UILoader":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\NX\\UILoader.js","./util/Utils":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\util\\Utils.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\PasswordField.js":[function(require,module,exports){
+},{"../NX/UILoader":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\NX\\UILoader.js","./util/Utils":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\util\\Utils.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\PasswordField.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2902,7 +3047,7 @@ var PasswordField = function (_TextInputControl) {
 
 exports.default = PasswordField;
 
-},{"./TextInputControl":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\TextInputControl.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\ProgressBar.js":[function(require,module,exports){
+},{"./TextInputControl":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\TextInputControl.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\ProgressBar.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3025,7 +3170,7 @@ var ProgressBar = function (_Node) {
 
 exports.default = ProgressBar;
 
-},{"./Node":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js","./util/Utils":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\util\\Utils.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\SelectControl.js":[function(require,module,exports){
+},{"./Node":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js","./util/Utils":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\util\\Utils.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\SelectControl.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3063,7 +3208,9 @@ var SelectControl = function (_Node) {
     }
 
     _this.dom.on('change.SelectControl', function (e) {
-      _AppMediator2.default.sendUserInput(_this, { selected: _this.selected, selectedText: _this.selectedText });
+      _AppMediator2.default.sendUserInput(_this, { selected: _this.selected, selectedText: _this.selectedText }, function () {
+        _this.trigger('action', e);
+      });
     });
     return _this;
   }
@@ -3124,7 +3271,7 @@ var SelectControl = function (_Node) {
 
 exports.default = SelectControl;
 
-},{"../NX/AppMediator":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\NX\\AppMediator.js","./Node":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\TextArea.js":[function(require,module,exports){
+},{"../NX/AppMediator":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\NX\\AppMediator.js","./Node":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\TextArea.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3175,7 +3322,7 @@ var TextArea = function (_TextInputControl) {
 
 exports.default = TextArea;
 
-},{"./TextInputControl":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\TextInputControl.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\TextField.js":[function(require,module,exports){
+},{"./TextInputControl":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\TextInputControl.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\TextField.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3218,7 +3365,7 @@ var TextField = function (_TextInputControl) {
 
 exports.default = TextField;
 
-},{"./TextInputControl":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\TextInputControl.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\TextInputControl.js":[function(require,module,exports){
+},{"./TextInputControl":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\TextInputControl.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\TextInputControl.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3310,7 +3457,7 @@ var TextInputControl = function (_Node) {
 
 exports.default = TextInputControl;
 
-},{"../NX/AppMediator":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\NX\\AppMediator.js","./Node":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js","./paint/Font":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\paint\\Font.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\ToggleButton.js":[function(require,module,exports){
+},{"../NX/AppMediator":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\NX\\AppMediator.js","./Node":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js","./paint/Font":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\paint\\Font.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\ToggleButton.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3382,7 +3529,7 @@ var ToggleButton = function (_Button) {
 
 exports.default = ToggleButton;
 
-},{"../NX/AppMediator":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\NX\\AppMediator.js","./Button":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Button.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\UX.js":[function(require,module,exports){
+},{"../NX/AppMediator":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\NX\\AppMediator.js","./Button":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Button.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\UX.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3499,7 +3646,7 @@ exports.default = {
   Font: _Font2.default
 };
 
-},{"./AnchorPane":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\AnchorPane.js","./Button":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Button.js","./Checkbox":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Checkbox.js","./Combobox":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Combobox.js","./Container":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Container.js","./HBox":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\HBox.js","./Hyperlink":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Hyperlink.js","./Icon":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Icon.js","./ImageView":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\ImageView.js","./Label":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Label.js","./Labeled":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Labeled.js","./ListView":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\ListView.js","./Listbox":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Listbox.js","./Node":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js","./PasswordField":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\PasswordField.js","./ProgressBar":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\ProgressBar.js","./TextArea":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\TextArea.js","./TextField":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\TextField.js","./TextInputControl":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\TextInputControl.js","./ToggleButton":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\ToggleButton.js","./VBox":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\VBox.js","./Window":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Window.js","./paint/Font":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\paint\\Font.js","./util/Utils":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\util\\Utils.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\VBox.js":[function(require,module,exports){
+},{"./AnchorPane":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\AnchorPane.js","./Button":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Button.js","./Checkbox":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Checkbox.js","./Combobox":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Combobox.js","./Container":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Container.js","./HBox":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\HBox.js","./Hyperlink":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Hyperlink.js","./Icon":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Icon.js","./ImageView":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\ImageView.js","./Label":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Label.js","./Labeled":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Labeled.js","./ListView":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\ListView.js","./Listbox":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Listbox.js","./Node":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js","./PasswordField":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\PasswordField.js","./ProgressBar":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\ProgressBar.js","./TextArea":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\TextArea.js","./TextField":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\TextField.js","./TextInputControl":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\TextInputControl.js","./ToggleButton":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\ToggleButton.js","./VBox":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\VBox.js","./Window":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Window.js","./paint/Font":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\paint\\Font.js","./util/Utils":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\util\\Utils.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\VBox.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3586,7 +3733,7 @@ var VBox = function (_Container) {
 
 exports.default = VBox;
 
-},{"./Container":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Container.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Window.js":[function(require,module,exports){
+},{"./Container":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Container.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Window.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3761,7 +3908,7 @@ var Window = function (_Container) {
 
 exports.default = Window;
 
-},{"../NX/AppMediator":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\NX\\AppMediator.js","./Container":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Container.js","./Node":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\paint\\Font.js":[function(require,module,exports){
+},{"../NX/AppMediator":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\NX\\AppMediator.js","./Container":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Container.js","./Node":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\paint\\Font.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3974,7 +4121,7 @@ var Font = function () {
 
 exports.default = Font;
 
-},{"./../util/Utils":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\util\\Utils.js"}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\util\\Utils.js":[function(require,module,exports){
+},{"./../util/Utils":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\util\\Utils.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\util\\Utils.js":[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4017,7 +4164,7 @@ var Utils = function () {
 
 exports.default = Utils;
 
-},{}],"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\lib.js":[function(require,module,exports){
+},{}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\lib.js":[function(require,module,exports){
 'use strict';
 
 var _NX = require('./NX/NX');
@@ -4033,6 +4180,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 window.NX = _NX2.default;
 window.UX = _UX2.default;
 
-},{"./NX/NX":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\NX\\NX.js","./UX/UX":"E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\UX\\UX.js"}]},{},["E:\\Dev\\framework\\wizard-web-ui\\src-js\\src\\lib.js"])
+},{"./NX/NX":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\NX\\NX.js","./UX/UX":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\UX.js"}]},{},["D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\lib.js"])
 
 //# sourceMappingURL=dnext-engine.js.map
