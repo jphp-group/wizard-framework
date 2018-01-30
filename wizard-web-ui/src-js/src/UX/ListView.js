@@ -1,6 +1,7 @@
 import Container from './Container';
 import Node from './Node';
 import AppMediator from '../NX/AppMediator';
+import Font from "./paint/Font";
 
 class ListView extends Container {
   constructor() {
@@ -16,9 +17,17 @@ class ListView extends Container {
       };
 
       AppMediator.sendUserInput(this, data, () => {
-        this.dom.trigger('action');
+        this.trigger('action');
       });
     })
+  }
+
+  get font() {
+    return Font.getFromDom(this.dom);
+  }
+
+  set font(value) {
+    Font.applyToDom(this.dom, value);
   }
 
   get selectedIndex() {
@@ -77,7 +86,7 @@ class ListView extends Container {
       throw new TypeError('createSlotDom(): 1 argument must be instance of Node')
     }
 
-    const dom = jQuery('<a href="#" class="list-group-item ux-slot" />').append(object.dom);
+    const dom = jQuery('<span class="list-group-item ux-slot" />').append(object.dom);
 
     dom.on('click.ListView', (e) => {
       dom.closest('.ux-list-view').find('> .ux-slot').removeClass('active');

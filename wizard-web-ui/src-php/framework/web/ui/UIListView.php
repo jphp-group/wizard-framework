@@ -9,6 +9,7 @@ use framework\core\EventSignal;
  *
  * @property UINode|null $selected
  * @property int $selectedIndex
+ * @property UIFont $font
  */
 class UIListView extends UIContainer
 {
@@ -21,6 +22,11 @@ class UIListView extends UIContainer
      * @var int
      */
     private $selectedIndex = -1;
+
+    /**
+     * @var UIFont
+     */
+    private $font;
 
     /**
      * @var EventSignal
@@ -39,6 +45,8 @@ class UIListView extends UIContainer
     public function __construct(array $children = [])
     {
         parent::__construct($children);
+
+        $this->font = new UIFont();
     }
 
     public function uiSchemaClassName(): string
@@ -55,6 +63,22 @@ class UIListView extends UIContainer
         return $schema;
     }
 
+    /**
+     * @return UIFont
+     */
+    protected function getFont(): UIFont
+    {
+        return UIFont::wrapper($this, 'font', $this->font);
+    }
+
+    /**
+     * @param UIFont|array|string $font
+     * @throws \TypeError
+     */
+    protected function setFont($font)
+    {
+        $this->font = UIFont::fetch($font);
+    }
 
     /**
      * @return UINode

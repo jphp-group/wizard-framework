@@ -2087,6 +2087,10 @@ var _AppMediator = require('../NX/AppMediator');
 
 var _AppMediator2 = _interopRequireDefault(_AppMediator);
 
+var _Font = require('./paint/Font');
+
+var _Font2 = _interopRequireDefault(_Font);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -2113,7 +2117,7 @@ var ListView = function (_Container) {
       };
 
       _AppMediator2.default.sendUserInput(_this, data, function () {
-        _this.dom.trigger('action');
+        _this.trigger('action');
       });
     });
     return _this;
@@ -2136,7 +2140,7 @@ var ListView = function (_Container) {
         throw new TypeError('createSlotDom(): 1 argument must be instance of Node');
       }
 
-      var dom = jQuery('<a href="#" class="list-group-item ux-slot" />').append(object.dom);
+      var dom = jQuery('<span class="list-group-item ux-slot" />').append(object.dom);
 
       dom.on('click.ListView', function (e) {
         dom.closest('.ux-list-view').find('> .ux-slot').removeClass('active');
@@ -2150,6 +2154,14 @@ var ListView = function (_Container) {
       dom.data('--wrapper', object);
       object.dom.data('--wrapper-dom', dom);
       return dom;
+    }
+  }, {
+    key: 'font',
+    get: function get() {
+      return _Font2.default.getFromDom(this.dom);
+    },
+    set: function set(value) {
+      _Font2.default.applyToDom(this.dom, value);
     }
   }, {
     key: 'selectedIndex',
@@ -2202,7 +2214,7 @@ var ListView = function (_Container) {
 
 exports.default = ListView;
 
-},{"../NX/AppMediator":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\NX\\AppMediator.js","./Container":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Container.js","./Node":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Listbox.js":[function(require,module,exports){
+},{"../NX/AppMediator":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\NX\\AppMediator.js","./Container":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Container.js","./Node":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js","./paint/Font":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\paint\\Font.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Listbox.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

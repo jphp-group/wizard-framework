@@ -10,6 +10,7 @@ use php\format\YamlProcessor;
 use php\io\IOException;
 use php\io\Stream;
 use php\lib\fs;
+use php\lib\str;
 
 /**
  * Class UILoader
@@ -32,6 +33,40 @@ class UILoader extends Component
      */
     private $components = [];
 
+    protected function findComponent($name)
+    {
+        if (str::contains($name, '@')) {
+            [$name, $sub] = str::split($name, '@', 2);
+
+            $component = $this->components[$name];
+
+            if ($component) {
+                $find = null;
+                $find = function ($components, $id) use (&$find) {
+                    foreach ((array) $components as $one) {
+                        if ($one['id'] === $id) {
+                            return $one;
+                        }
+
+                        if (is_array($one['_content'])) {
+                            if ($found = $find($one['_content'], $id)) {
+                                return $found;
+                            }
+                        }
+                    }
+
+                    return null;
+                };
+
+                return $find((array) $component['_content'], $sub);
+            } else {
+                return $component;
+            }
+        } else {
+            return $this->components[$name];
+        }
+    }
+
     /**
      * @param array $data
      * @param string $componentName
@@ -40,7 +75,7 @@ class UILoader extends Component
      */
     protected function extend(array $data, string $componentName): array
     {
-        $component = $this->components[$componentName];
+        $component = $this->findComponent($componentName);
 
         if ($component) {
             foreach ($component as $key => $value) {
@@ -85,7 +120,7 @@ class UILoader extends Component
     {
         $type = $data['_'];
 
-        if ($this->components[$type]) {
+        if ($this->findComponent($type)) {
             $data = $this->extend($data, $type);
 
             $type = $data['_'];
