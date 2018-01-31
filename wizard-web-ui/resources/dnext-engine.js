@@ -1147,10 +1147,12 @@ var Container = function (_Node) {
 
       if (typeof width === 'string') {
         dom.width(width);
+        object.dom.width('100%');
       }
 
-      if (typeof width === 'string') {
+      if (typeof height === 'string') {
         dom.height(height);
+        object.dom.height('100%');
       }
 
       if (!visible) {
@@ -1619,8 +1621,6 @@ var ImageView = function (_Node) {
       if (this.displayType === 'origin') {
         this.dom.find('img').attr('src', value);
       }
-
-      this.__triggerPropertyChange('source', value);
     }
   }, {
     key: 'centered',
@@ -1629,7 +1629,6 @@ var ImageView = function (_Node) {
     },
     set: function set(value) {
       this.dom.css('background-position', value ? '50% 50%' : '0 0');
-      this.__triggerPropertyChange('centered', value);
     }
   }, {
     key: 'displayType',
@@ -1670,8 +1669,6 @@ var ImageView = function (_Node) {
           this.source = source;
           break;
       }
-
-      this.__triggerPropertyChange('displayType', type);
     }
   }]);
 
@@ -1792,7 +1789,6 @@ var Labeled = function (_Node) {
     },
     set: function set(value) {
       _Font2.default.applyToDom(this.dom, value);
-      this.__triggerPropertyChange('value', value);
     }
   }, {
     key: 'align',
@@ -1822,8 +1818,6 @@ var Labeled = function (_Node) {
       this.dom.removeClass('ux-m-halign-center');
 
       this.dom.addClass('ux-m-halign-' + value);
-
-      this.__triggerPropertyChange('horAlign', value);
     }
   }, {
     key: 'verAlign',
@@ -1842,8 +1836,6 @@ var Labeled = function (_Node) {
       this.dom.removeClass('ux-m-valign-center');
 
       this.dom.addClass('ux-m-valign-' + value);
-
-      this.__triggerPropertyChange('verAlign', value);
     }
   }, {
     key: 'text',
@@ -1879,8 +1871,6 @@ var Labeled = function (_Node) {
           dom.html(value);
           break;
       }
-
-      this.__triggerPropertyChange('text', value);
     }
   }, {
     key: 'textPreFormatted',
@@ -1906,8 +1896,6 @@ var Labeled = function (_Node) {
     },
     set: function set(value) {
       this.dom.css('color', value ? value : '');
-
-      this.__triggerPropertyChange('textColor', value);
     }
   }, {
     key: 'textType',
@@ -1926,7 +1914,6 @@ var Labeled = function (_Node) {
 
       this.text = text;
       this.graphic = graphic;
-      this.__triggerPropertyChange('textType', value);
     }
   }, {
     key: 'contentDisplay',
@@ -1969,7 +1956,6 @@ var Labeled = function (_Node) {
           break;
       }
 
-      this.__triggerPropertyChange('contentDisplay', value);
       this.graphic = graphic;
       this.graphicTextGap = graphicGap;
     }
@@ -2022,8 +2008,6 @@ var Labeled = function (_Node) {
 
         grDom.css(prop, value + 'px');
       }
-
-      this.__triggerPropertyChange('contentDisplay', value);
     }
   }, {
     key: 'graphic',
@@ -2054,8 +2038,6 @@ var Labeled = function (_Node) {
 
         this.graphicTextGap = graphicGap;
       }
-
-      this.__triggerPropertyChange('graphic', node);
     }
   }]);
 
@@ -2745,7 +2727,6 @@ var Node = function () {
       return this.dom.attr('id');
     },
     set: function set(value) {
-      this.__triggerPropertyChange('id', value);
       this.dom.attr('id', value);
     }
 
@@ -2787,7 +2768,6 @@ var Node = function () {
       return this.dom.attr('style');
     },
     set: function set(value) {
-      this.__triggerPropertyChange('style', value);
       this.dom.attr('style', value);
     }
   }, {
@@ -2802,8 +2782,6 @@ var Node = function () {
       return dom.is(':visible');
     },
     set: function set(value) {
-      this.__triggerPropertyChange('visible', value);
-
       if (value) {
         this.show();
       } else {
@@ -2816,7 +2794,6 @@ var Node = function () {
       return this.dom.css('opacity');
     },
     set: function set(value) {
-      this.__triggerPropertyChange('opacity', value);
       this.dom.css('opacity', value);
     }
   }, {
@@ -2825,7 +2802,6 @@ var Node = function () {
       return !this.dom.prop("disabled");
     },
     set: function set(value) {
-      this.__triggerPropertyChange('enabled', value);
       this.dom.prop('disabled', !value);
     }
   }, {
@@ -2847,7 +2823,6 @@ var Node = function () {
       return this.dom.position().left;
     },
     set: function set(value) {
-      this.__triggerPropertyChange('x', value);
       this.dom.css({ left: value });
     }
   }, {
@@ -2856,7 +2831,6 @@ var Node = function () {
       return this.dom.position().top;
     },
     set: function set(value) {
-      this.__triggerPropertyChange('y', value);
       this.dom.css({ top: value });
     }
   }, {
@@ -2873,14 +2847,22 @@ var Node = function () {
   }, {
     key: "width",
     get: function get() {
+      if (this.data('--width-percent')) {
+        return this.data('--width-percent');
+      }
+
       return this.dom.width();
     },
     set: function set(value) {
-      this.__triggerPropertyChange('width', value);
       this.dom.width(value);
 
       if (typeof value === 'string' && value.indexOf('%') > -1) {
         this.data('--width-percent', value);
+
+        var wrapperDom = this.dom.data('--wrapper-dom');
+        if (wrapperDom) {
+          this.dom.width('100%');
+        }
       } else {
         this.data('--width-percent', null);
       }
@@ -2888,14 +2870,22 @@ var Node = function () {
   }, {
     key: "height",
     get: function get() {
+      if (this.data('--height-percent')) {
+        return this.data('--height-percent');
+      }
+
       return this.dom.height();
     },
     set: function set(value) {
-      this.__triggerPropertyChange('height', value);
       this.dom.height(value);
 
       if (typeof value === 'string' && value.indexOf('%') > -1) {
         this.data('--height-percent', value);
+
+        var wrapperDom = this.dom.data('--wrapper-dom');
+        if (wrapperDom) {
+          this.dom.height('100%');
+        }
       } else {
         this.data('--height-percent', null);
       }
@@ -2918,7 +2908,6 @@ var Node = function () {
     },
     set: function set(tooltip) {
       if (this.tooltip === tooltip) return;
-      this.__triggerPropertyChange('tooltip', tooltip);
 
       this.__setTooltip(tooltip);
     }
@@ -2928,8 +2917,6 @@ var Node = function () {
       return this.dom.data('--tooltipOptions') || {};
     },
     set: function set(options) {
-      this.__triggerPropertyChange('tooltipOptions', options || {});
-
       this.dom.data('--tooltipOptions', options || {});
       this.__setTooltip(this.tooltip);
     }
@@ -2939,8 +2926,6 @@ var Node = function () {
       return [_Utils2.default.toPt(this.dom.css('padding-top')), _Utils2.default.toPt(this.dom.css('padding-right')), _Utils2.default.toPt(this.dom.css('padding-bottom')), _Utils2.default.toPt(this.dom.css('padding-left'))];
     },
     set: function set(value) {
-      this.__triggerPropertyChange('padding', value);
-
       if (value instanceof Array) {
         if (value.length >= 4) {
           this.dom.css({
@@ -2992,7 +2977,6 @@ var Node = function () {
       return this.dom.data('--user-data');
     },
     set: function set(value) {
-      this.__triggerPropertyChange('userData', value);
       this.dom.data('--user-data', value);
     }
   }], [{
@@ -3191,6 +3175,8 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
 var _Node2 = require('./Node');
 
 var _Node3 = _interopRequireDefault(_Node2);
@@ -3228,6 +3214,19 @@ var SelectControl = function (_Node) {
   }
 
   _createClass(SelectControl, [{
+    key: 'loadSchema',
+    value: function loadSchema(object) {
+      _get(SelectControl.prototype.__proto__ || Object.getPrototypeOf(SelectControl.prototype), 'loadSchema', this).call(this, object);
+
+      if (object.hasOwnProperty('selected')) {
+        this.selected = object.selected;
+      }
+
+      if (object.hasOwnProperty('selectedText')) {
+        this.selectedText = object.selectedText;
+      }
+    }
+  }, {
     key: 'createDom',
     value: function createDom() {
       var dom = jQuery('<select class="form-control ux-select-control">');
@@ -3239,7 +3238,7 @@ var SelectControl = function (_Node) {
       var result = {};
 
       this.dom.find('option').each(function () {
-        result[this.attr('value')] = $(this).text();
+        result[$(this).attr('value')] = $(this).text();
       });
 
       return result;
@@ -3882,7 +3881,6 @@ var Window = function (_Container) {
       return this.dom.find('.modal-dialog').width();
     },
     set: function set(value) {
-      this.__triggerPropertyChange('width', value);
       this.dom.find('.modal-dialog').width(value);
     }
   }, {
@@ -3891,7 +3889,6 @@ var Window = function (_Container) {
       return this.dom.find('.modal-dialog').height();
     },
     set: function set(value) {
-      this.__triggerPropertyChange('height', value);
       this.dom.find('.modal-dialog').height(value);
     }
   }, {

@@ -20,7 +20,7 @@ export default class SelectControl extends Node {
     const result = {};
 
     this.dom.find('option').each(function () {
-      result[this.attr('value')] = $(this).text();
+      result[$(this).attr('value')] = $(this).text();
     });
 
     return result;
@@ -57,6 +57,19 @@ export default class SelectControl extends Node {
         return false;
       }
     });
+  }
+
+
+  loadSchema(object) {
+    super.loadSchema(object);
+
+    if (object.hasOwnProperty('selected')) {
+      this.selected = object.selected;
+    }
+
+    if (object.hasOwnProperty('selectedText')) {
+      this.selectedText = object.selectedText;
+    }
   }
 
   createDom() {
