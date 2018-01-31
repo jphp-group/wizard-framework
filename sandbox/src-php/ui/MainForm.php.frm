@@ -76,9 +76,10 @@
         "target": "_blank"
       },
       {
-        "_": "Checkbox",
+        "_": "Button",
         "id": "my",
-        "text": "Моя кнопка"
+        "text": "Моя кнопка",
+        "width": "50%"
       }
     ]
   }

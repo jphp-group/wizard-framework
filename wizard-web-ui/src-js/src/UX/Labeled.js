@@ -21,7 +21,6 @@ class Labeled extends Node {
 
   set font(value) {
     Font.applyToDom(this.dom, value);
-    this.__triggerPropertyChange('value', value);
   }
 
   get align() {
@@ -51,8 +50,6 @@ class Labeled extends Node {
     this.dom.removeClass('ux-m-halign-center');
 
     this.dom.addClass('ux-m-halign-' + value);
-
-    this.__triggerPropertyChange('horAlign', value);
   }
 
   get verAlign() {
@@ -71,8 +68,6 @@ class Labeled extends Node {
     this.dom.removeClass('ux-m-valign-center');
 
     this.dom.addClass('ux-m-valign-' + value);
-
-    this.__triggerPropertyChange('verAlign', value);
   }
 
   get text() {
@@ -108,8 +103,6 @@ class Labeled extends Node {
         dom.html(value);
         break;
     }
-
-    this.__triggerPropertyChange('text', value);
   }
 
   get textPreFormatted() {
@@ -135,8 +128,6 @@ class Labeled extends Node {
 
   set textColor(value) {
     this.dom.css('color', value ? value : '');
-
-    this.__triggerPropertyChange('textColor', value);
   }
 
   get textType() {
@@ -155,7 +146,6 @@ class Labeled extends Node {
 
     this.text = text;
     this.graphic = graphic;
-    this.__triggerPropertyChange('textType', value);
   }
 
   get contentDisplay() {
@@ -198,7 +188,6 @@ class Labeled extends Node {
         break;
     }
 
-    this.__triggerPropertyChange('contentDisplay', value);
     this.graphic = graphic;
     this.graphicTextGap = graphicGap;
   }
@@ -251,8 +240,6 @@ class Labeled extends Node {
 
       grDom.css(prop, value + 'px');
     }
-
-    this.__triggerPropertyChange('contentDisplay', value);
   }
 
   get graphic() {
@@ -283,8 +270,6 @@ class Labeled extends Node {
 
       this.graphicTextGap = graphicGap;
     }
-
-    this.__triggerPropertyChange('graphic', node);
   }
 
   innerNodes() {

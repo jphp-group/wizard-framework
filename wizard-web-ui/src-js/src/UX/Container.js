@@ -71,10 +71,12 @@ class Container extends Node {
 
     if (typeof width === 'string') {
       dom.width(width);
+      object.dom.width('100%');
     }
 
-    if (typeof width === 'string') {
+    if (typeof height === 'string') {
       dom.height(height);
+      object.dom.height('100%');
     }
 
     if (!visible) {

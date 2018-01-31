@@ -59,7 +59,6 @@ class Window extends Container {
   }
 
   set width(value) {
-    this.__triggerPropertyChange('width', value);
     this.dom.find('.modal-dialog').width(value);
   }
 
@@ -68,7 +67,6 @@ class Window extends Container {
   }
 
   set height(value) {
-    this.__triggerPropertyChange('height', value);
     this.dom.find('.modal-dialog').height(value);
   }
 

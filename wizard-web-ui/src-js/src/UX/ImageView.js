@@ -30,8 +30,6 @@ class ImageView extends Node {
     if (this.displayType === 'origin') {
       this.dom.find('img').attr('src', value);
     }
-
-    this.__triggerPropertyChange('source', value);
   }
 
   get centered() {
@@ -40,7 +38,6 @@ class ImageView extends Node {
 
   set centered(value) {
     this.dom.css('background-position', value ? '50% 50%' : '0 0');
-    this.__triggerPropertyChange('centered', value);
   }
 
   get displayType() {
@@ -77,8 +74,6 @@ class ImageView extends Node {
         this.source = source;
         break;
     }
-
-    this.__triggerPropertyChange('displayType', type);
   }
 
   createDom() {

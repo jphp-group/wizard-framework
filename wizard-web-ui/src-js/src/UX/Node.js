@@ -168,7 +168,6 @@ class Node {
   }
 
   set id(value) {
-    this.__triggerPropertyChange('id', value);
     this.dom.attr('id', value);
   }
 
@@ -206,7 +205,6 @@ class Node {
   }
 
   set style(value) {
-    this.__triggerPropertyChange('style', value);
     this.dom.attr('style', value);
   }
 
@@ -221,8 +219,6 @@ class Node {
   }
 
   set visible(value) {
-    this.__triggerPropertyChange('visible', value);
-
     if (value) {
       this.show();
     } else {
@@ -235,7 +231,6 @@ class Node {
   }
 
   set opacity(value) {
-    this.__triggerPropertyChange('opacity', value);
     this.dom.css('opacity', value);
   }
 
@@ -244,7 +239,6 @@ class Node {
   }
 
   set enabled(value) {
-    this.__triggerPropertyChange('enabled', value);
     this.dom.prop('disabled', !value);
   }
 
@@ -265,7 +259,6 @@ class Node {
   }
 
   set x(value) {
-    this.__triggerPropertyChange('x', value);
     this.dom.css({left: value});
   }
 
@@ -274,7 +267,6 @@ class Node {
   }
 
   set y(value) {
-    this.__triggerPropertyChange('y', value);
     this.dom.css({top: value});
   }
 
@@ -290,30 +282,46 @@ class Node {
   }
 
   get width() {
+    if (this.data('--width-percent')) {
+      return this.data('--width-percent');
+    }
+
     return this.dom.width()
   }
 
   set width(value) {
-    this.__triggerPropertyChange('width', value);
     this.dom.width(value);
 
     if (typeof value === 'string' && value.indexOf('%') > -1) {
       this.data('--width-percent', value);
+
+      const wrapperDom = this.dom.data('--wrapper-dom');
+      if (wrapperDom) {
+        this.dom.width('100%');
+      }
     } else {
       this.data('--width-percent', null);
     }
   }
 
   get height() {
+    if (this.data('--height-percent')) {
+      return this.data('--height-percent');
+    }
+
     return this.dom.height()
   }
 
   set height(value) {
-    this.__triggerPropertyChange('height', value);
     this.dom.height(value);
 
     if (typeof value === 'string' && value.indexOf('%') > -1) {
       this.data('--height-percent', value);
+
+      const wrapperDom = this.dom.data('--wrapper-dom');
+      if (wrapperDom) {
+        this.dom.height('100%');
+      }
     } else {
       this.data('--height-percent', null);
     }
@@ -353,7 +361,6 @@ class Node {
 
   set tooltip(tooltip) {
     if (this.tooltip === tooltip) return;
-    this.__triggerPropertyChange('tooltip', tooltip);
 
     this.__setTooltip(tooltip);
   }
@@ -363,8 +370,6 @@ class Node {
   }
 
   set tooltipOptions(options) {
-    this.__triggerPropertyChange('tooltipOptions', options || {});
-
     this.dom.data('--tooltipOptions', options || {});
     this.__setTooltip(this.tooltip);
   }
@@ -379,8 +384,6 @@ class Node {
   }
 
   set padding(value) {
-    this.__triggerPropertyChange('padding', value);
-
     if (value instanceof Array) {
       if (value.length >= 4) {
         this.dom.css({
@@ -431,7 +434,6 @@ class Node {
   }
 
   set userData(value) {
-    this.__triggerPropertyChange('userData', value);
     this.dom.data('--user-data', value);
   }
 
