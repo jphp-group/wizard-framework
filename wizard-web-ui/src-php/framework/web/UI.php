@@ -398,7 +398,14 @@ abstract class UI extends Component
 
         $body = fs::get($moduleFile);
 
+        $body = str::replace($body, '{{dnextBootstrapCSSUrl}}', '/dnext/bootstrap4/bootstrap.min.css');
+        $body = str::replace($body, '{{dnextBootstrapJSUrl}}', '/dnext/bootstrap4/bootstrap.min.js');
+        $body = str::replace($body, '{{dnextBootstrapPopperJSUrl}}', '/dnext/bootstrap4/popper.min.js');
+
+        $body = str::replace($body, '{{dnextJqueryJSUrl}}', '/dnext/jquery/jquery-3.2.1.min.js');
+
         $body = str::replace($body, '{{dnextCSSUrl}}', '/dnext/engine-' . Application::current()->getStamp() . '.min.css');
+        $body = str::replace($body, '{{dnextFontCSSUrl}}', '/dnext/material-icons/material-icons.css');
         $body = str::replace($body, '{{dnextJSUrl}}', '/dnext/engine-' . Application::current()->getStamp() . '.js');
 
         $body = str::replace($body, '{{uiSchemaUrl}}', "$path/@ui-schema");

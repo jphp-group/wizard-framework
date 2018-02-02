@@ -253,4 +253,9 @@ class HotDeployer extends Component
 
         $env->execute($this->deployHandler);
     }
+
+    public function directRun()
+    {
+        call_user_func($this->deployHandler);
+    }
 }

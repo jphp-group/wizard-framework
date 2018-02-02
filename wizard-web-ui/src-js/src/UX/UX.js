@@ -20,6 +20,7 @@ import TextArea from './TextArea';
 import Window from './Window';
 import Icon from './Icon';
 import Hyperlink from './Hyperlink';
+import Switch from './Switch';
 
 
 import Font from './paint/Font';
@@ -32,7 +33,7 @@ export default {
   Labeled,
   Label, Checkbox, Combobox, Listbox, ProgressBar,
   TextInputControl, TextField, PasswordField, TextArea,
-  Container, HBox, VBox, AnchorPane, ListView, Icon, Hyperlink,
+  Container, HBox, VBox, AnchorPane, ListView, Icon, Hyperlink, Switch,
 
   Font
 }

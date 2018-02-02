@@ -15,18 +15,18 @@ class Checkbox extends Labeled {
   }
 
   createDom() {
-      const dom = jQuery('<label><input type="checkbox"> <span class="ux-labeled-text"></span></label>');
+      const dom = jQuery('<span><label><input type="checkbox"><span class="cr"><i class="cr-icon material-icons" style="font-weight: bold;">check</i></span><span class="ux-labeled-text"></span></label></span>');
       dom.addClass('ux-labeled');
       dom.addClass('ux-checkbox');
       return dom;
   }
 
   get checked() {
-    return this.dom.find('> input[type=checkbox]').prop('checked');
+    return this.dom.find('input[type=checkbox]').prop('checked');
   }
 
   set checked(value) {
-    this.dom.find('> input[type=checkbox]').prop('checked', value);
+    this.dom.find('input[type=checkbox]').prop('checked', value);
   }
 
   get selected() {
@@ -35,6 +35,14 @@ class Checkbox extends Labeled {
 
   set selected(value) {
     this.checked = value;
+  }
+
+  get enabled() {
+    return !this.dom.find('input[type=checkbox]').prop("disabled");
+  }
+
+  set enabled(value) {
+    this.dom.find('input[type=checkbox]').prop('disabled', !value);
   }
 }
 

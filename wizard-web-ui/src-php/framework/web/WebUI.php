@@ -53,6 +53,8 @@ class WebUI extends Module
 
     public function __construct()
     {
+        parent::__construct();
+
         $this->on('inject', function (Event $event) {
             if ($event->context instanceof WebApplication) {
                 $this->app = $event->context;
@@ -199,6 +201,52 @@ class WebUI extends Module
         return $this;
     }
 
+    protected function initializeWebFontLib(WebApplication $app)
+    {
+        $dir = fs::abs(System::getProperty('java.io.tmpdir') . "/dnext-engine/material-icons/");
+        $tempDir = str::replace($dir, '\\', '/');
+        fs::makeDir($tempDir);
+
+        foreach (['material-icons.css',
+                     'MaterialIcons-Regular.eot',
+                     'MaterialIcons-Regular.ijmap',
+                     'MaterialIcons-Regular.svg',
+                     'MaterialIcons-Regular.ttf',
+                     'MaterialIcons-Regular.woff',
+                     'MaterialIcons-Regular.woff2',
+                 ] as $file) {
+            fs::copy("res://lib/material-icons/$file", "$tempDir/$file");
+        }
+
+        $app->addModule(new WebAssets('/dnext/material-icons', $dir));
+    }
+
+    protected function initializeWebBootstrapLib(WebApplication $app)
+    {
+        $dir = fs::abs(System::getProperty('java.io.tmpdir') . "/dnext-engine/bootstrap4/");
+        $tempDir = str::replace($dir, '\\', '/');
+        fs::makeDir($tempDir);
+
+        foreach (['bootstrap.min.css', 'bootstrap.min.js', 'popper.min.js'] as $file) {
+            fs::copy("res://lib/bootstrap4/$file", "$tempDir/$file");
+        }
+
+        $app->addModule(new WebAssets('/dnext/bootstrap4', $dir));
+    }
+
+    protected function initializeWebJqueryLib(WebApplication $app)
+    {
+        $dir = fs::abs(System::getProperty('java.io.tmpdir') . "/dnext-engine/jquery/");
+        $tempDir = str::replace($dir, '\\', '/');
+        fs::makeDir($tempDir);
+
+        foreach (['jquery-3.2.1.min.js'] as $file) {
+            fs::copy("res://lib/jquery/$file", "$tempDir/$file");
+        }
+
+        $app->addModule(new WebAssets('/dnext/jquery', $dir));
+    }
+
     protected function initializeWebLib(WebApplication $app)
     {
         Logger::info("Initialize Web Library (DNext Engine) with stamp ...");
@@ -209,7 +257,6 @@ class WebUI extends Module
 
         $tempDir = str::replace(fs::abs(System::getProperty('java.io.tmpdir') . "/dnext-engine/"), '\\', '/');
         fs::makeDir($tempDir);
-
 
         if ($this->dnextJsFile) {
             $jsFile = $this->dnextJsFile;
@@ -245,6 +292,9 @@ class WebUI extends Module
 
         Logger::info("\t-> GET {0} --> {1}", $cssUrl, $cssFile);
 
+        $this->initializeWebFontLib($app);
+        $this->initializeWebBootstrapLib($app);
+        $this->initializeWebJqueryLib($app);
 
         if ($this->getModules()) {
             Logger::info("Add DNext Modules:");

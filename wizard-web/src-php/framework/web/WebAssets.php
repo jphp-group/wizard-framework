@@ -40,6 +40,7 @@ class WebAssets extends Module
             $this->app = $event->context;
 
             $handler = new HttpResourceHandler($this->directory);
+            $handler->dirAllowed(false);
 
             $this->app->server()->get("$this->path/**", $handler);
 

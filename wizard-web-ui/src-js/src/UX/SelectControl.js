@@ -20,7 +20,7 @@ export default class SelectControl extends Node {
     const result = {};
 
     this.dom.find('option').each(function () {
-      result[$(this).attr('value')] = $(this).text();
+      result[jQuery(this).attr('value')] = jQuery(this).text();
     });
 
     return result;

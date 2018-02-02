@@ -71,7 +71,7 @@ class Labeled extends Node {
   }
 
   get text() {
-    let dom = this.dom.find('> span.ux-labeled-text');
+    let dom = this.dom.find('span.ux-labeled-text');
 
     if (this.textPreFormatted) {
       dom = dom.find('> pre');
@@ -88,7 +88,7 @@ class Labeled extends Node {
   }
 
   set text(value) {
-    let dom = this.dom.find('> span.ux-labeled-text');
+    let dom = this.dom.find('span.ux-labeled-text');
 
     if (this.textPreFormatted) {
       dom = dom.find('> pre');
@@ -106,7 +106,7 @@ class Labeled extends Node {
   }
 
   get textPreFormatted() {
-    return this.dom.find('> span.ux-labeled-text').has('> pre').length > 0;
+    return this.dom.find('span.ux-labeled-text').has('> pre').length > 0;
   }
 
   set textPreFormatted(value) {
@@ -114,7 +114,7 @@ class Labeled extends Node {
       return;
     }
 
-    const dom = this.dom.find('> span.ux-labeled-text');
+    const dom = this.dom.find('span.ux-labeled-text');
     if (value) {
       dom.html('<pre>' + dom.html() + '</pre>');
     } else {
