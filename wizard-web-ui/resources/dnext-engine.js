@@ -1018,7 +1018,7 @@ var Checkbox = function (_Labeled) {
   _createClass(Checkbox, [{
     key: 'createDom',
     value: function createDom() {
-      var dom = jQuery('<label><input type="checkbox"> <span class="ux-labeled-text"></span></label>');
+      var dom = jQuery('<span><label><input type="checkbox"><span class="cr"><i class="cr-icon material-icons" style="font-weight: bold;">check</i></span><span class="ux-labeled-text"></span></label></span>');
       dom.addClass('ux-labeled');
       dom.addClass('ux-checkbox');
       return dom;
@@ -1026,10 +1026,10 @@ var Checkbox = function (_Labeled) {
   }, {
     key: 'checked',
     get: function get() {
-      return this.dom.find('> input[type=checkbox]').prop('checked');
+      return this.dom.find('input[type=checkbox]').prop('checked');
     },
     set: function set(value) {
-      this.dom.find('> input[type=checkbox]').prop('checked', value);
+      this.dom.find('input[type=checkbox]').prop('checked', value);
     }
   }, {
     key: 'selected',
@@ -1038,6 +1038,14 @@ var Checkbox = function (_Labeled) {
     },
     set: function set(value) {
       this.checked = value;
+    }
+  }, {
+    key: 'enabled',
+    get: function get() {
+      return !this.dom.find('input[type=checkbox]').prop("disabled");
+    },
+    set: function set(value) {
+      this.dom.find('input[type=checkbox]').prop('disabled', !value);
     }
   }]);
 
@@ -1840,7 +1848,7 @@ var Labeled = function (_Node) {
   }, {
     key: 'text',
     get: function get() {
-      var dom = this.dom.find('> span.ux-labeled-text');
+      var dom = this.dom.find('span.ux-labeled-text');
 
       if (this.textPreFormatted) {
         dom = dom.find('> pre');
@@ -1856,7 +1864,7 @@ var Labeled = function (_Node) {
       return '';
     },
     set: function set(value) {
-      var dom = this.dom.find('> span.ux-labeled-text');
+      var dom = this.dom.find('span.ux-labeled-text');
 
       if (this.textPreFormatted) {
         dom = dom.find('> pre');
@@ -1875,14 +1883,14 @@ var Labeled = function (_Node) {
   }, {
     key: 'textPreFormatted',
     get: function get() {
-      return this.dom.find('> span.ux-labeled-text').has('> pre').length > 0;
+      return this.dom.find('span.ux-labeled-text').has('> pre').length > 0;
     },
     set: function set(value) {
       if (this.textPreFormatted === value) {
         return;
       }
 
-      var dom = this.dom.find('> span.ux-labeled-text');
+      var dom = this.dom.find('span.ux-labeled-text');
       if (value) {
         dom.html('<pre>' + dom.html() + '</pre>');
       } else {
@@ -3238,7 +3246,7 @@ var SelectControl = function (_Node) {
       var result = {};
 
       this.dom.find('option').each(function () {
-        result[$(this).attr('value')] = $(this).text();
+        result[jQuery(this).attr('value')] = jQuery(this).text();
       });
 
       return result;
@@ -3282,7 +3290,193 @@ var SelectControl = function (_Node) {
 
 exports.default = SelectControl;
 
-},{"../NX/AppMediator":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\NX\\AppMediator.js","./Node":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\TextArea.js":[function(require,module,exports){
+},{"../NX/AppMediator":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\NX\\AppMediator.js","./Node":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Switch.js":[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Checkbox2 = require("./Checkbox");
+
+var _Checkbox3 = _interopRequireDefault(_Checkbox2);
+
+var _AppMediator = require("../NX/AppMediator");
+
+var _AppMediator2 = _interopRequireDefault(_AppMediator);
+
+var _Utils = require("./util/Utils");
+
+var _Utils2 = _interopRequireDefault(_Utils);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var KINDS = ['success', 'primary', 'secondary', 'info', 'warning', 'danger', 'link', 'dark', 'light'];
+
+var Switch = function (_Checkbox) {
+  _inherits(Switch, _Checkbox);
+
+  function Switch() {
+    _classCallCheck(this, Switch);
+
+    return _possibleConstructorReturn(this, (Switch.__proto__ || Object.getPrototypeOf(Switch)).call(this));
+  }
+
+  _createClass(Switch, [{
+    key: "createDom",
+    value: function createDom() {
+      var _this2 = this;
+
+      var dom = jQuery('<span><input type="checkbox" /><label class="badge-default"></label><span class="ux-labeled-text"></span></span>');
+      dom.addClass('ux-labeled');
+      dom.addClass('ux-switch');
+
+      dom.on('click.Switch', function (e) {
+        var checkbox = dom.find('input[type=checkbox]');
+
+        if (!checkbox.prop('disabled')) {
+          checkbox.prop('checked', !checkbox.prop('checked'));
+
+          _AppMediator2.default.sendUserInput(_this2, { selected: _this2.selected }, function () {
+            _this2.trigger('action', e);
+          });
+        }
+      });
+
+      return dom;
+    }
+  }, {
+    key: "iconSize",
+    get: function get() {
+      return this.dom.find('label').css('font-size');
+    },
+    set: function set(value) {
+      var dom = this.dom.find('label');
+      dom.css('font-size', value);
+    }
+  }, {
+    key: "kind",
+    set: function set(value) {
+      if (!value) {
+        value = 'default';
+      }
+
+      var dom = this.dom.find('label');
+
+      dom.removeClass("badge-" + this.kind);
+
+      if (value) {
+        dom.addClass("badge-" + value);
+      }
+    },
+    get: function get() {
+      var dom = this.dom.find('label');
+
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = KINDS[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var kind = _step.value;
+
+          if (dom.hasClass("badge-" + kind)) {
+            return kind;
+          }
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+
+      return 'default';
+    }
+  }, {
+    key: "iconGap",
+    get: function get() {
+      var labeled = this.dom.find('.ux-labeled-text');
+      switch (this.iconDisplay) {
+        case 'left':
+          return _Utils2.default.toPt(labeled.css('margin-left'));
+        case 'right':
+          return _Utils2.default.toPt(labeled.css('margin-right'));
+      }
+
+      return 0;
+    },
+    set: function set(value) {
+      var labeled = this.dom.find('.ux-labeled-text');
+      labeled.css('margin-right', '');
+      labeled.css('margin-left', '');
+
+      switch (this.iconDisplay) {
+        case 'left':
+          labeled.css('margin-left', value);break;
+
+        case 'right':
+          labeled.css('margin-right', value);break;
+      }
+    }
+  }, {
+    key: "iconDisplay",
+    get: function get() {
+      if (this.dom.find('> *:first').hasClass('ux-labeled-text')) {
+        return 'right';
+      } else {
+        return 'left';
+      }
+    },
+    set: function set(value) {
+      if (this.iconDisplay === value) return;
+
+      var gap = this.iconGap;
+
+      var checkbox = this.dom.find('input[type=checkbox]');
+      var label = this.dom.find('label');
+      label.remove();
+      checkbox.remove();
+
+      var labeled = this.dom.find('.ux-labeled-text');
+
+      switch (value) {
+        case "right":
+          label.insertAfter(labeled);
+          checkbox.insertAfter(labeled);
+          break;
+        case "left":
+          checkbox.insertBefore(labeled);
+          label.insertBefore(labeled);
+          break;
+      }
+
+      this.iconGap = gap;
+    }
+  }]);
+
+  return Switch;
+}(_Checkbox3.default);
+
+exports.default = Switch;
+
+},{"../NX/AppMediator":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\NX\\AppMediator.js","./Checkbox":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Checkbox.js","./util/Utils":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\util\\Utils.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\TextArea.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3635,6 +3829,10 @@ var _Hyperlink = require('./Hyperlink');
 
 var _Hyperlink2 = _interopRequireDefault(_Hyperlink);
 
+var _Switch = require('./Switch');
+
+var _Switch2 = _interopRequireDefault(_Switch);
+
 var _Font = require('./paint/Font');
 
 var _Font2 = _interopRequireDefault(_Font);
@@ -3652,12 +3850,12 @@ exports.default = {
   Labeled: _Labeled2.default,
   Label: _Label2.default, Checkbox: _Checkbox2.default, Combobox: _Combobox2.default, Listbox: _Listbox2.default, ProgressBar: _ProgressBar2.default,
   TextInputControl: _TextInputControl2.default, TextField: _TextField2.default, PasswordField: _PasswordField2.default, TextArea: _TextArea2.default,
-  Container: _Container2.default, HBox: _HBox2.default, VBox: _VBox2.default, AnchorPane: _AnchorPane2.default, ListView: _ListView2.default, Icon: _Icon2.default, Hyperlink: _Hyperlink2.default,
+  Container: _Container2.default, HBox: _HBox2.default, VBox: _VBox2.default, AnchorPane: _AnchorPane2.default, ListView: _ListView2.default, Icon: _Icon2.default, Hyperlink: _Hyperlink2.default, Switch: _Switch2.default,
 
   Font: _Font2.default
 };
 
-},{"./AnchorPane":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\AnchorPane.js","./Button":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Button.js","./Checkbox":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Checkbox.js","./Combobox":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Combobox.js","./Container":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Container.js","./HBox":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\HBox.js","./Hyperlink":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Hyperlink.js","./Icon":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Icon.js","./ImageView":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\ImageView.js","./Label":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Label.js","./Labeled":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Labeled.js","./ListView":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\ListView.js","./Listbox":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Listbox.js","./Node":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js","./PasswordField":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\PasswordField.js","./ProgressBar":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\ProgressBar.js","./TextArea":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\TextArea.js","./TextField":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\TextField.js","./TextInputControl":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\TextInputControl.js","./ToggleButton":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\ToggleButton.js","./VBox":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\VBox.js","./Window":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Window.js","./paint/Font":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\paint\\Font.js","./util/Utils":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\util\\Utils.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\VBox.js":[function(require,module,exports){
+},{"./AnchorPane":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\AnchorPane.js","./Button":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Button.js","./Checkbox":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Checkbox.js","./Combobox":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Combobox.js","./Container":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Container.js","./HBox":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\HBox.js","./Hyperlink":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Hyperlink.js","./Icon":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Icon.js","./ImageView":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\ImageView.js","./Label":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Label.js","./Labeled":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Labeled.js","./ListView":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\ListView.js","./Listbox":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Listbox.js","./Node":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Node.js","./PasswordField":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\PasswordField.js","./ProgressBar":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\ProgressBar.js","./Switch":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Switch.js","./TextArea":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\TextArea.js","./TextField":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\TextField.js","./TextInputControl":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\TextInputControl.js","./ToggleButton":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\ToggleButton.js","./VBox":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\VBox.js","./Window":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\Window.js","./paint/Font":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\paint\\Font.js","./util/Utils":"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\util\\Utils.js"}],"D:\\dev\\personal\\framework\\wizard-web-ui\\src-js\\src\\UX\\VBox.js":[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

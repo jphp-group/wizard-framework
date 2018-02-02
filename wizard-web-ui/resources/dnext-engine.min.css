@@ -6,6 +6,10 @@ label {
     display: inline-block;
 }
 
+.badge-default {
+  background-color: #777;
+}
+
 .ux-window {
 }
 
@@ -132,13 +136,129 @@ label {
 }
 
 /* Checkbox component */
-.ux-checkbox > input[type=checkbox] {
-  margin-top: 0;
-  margin-right: 4px;
-  vertical-align: middle;
+.ux-checkbox label {
+  cursor: pointer;
 }
 
+.ux-checkbox label:after {
+  content: '';
+  display: table;
+  clear: both;
+}
 
+.ux-checkbox .cr {
+  position: relative;
+  display: inline-block;
+  border: 1px solid #a9a9a9;
+  border-radius: .25em;
+  width: 1.3em;
+  height: 1.3em;
+  float: left;
+  margin-right: .5em;
+  margin-top: 0;
+}
+
+.ux-checkbox .cr .cr-icon {
+  position: absolute;
+  font-size: .8em;
+  line-height: 0;
+  top: 50%;
+  left: 20%;
+}
+
+.ux-checkbox label input[type="checkbox"] {
+  display: none;
+}
+
+.ux-checkbox label input[type="checkbox"] + .cr > .cr-icon {
+  transform: scale(3) rotateZ(-20deg);
+  opacity: 0;
+  /*transition: all .3s ease-in;*/
+}
+
+.ux-checkbox label input[type="checkbox"]:checked + .cr > .cr-icon {
+  transform: scale(1) rotateZ(0deg);
+  opacity: 1;
+}
+
+.ux-checkbox label input[type="checkbox"]:disabled + .cr {
+  opacity: .5;
+}
+
+/** Switch */
+.ux-switch input[type="checkbox"] {
+  display: none;
+}
+
+.ux-switch label {
+  cursor: pointer;
+  height: 0;
+  position: relative;
+  font-size: 16px;
+}
+
+.ux-switch .ux-labeled-text {
+  cursor: pointer;
+}
+
+.ux-switch .ux-labeled-text:last-child {
+  padding-left: 2.5em;
+  margin-left: 8px;
+}
+
+.ux-switch .ux-labeled-text:first-child {
+  margin-right: 8px;
+}
+
+.ux-switch .ux-labeled-text:empty {
+  display: none;
+}
+
+.ux-switch label::before {
+  background: rgb(0, 0, 0);
+  box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.5);
+  border-radius: 0.5em;
+  content: '';
+  height: 1em;
+  margin-top: -0.5em;
+  position:absolute;
+  opacity: 0.3;
+  transition: all 0.4s ease-in-out;
+  width: 2.5em;
+}
+
+.ux-switch label::after {
+  background: rgb(255, 255, 255);
+  border-radius: 1em;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+  content: '';
+  height: 1.5em;
+  margin-top: -0.75em;
+  position: absolute;
+  transition: all 0.3s ease-in-out;
+  width: 1.5em;
+}
+
+.ux-switch input[type="checkbox"]:disabled + label,
+.ux-switch input[type="checkbox"]:disabled + label + .ux-labeled-text,
+.ux-checkbox input[type="checkbox"]:disabled + .cr,
+.ux-checkbox input[type="checkbox"]:disabled + .cr + .ux-labeled-text
+{
+  opacity: 0.5;
+  cursor: default;
+}
+
+.ux-switch input[type="checkbox"]:checked + label::before {
+  background: inherit;
+  opacity: 0.5;
+}
+
+.ux-switch input[type="checkbox"]:checked + label::after {
+  background: inherit;
+  margin-left: 1.25em;
+}
+
+/* Modal */
 .modal.ux-centered {
   text-align: center;
   padding: 0!important;

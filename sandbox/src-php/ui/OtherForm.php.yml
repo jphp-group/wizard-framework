@@ -1,0 +1,12 @@
+title: Привет мир
+
+layout:
+  _: VBox
+  align: [center, center]
+  size: [100%, 100%]
+  _content:
+    - _: Switch
+      text: Hello World
+      iconSize: 16
+      iconGap: 18
+      iconDisplay: right

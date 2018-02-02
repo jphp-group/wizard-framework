@@ -194,11 +194,20 @@ label {
   cursor: pointer;
   height: 0;
   position: relative;
+  font-size: 16px;
 }
 
 .ux-switch .ux-labeled-text {
-  padding-left: 50px;
   cursor: pointer;
+}
+
+.ux-switch .ux-labeled-text:last-child {
+  padding-left: 2.5em;
+  margin-left: 8px;
+}
+
+.ux-switch .ux-labeled-text:first-child {
+  margin-right: 8px;
 }
 
 .ux-switch .ux-labeled-text:empty {
@@ -208,26 +217,26 @@ label {
 .ux-switch label::before {
   background: rgb(0, 0, 0);
   box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.5);
-  border-radius: 8px;
+  border-radius: 0.5em;
   content: '';
-  height: 16px;
-  margin-top: -8px;
+  height: 1em;
+  margin-top: -0.5em;
   position:absolute;
   opacity: 0.3;
   transition: all 0.4s ease-in-out;
-  width: 40px;
+  width: 2.5em;
 }
 
 .ux-switch label::after {
   background: rgb(255, 255, 255);
-  border-radius: 16px;
+  border-radius: 1em;
   box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
   content: '';
-  height: 24px;
-  margin-top: -12px;
+  height: 1.5em;
+  margin-top: -0.75em;
   position: absolute;
   transition: all 0.3s ease-in-out;
-  width: 24px;
+  width: 1.5em;
 }
 
 .ux-switch input[type="checkbox"]:disabled + label,
@@ -246,7 +255,7 @@ label {
 
 .ux-switch input[type="checkbox"]:checked + label::after {
   background: inherit;
-  margin-left: 20px;
+  margin-left: 1.25em;
 }
 
 /* Modal */

@@ -15,19 +15,8 @@ use php\time\Timer;
  */
 class OtherForm extends UIForm
 {
-    /**
-     * @event button.click
-     */
-    public function doButtonClick()
+    protected function getFrmFormat()
     {
-        $this->appUI->navigateTo('MainForm');
-    }
-
-    /**
-     * @event leave
-     */
-    public function doLeave()
-    {
-        $this->label->text = "Super Text";
+        return 'yml';
     }
 }

@@ -54,10 +54,10 @@ class MainForm extends UIForm
 
         $line = new UICheckbox($text);
 
-        $line->on('change-selected', function (Event $e) {
+        $line->on('action', function (Event $e) {
             /** @var UICheckbox $checkbox */
-           $checkbox = $e->sender;
-           $checkbox->font->linethrough = $e->data['value'];
+            $checkbox = $e->sender;
+            $checkbox->font->linethrough = $checkbox->selected;
         });
 
         $this->quests->add($line);
@@ -66,17 +66,9 @@ class MainForm extends UIForm
     }
 
     /**
-     * @event my.change
-     */
-    /*public function test()
-    {
-        alert($this->my->selected);
-    }*/
-
-    /**
      * @event clear.click
      */
-    /*public function doClear()
+    public function doClear()
     {
         $alert = new UIAlert('confirm');
         $alert->text = 'Вы уверены, что хотите удалить все записи?';
@@ -90,5 +82,5 @@ class MainForm extends UIForm
         });
 
         $alert->show();
-    }*/
+    }
 }
