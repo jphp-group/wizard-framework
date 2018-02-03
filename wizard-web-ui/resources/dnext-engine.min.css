@@ -202,7 +202,7 @@ label {
 }
 
 .ux-switch .ux-labeled-text:last-child {
-  padding-left: 2.5em;
+  padding-left: 40px;
   margin-left: 8px;
 }
 

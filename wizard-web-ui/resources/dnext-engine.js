@@ -3356,11 +3356,19 @@ var Switch = function (_Checkbox) {
   }, {
     key: "iconSize",
     get: function get() {
-      return this.dom.find('label').css('font-size');
+      return _Utils2.default.toPt(this.dom.find('label').css('font-size'));
     },
     set: function set(value) {
       var dom = this.dom.find('label');
       dom.css('font-size', value);
+
+      var labeled = this.dom.find('.ux-labeled-text');
+
+      if (this.iconDisplay === 'left') {
+        labeled.css('padding-left', value * 2.5);
+      } else {
+        labeled.css('padding-left', '');
+      }
     }
   }, {
     key: "kind",
@@ -3426,10 +3434,13 @@ var Switch = function (_Checkbox) {
       var labeled = this.dom.find('.ux-labeled-text');
       labeled.css('margin-right', '');
       labeled.css('margin-left', '');
+      labeled.css('padding-left', '');
 
       switch (this.iconDisplay) {
         case 'left':
-          labeled.css('margin-left', value);break;
+          labeled.css('margin-left', value);
+          labeled.css('padding-left', this.iconSize * 2.5);
+          break;
 
         case 'right':
           labeled.css('margin-right', value);break;
