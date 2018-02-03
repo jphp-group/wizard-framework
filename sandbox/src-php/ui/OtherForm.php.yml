@@ -8,5 +8,5 @@ layout:
     - _: Switch
       text: Hello World
       iconSize: 16
-      iconGap: 18
+      iconGap: 5
       iconDisplay: right

@@ -14,12 +14,20 @@ class Switch extends Checkbox {
   }
 
   get iconSize() {
-    return this.dom.find('label').css('font-size');
+    return Utils.toPt(this.dom.find('label').css('font-size'));
   }
 
   set iconSize(value) {
     const dom = this.dom.find('label');
     dom.css('font-size', value);
+
+    const labeled = this.dom.find('.ux-labeled-text');
+
+    if (this.iconDisplay === 'left') {
+      labeled.css('padding-left', value * 2.5);
+    } else {
+      labeled.css('padding-left', '');
+    }
   }
 
   set kind(value) {
@@ -62,10 +70,13 @@ class Switch extends Checkbox {
     const labeled = this.dom.find('.ux-labeled-text');
     labeled.css('margin-right', '');
     labeled.css('margin-left', '');
+    labeled.css('padding-left', '');
 
     switch (this.iconDisplay) {
       case 'left':
-        labeled.css('margin-left', value); break;
+        labeled.css('margin-left', value);
+        labeled.css('padding-left', this.iconSize * 2.5);
+        break;
 
       case 'right':
         labeled.css('margin-right', value); break;
