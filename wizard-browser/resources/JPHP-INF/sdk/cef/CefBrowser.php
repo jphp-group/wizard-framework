@@ -20,7 +20,7 @@ class CefBrowser
      * @param string|null $url
      * @param int $line
      */
-    public function executeScript(string $script, string $url = null, int $line = 0)
+    public function executeJavaScript(string $script, string $url = null, int $line = 0)
     {
     }
 

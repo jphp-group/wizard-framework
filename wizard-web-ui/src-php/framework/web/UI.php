@@ -148,11 +148,16 @@ abstract class UI extends Component
      */
     public function addWindow(UIWindow $window)
     {
-        $this->windows[$window->uuid] = $window;
+        $event = new Event('addWindow', $this, $window);
+        $this->trigger($event);
 
-        $window->connectToUI($this);
+        if (!$event->isConsumed()) {
+            $this->windows[$window->uuid] = $window;
 
-        $this->sendMessage('ui-create-node', ['schema' => $window->uiSchema()]);
+            $window->connectToUI($this);
+
+            $this->sendMessage('ui-create-node', ['schema' => $window->uiSchema()]);
+        }
     }
 
     /**
@@ -160,8 +165,13 @@ abstract class UI extends Component
      */
     public function removeWindow(UIWindow $window)
     {
-        unset($this->windows[$window->uuid]);
-        $window->disconnectUI();
+        $event = new Event('removeWindow', $this, $window);
+        $this->trigger($event);
+
+        if (!$event->isConsumed()) {
+            unset($this->windows[$window->uuid]);
+            $window->disconnectUI();
+        }
     }
 
     /**

@@ -38,6 +38,7 @@ class StreamCefResourceHandler extends CefResourceHandler
         try {
             $this->stream = Stream::of($this->source);
             $callback->continue();
+            Logger::info("Resource {0} send to browser", $this->source);
             return true;
         } catch (IOException $e) {
             Logger::warn("Resource {0} not found, {1}", $this->source, $e->getMessage());
@@ -72,6 +73,10 @@ class StreamCefResourceHandler extends CefResourceHandler
                 $mimeType = "application/octet-stream";
                 break;
         }
+
+        $response->headerMap = [
+            'Access-Control-Allow-Origin' => '*'
+        ];
 
         $response->mimeType = $mimeType;
 

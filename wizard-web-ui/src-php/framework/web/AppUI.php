@@ -64,6 +64,7 @@ class AppUI extends UI
 
         $this->setAlertFunction(function ($message, array $options) {
             $alert = new UIAlert($options['type'] ?? 'info');
+            $alert->connectToUI($this);
 
             $alert->preFormatted = $options['pre'];
             $alert->text = $message;
@@ -144,6 +145,14 @@ class AppUI extends UI
         return $this->currentForm;
     }
 
+    /**
+     * @param UIForm $currentForm
+     */
+    public function setCurrentForm(?UIForm $currentForm)
+    {
+        $this->currentForm = $currentForm;
+    }
+
     public function renderView()
     {
         $this->sendMessage('ui-render', [
@@ -168,13 +177,20 @@ class AppUI extends UI
 
         $subPath = "/" . $this->location['contextUrl'];
 
+        $event = new Event('detectCurrentForm', $this, $this, ['path' => $subPath]);
+        $this->trigger($event);
+
         $found = false;
 
-        foreach ($this->urlForms as $url => $form) {
-            if ($url === $subPath) {
-                $this->currentForm = $form;
-                $found = true;
-                break;
+        if ($event->isConsumed()) {
+            $found = true;
+        } else {
+            foreach ($this->urlForms as $url => $form) {
+                if ($url === $subPath) {
+                    $this->currentForm = $form;
+                    $found = true;
+                    break;
+                }
             }
         }
 
@@ -186,6 +202,26 @@ class AppUI extends UI
             $this->currentForm->connectToUI($this);
 
             $this->sendMessage('page-set-properties', ['title' => $this->currentForm->title]);
+        }
+    }
+
+    /**
+     * @param $formOrCode
+     * @param array $args
+     */
+    public function show($formOrCode, array $args)
+    {
+        if ($formOrCode instanceof UIForm) {
+            $form = $formOrCode;
+        } else {
+            $form = $this->forms[$formOrCode];
+        }
+
+        $event = new Event('show', $this, $form, $args);
+        $this->trigger($event);
+
+        if (!$event->isConsumed()) {
+            $form->showPopup();
         }
     }
 

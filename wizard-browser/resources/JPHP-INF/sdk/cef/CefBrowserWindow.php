@@ -29,6 +29,34 @@ class CefBrowserWindow
     public $position = [0, 0];
 
     /**
+     * @var bool
+     */
+    public $undecorated = false;
+
+    /**
+     * Only for dialogs.
+     *
+     * @var bool
+     */
+    public $modal = false;
+
+    /**
+     * @var bool
+     */
+    public $resizable = false;
+
+    /**
+     * @var bool
+     */
+    public $enabled = true;
+
+    /**
+     * @readonly
+     * @var bool
+     */
+    public $active;
+
+    /**
      * CefBrowserWindow constructor.
      * @param CefBrowser $browser
      * @param bool $asDialog
@@ -55,6 +83,35 @@ class CefBrowserWindow
      * Dispose window.
      */
     public function free()
+    {
+    }
+
+    /**
+     *
+     */
+    public function centerOnScreen()
+    {
+    }
+
+    /**
+     *
+     */
+    public function toFront()
+    {
+    }
+
+    /**
+     *
+     */
+    public function toBack()
+    {
+    }
+
+    public function onActivated(callable $handler)
+    {
+    }
+
+    public function onDeactivated(callable $handler)
     {
     }
 

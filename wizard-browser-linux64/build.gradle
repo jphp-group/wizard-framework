@@ -1,0 +1,17 @@
+
+dependencies {
+    compile project(':wizard-browser')
+    compile fileTree(include: ['*.jar'], dir: "$projectDir.path/lib")
+}
+
+task unpackNativeLinux64(type: Copy) {
+    def zipFile = file("$projectDir/native/linux64.tar.gz")
+    def outputDir = file("$buildDir/native")
+
+    doFirst { delete "$outputDir/linux64" }
+
+    from tarTree(resources.gzip(zipFile))
+    into outputDir
+}
+
+task unpackNative(dependsOn: 'unpackNativeLinux64') {}

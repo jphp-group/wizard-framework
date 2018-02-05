@@ -34,8 +34,8 @@ class DesktopBrowserUISession extends AbstractUISession
      */
     public function sendText(string $text, ?callable $callback = null): void
     {
-        $text = var_export($text);
-        $this->browser->executeScript("window.cefMessageHandler('$text');");
+        $text = var_export($text, true);
+        $this->browser->executeJavaScript("window.cefMessageHandler($text);");
     }
 
     /**

@@ -33,6 +33,20 @@ class CefClient
     }
 
     /**
+     * @param callable $invoker (CefBrowser $browser)
+     */
+    public function onAfterCreated(callable $invoker)
+    {
+    }
+
+    /**
+     * @param callable $invoker (CefBrowser $browser)
+     */
+    public function onBeforeClose(callable $invoker)
+    {
+    }
+
+    /**
      * @param callable $invoker (CefBrowser $browser, string $title)
      */
     public function onTitleChange(callable $invoker)

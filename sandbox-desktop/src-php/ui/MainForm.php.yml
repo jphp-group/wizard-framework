@@ -1,0 +1,13 @@
+title: MainForm
+window:
+  size: [800, 600]
+
+layout:
+  _: VBox
+  align: [center, center]
+  size: [100%, 100%]
+  _content:
+    - _: Button
+      id: button
+      text: Click Me
+      kind: dark

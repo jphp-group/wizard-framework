@@ -7,7 +7,7 @@ use framework\web\AppUI;
  * Class MainUI
  * @package ui
  *
- * @path /app/
+ * @path /
  */
 class MainUI extends AppUI
 {
@@ -15,6 +15,6 @@ class MainUI extends AppUI
     {
         parent::__construct();
 
-        $this->registerNotFoundForm('Main', new MainForm());
+        $this->registerForm('Main', new MainForm());
     }
 }

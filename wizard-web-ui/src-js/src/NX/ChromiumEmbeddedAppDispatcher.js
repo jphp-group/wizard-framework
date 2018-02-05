@@ -2,8 +2,10 @@ import AppDispatcher from "./AppDispatcher";
 
 class ChromiumEmbeddedAppDispatcher extends AppDispatcher
 {
-  constructor() {
+  constructor(wsUrl) {
     super();
+
+    this.wsUrl = wsUrl;
 
     this.onOpen(() => {});
     this.onMessage(() => {});
@@ -15,6 +17,8 @@ class ChromiumEmbeddedAppDispatcher extends AppDispatcher
     window.cefOpenHandler = () => {
       callback();
     };
+
+    setTimeout(() => window.cefOpenHandler(), 1);
   }
 
   onMessage(callback) {
@@ -31,7 +35,7 @@ class ChromiumEmbeddedAppDispatcher extends AppDispatcher
 
   send(data) {
     window.cefQuery({
-      requiest: 'send',
+      request: 'ws:' + this.wsUrl + ':' + data,
       persistent: false,
       onSuccess: (res) => {
       },

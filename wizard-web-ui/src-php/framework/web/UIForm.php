@@ -112,6 +112,11 @@ abstract class UIForm extends Component
      */
     public function show()
     {
+        $this->appUI->show($this, []);
+    }
+
+    public function showPopup()
+    {
         $this->window->connectToUI($this->appUI);
 
         $this->window->title = $this->title;

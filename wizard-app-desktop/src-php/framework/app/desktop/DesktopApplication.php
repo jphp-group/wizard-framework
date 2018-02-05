@@ -12,7 +12,7 @@ use framework\app\desktop\scheme\RouteRequest;
 use framework\app\desktop\scheme\RouteResponse;
 use framework\core\Application;
 use framework\core\Logger;
-use php\io\Stream;
+use php\format\JsonProcessor;
 use php\lib\str;
 
 /**
@@ -37,9 +37,19 @@ class DesktopApplication extends Application
     private $cefBrowser;
 
     /**
+     * @var DesktopBrowserUISession[]
+     */
+    private $uiSessions;
+
+    /**
      * @var array
      */
     private $routes = [];
+
+    /**
+     * @var callable
+     */
+    private $messageRouters = [];
 
     protected function initialize()
     {
@@ -53,6 +63,9 @@ class DesktopApplication extends Application
 
         $this->cefApp = CefApp::getInstance();
         $this->cefClient = $this->cefApp->createClient();
+        $this->cefClient->addMessageRouter([$this, 'handleClientQuery']);
+        $this->cefClient->onConsoleMessage([$this, 'handleConsoleMessage']);
+        $this->cefClient->onAfterCreated([$this, 'handleAfterCreated']);
 
         $version = $this->cefApp->getVersion();
         Logger::info("Initialize Desktop Application (chromium = {0}.{1}.{2})",
@@ -60,8 +73,46 @@ class DesktopApplication extends Application
         );
     }
 
+    protected function getUiSession(CefBrowser $browser)
+    {
+        $key = spl_object_hash($browser);
+
+        if ($session = $this->uiSessions[$key]) {
+            return $session;
+        }
+
+        Logger::info("Create UI session for browser (key = {0})", $key);
+        return $this->uiSessions[$key] = new DesktopBrowserUISession($browser);
+    }
+
     protected function handleStateChanged($state)
     {
+    }
+
+    protected function handleAfterCreated(CefBrowser $browser)
+    {
+        $session = $this->getUiSession($browser);
+    }
+
+    protected function handleConsoleMessage(CefBrowser $browser, string $message, string $source, int $line)
+    {
+        //Logger::warn("{0} in {1} on line {2}", $message, $source ?: 'Unknown', $line);
+    }
+
+    protected function handleClientQuery(CefBrowser $browser, string $request, bool $persistence)
+    {
+        if (str::startsWith($request, 'ws:')) {
+            list(, $path, $message) = str::split($request, ':', 3);
+
+            if ($router = $this->messageRouters[$path]) {
+                $message = str::parseAs($message, 'json', JsonProcessor::DESERIALIZE_AS_ARRAYS);
+                $router($browser, $message);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     public function routeRequest(CefBrowser $browser, $scheme, array $request): CefResourceHandler
@@ -72,6 +123,16 @@ class DesktopApplication extends Application
             return $route($browser, $request);
         }
 
+        foreach ($this->routes as $path => $route) {
+            if (str::endsWith($path, '**')) {
+                $path = str::sub($path, 0, str::length($path) - 2);
+
+                if (str::startsWith($url, $path)) {
+                    return $route($browser, $request);
+                }
+            }
+        }
+
         Logger::warn("{0} - 404. Not found.", $url);
 
         return new RouteCefResourceHandler(function (RouteRequest $request, RouteResponse $response) {
@@ -79,6 +140,11 @@ class DesktopApplication extends Application
             $response->contentType = 'text/pain';
             $response->body = '404. Not Found (' . $request->url . ')';
         });
+    }
+
+    public function addMessageRouter(string $path, callable $handler)
+    {
+        $this->messageRouters[$path] = $handler;
     }
 
     public function addResource(string $path, string $source)
@@ -95,18 +161,16 @@ class DesktopApplication extends Application
         };
     }
 
+    /**
+     * @return CefClient
+     */
+    public function getCefClient(): CefClient
+    {
+        return $this->cefClient;
+    }
+
     public function launch(): void
     {
         parent::launch();
-
-        $this->cefBrowser = $browser = $this->cefClient->createBrowser('wizard://app/', false);
-
-        $window = new CefBrowserWindow($browser);
-        $window->onClosing(function () use ($window) {
-             $window->free();
-        });
-
-        $window->size = [1024, 768];
-        $window->show();
     }
 }

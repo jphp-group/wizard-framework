@@ -11,5 +11,16 @@ use framework\web\UIForm;
  */
 class MainForm extends UIForm
 {
+    protected function getFrmFormat()
+    {
+        return 'yml';
+    }
 
+    /**
+     * @event button.click
+     */
+    public function doClick()
+    {
+        alert("Yes, It's work!");
+    }
 }

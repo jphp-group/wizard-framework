@@ -65,6 +65,26 @@ public class PCefClient extends BaseWrapper<CefClient> {
     }
 
     @Signature
+    public void onAfterCreated(Environment env, Invoker invoker) {
+        getWrappedObject().addLifeSpanHandler(new CefLifeSpanHandlerAdapter() {
+            @Override
+            public void onAfterCreated(CefBrowser browser) {
+                invoker.callAny(new PCefBrowser(env, browser));
+            }
+        });
+    }
+
+    @Signature
+    public void onBeforeClose(Environment env, Invoker invoker) {
+        getWrappedObject().addLifeSpanHandler(new CefLifeSpanHandlerAdapter() {
+            @Override
+            public void onBeforeClose(CefBrowser browser) {
+                invoker.callAny(new PCefBrowser(env, browser));
+            }
+        });
+    }
+
+    @Signature
     public void onTitleChange(Environment env, Invoker invoker) {
         getWrappedObject().addDisplayHandler(new CefDisplayHandlerAdapter() {
             @Override

@@ -42,12 +42,14 @@ public class PCefBrowserWindow extends BaseObject {
             JDialog jDialog = new JDialog();
             jDialog.getContentPane().add(browser.getUIComponent());
             jDialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+            jDialog.setResizable(false);
 
             this.frame = jDialog;
         } else {
             JFrame jframe = new JFrame();
             jframe.getContentPane().add(browser.getUIComponent());
             jframe.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+            jframe.setResizable(false);
 
             frame = jframe;
         }
@@ -55,7 +57,21 @@ public class PCefBrowserWindow extends BaseObject {
         frame.pack();
         frame.setSize(800, 600);
         frame.setLocationRelativeTo(null);
+    }
 
+    @Getter
+    public boolean getEnabled() {
+        return frame.isEnabled();
+    }
+
+    @Setter
+    public void setEnabled(boolean value) {
+        frame.setEnabled(value);
+    }
+
+    @Getter
+    public boolean getActive() {
+        return frame.isActive();
     }
 
     @Setter
@@ -124,6 +140,66 @@ public class PCefBrowserWindow extends BaseObject {
         frame.setType(type);
     }
 
+    @Setter
+    public void setResizable(boolean value) {
+        if (frame instanceof Frame) {
+            ((Frame) frame).setResizable(value);
+        } else if (frame instanceof Dialog) {
+            ((Dialog) frame).setResizable(value);
+        }
+    }
+
+    @Getter
+    public boolean getResizable() {
+        if (frame instanceof Frame) {
+            return ((Frame) frame).isResizable();
+        } else if (frame instanceof Dialog) {
+            return ((Dialog) frame).isResizable();
+        }
+
+        return false;
+    }
+
+    @Setter
+    public void setUndecorated(boolean value) {
+        if (frame instanceof Frame) {
+            ((Frame) frame).setUndecorated(value);
+        } else if (frame instanceof Dialog) {
+            ((Dialog) frame).setUndecorated(value);
+        }
+    }
+
+    @Getter
+    public boolean getUndecorated() {
+        if (frame instanceof Frame) {
+            return ((Frame) frame).isUndecorated();
+        } else if (frame instanceof Dialog) {
+            return ((Dialog) frame).isUndecorated();
+        }
+
+        return false;
+    }
+
+    @Setter
+    public void setModal(boolean value) {
+        if (frame instanceof Frame) {
+            throw new IllegalStateException("Only dialogs can be modal");
+        } else if (frame instanceof Dialog) {
+            ((Dialog) frame).setModal(value);
+        }
+    }
+
+    @Getter
+    public boolean getModal() {
+        if (frame instanceof Frame) {
+            throw new IllegalStateException("Only dialogs can be modal");
+        } else if (frame instanceof Dialog) {
+            return ((Dialog) frame).isModal();
+        }
+
+        return false;
+    }
+
     @Signature
     public void show() {
         frame.setVisible(true);
@@ -140,10 +216,45 @@ public class PCefBrowserWindow extends BaseObject {
     }
 
     @Signature
+    public void centerOnScreen() {
+        frame.setLocationRelativeTo(null);
+    }
+
+    @Signature
+    public void toFront() {
+        frame.toFront();
+    }
+
+    @Signature
+    public void toBack() {
+        frame.toBack();
+    }
+
+    @Signature
     public void onClosed(Invoker invoker) {
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
+                invoker.callAny(PCefBrowserWindow.this);
+            }
+        });
+    }
+
+    @Signature
+    public void onActivated(Invoker invoker) {
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowActivated(WindowEvent e) {
+                invoker.callAny(PCefBrowserWindow.this);
+            }
+        });
+    }
+
+    @Signature
+    public void onDeactivated(Invoker invoker) {
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowDeactivated(WindowEvent e) {
                 invoker.callAny(PCefBrowserWindow.this);
             }
         });

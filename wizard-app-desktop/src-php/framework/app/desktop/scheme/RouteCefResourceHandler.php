@@ -55,7 +55,7 @@ class RouteCefResourceHandler extends CefResourceHandler
         $this->request->method = $request['method'];
 
         $this->response = new RouteResponse();
-
+        
         call_user_func($this->handler, $this->request, $this->response);
 
         $callback->continue();
