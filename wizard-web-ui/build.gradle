@@ -17,7 +17,7 @@ gulp {
 }
 
 dependencies {
-    compile project(":wizard-web")
+    compile project(":wizard-core")
 }
 
 task buildCss(dependsOn: 'gulp_compile-css') {

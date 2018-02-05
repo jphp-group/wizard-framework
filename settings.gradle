@@ -3,12 +3,20 @@ rootProject.name = 'framework'
 
 include 'wizard-core'
 include 'wizard-core-legacy'
+include 'wizard-browser'
+include 'wizard-browser-win32'
+include 'wizard-browser-win64'
 include 'wizard-web'
 include 'wizard-web-ui'
 include 'wizard-web-ui/components/ace-editor'
 include 'wizard-web-ui/components/slider'
 include 'wizard-web-ui/components/craft-game-engine'
 
-include 'sandbox'
-include 'sandbox-game'
+include 'wizard-app'
+include 'wizard-app-web'
+include 'wizard-app-desktop'
+
+include 'sandbox-web'
+include 'sandbox-desktop'
+include 'sandbox-browser'
 

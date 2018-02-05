@@ -23,7 +23,7 @@
 
         <script>
             appMediator = NX.AppMediator;
-            appMediator.init($('#app'));
+            appMediator.init($('#app'), {{jsAppDispatcher}});
             appMediator.startWatching('{{urlArgument}}', '{{uiSocketUrl}}', '{{sessionId}}');
         </script>
     </body>

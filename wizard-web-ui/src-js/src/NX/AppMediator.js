@@ -1,9 +1,11 @@
 import UILoader from "./UILoader";
 import Node from "../UX/Node";
+import WebSocketAppDispatcher from "./WebSocketAppDispatcher";
 
 class AppMediator {
-  init(rootDom) {
+  init(rootDom, dispatcherType) {
     this.rootDom = rootDom;
+    this.dispatcherType = dispatcherType;
     this.activated = true;
     this._callbacks = [];
     this._nodes = {};
@@ -24,31 +26,17 @@ class AppMediator {
    * @param sessionId
    */
   startWatching(contextUrl, wsUrl, sessionId) {
-    this.contextUrl = contextUrl;
-    this.wsUrl = wsUrl;
     this.sessionId = sessionId;
 
-    const loc = window.location;
-    let newUri = '';
+    this.dispatcher = new this.dispatcherType(wsUrl);
 
-    if (loc.protocol === "https:") {
-      newUri = "wss:";
-    } else {
-      newUri = "ws:";
-    }
-
-    newUri += "//" + loc.host;
-    newUri += wsUrl;
-
-    this.ws = new WebSocket(newUri);
-
-    this.ws.onerror = () => {
+    this.dispatcher.onError(() => {
       if (sessionStorage.getItem('AppMediator.reloading')) {
         setTimeout(() => window.location.reload(true), 200);
       }
-    };
+    });
 
-    this.ws.onopen = () => {
+    this.dispatcher.onOpen(() => {
       sessionStorage.setItem('AppMediator.reloading', false);
 
       this.send('initialize', {});
@@ -63,15 +51,15 @@ class AppMediator {
           target: window.location.target,
         }
       });
-    };
+    });
 
-    this.ws.onclose = () => {
-      this.ws = null;
+    this.dispatcher.onClose(() => {
+      this.dispatcher = null;
 
       if (this.node) {
         this.node.free();
       }
-    };
+    });
 
     const handlers = {
       'ui-render': this.triggerRenderView,
@@ -83,8 +71,8 @@ class AppMediator {
       'ui-create-node': this.triggerCreateNode,
     };
 
-    this.ws.onmessage = (event) => {
-      const message = JSON.parse(event.data);
+    this.dispatcher.onMessage((data) => {
+      const message = JSON.parse(data);
       const type = message.type;
 
       console.debug("AppMediator.receive", message);
@@ -181,7 +169,7 @@ class AppMediator {
             break;
         }
       }
-    };
+    });
 
     setInterval(() => {
       const docVisible = !document.hidden;
@@ -279,7 +267,7 @@ class AppMediator {
    * @param callback
    */
   sendUserInput(node, data, callback = null) {
-    if (!this.ws) {
+    if (!this.dispatcher) {
       return;
     }
 
@@ -308,7 +296,7 @@ class AppMediator {
    * @returns {boolean}
    */
   sendIfCan(type, message, callback) {
-    if (this.ws !== undefined) {
+    if (this.dispatcher !== undefined) {
       this.send(type, message, callback);
       return true;
     } else {
@@ -322,7 +310,7 @@ class AppMediator {
    * @param callback
    */
   send(type, message, callback) {
-    if (this.ws === undefined) {
+    if (this.dispatcher === undefined) {
       throw "Mediator is not in watching state.";
     }
 
@@ -338,7 +326,7 @@ class AppMediator {
 
     console.debug("AppMediator.send", message);
 
-    this.ws.send(JSON.stringify(message));
+    this.dispatcher.send(JSON.stringify(message));
   }
 
   findNodeByUuidGlobally(uuid) {

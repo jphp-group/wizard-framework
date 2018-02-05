@@ -7,17 +7,9 @@ use framework\core\Application;
 use framework\core\Component;
 use framework\core\Event;
 use framework\core\Logger;
-use framework\core\Module;
-use framework\web\ui\UIContainer;
 use framework\web\ui\UINode;
 use framework\web\ui\UIViewable;
 use framework\web\ui\UIWindow;
-use php\format\JsonProcessor;
-use php\http\HttpServerRequest;
-use php\http\HttpServerResponse;
-use php\http\WebSocketSession;
-use php\io\Stream;
-use php\lang\Thread;
 use php\lang\ThreadLocal;
 use php\lib\arr;
 use php\lib\fs;
@@ -384,13 +376,7 @@ abstract class UI extends Component
         }
     }
 
-    /**
-     * @param HttpServerRequest $request
-     * @param HttpServerResponse $response
-     * @param string $path
-     * @param array $resources
-     */
-    public function show(HttpServerRequest $request, HttpServerResponse $response, string $path, array $resources = [])
+    public function makeHtmlView(string $path, string $jsAppDispatcher, array $resources = [], array $args = []): string
     {
         $moduleFile = reflect::typeModule(__CLASS__)->getName();
         $ext = fs::ext($moduleFile);
@@ -398,22 +384,26 @@ abstract class UI extends Component
 
         $body = fs::get($moduleFile);
 
-        $body = str::replace($body, '{{dnextBootstrapCSSUrl}}', '/dnext/bootstrap4/bootstrap.min.css');
-        $body = str::replace($body, '{{dnextBootstrapJSUrl}}', '/dnext/bootstrap4/bootstrap.min.js');
-        $body = str::replace($body, '{{dnextBootstrapPopperJSUrl}}', '/dnext/bootstrap4/popper.min.js');
+        foreach ($args as $name => $value) {
+            $body = str::replace($body, "{\{$name\}}", $value);
+        }
 
-        $body = str::replace($body, '{{dnextJqueryJSUrl}}', '/dnext/jquery/jquery-3.2.1.min.js');
+        $prefix = $args['prefix'] ?? '/';
 
-        $body = str::replace($body, '{{dnextCSSUrl}}', '/dnext/engine-' . Application::current()->getStamp() . '.min.css');
-        $body = str::replace($body, '{{dnextFontCSSUrl}}', '/dnext/material-icons/material-icons.css');
-        $body = str::replace($body, '{{dnextJSUrl}}', '/dnext/engine-' . Application::current()->getStamp() . '.js');
+        $body = str::replace($body, '{{dnextBootstrapCSSUrl}}', $prefix . 'dnext/bootstrap4/bootstrap.min.css');
+        $body = str::replace($body, '{{dnextBootstrapJSUrl}}', $prefix. 'dnext/bootstrap4/bootstrap.min.js');
+        $body = str::replace($body, '{{dnextBootstrapPopperJSUrl}}', $prefix . 'dnext/bootstrap4/popper.min.js');
+
+        $body = str::replace($body, '{{dnextJqueryJSUrl}}', $prefix . 'dnext/jquery/jquery-3.2.1.min.js');
+
+        $body = str::replace($body, '{{dnextCSSUrl}}', $prefix . 'dnext/engine-' . Application::current()->getStamp() . '.min.css');
+        $body = str::replace($body, '{{dnextFontCSSUrl}}', $prefix . 'dnext/material-icons/material-icons.css');
+        $body = str::replace($body, '{{dnextJSUrl}}', $prefix . 'dnext/engine-' . Application::current()->getStamp() . '.js');
 
         $body = str::replace($body, '{{uiSchemaUrl}}', "$path/@ui-schema");
         $body = str::replace($body, '{{uiSocketUrl}}', "$path/@ws/");
-        $body = str::replace($body, '{{sessionId}}', $request->sessionId());
-        $body = str::replace($body, '{{title}}', $request->attribute('~title'));
+        $body = str::replace($body, '{{jsAppDispatcher}}', $jsAppDispatcher);
 
-        $body = str::replace($body, '{{urlArgument}}', $request->attribute('**'));
 
         $head = [];
         foreach ($resources as $resource) {
@@ -431,8 +421,7 @@ abstract class UI extends Component
 
         $body = str::replace($body, '{{head}}', str::join($head, "\n"));
 
-        $response->contentType('text/html');
-        $response->body($body);
+        return $body;
     }
 
     /**

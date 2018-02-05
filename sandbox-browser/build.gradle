@@ -1,0 +1,19 @@
+apply plugin: 'application'
+
+mainClassName = 'php.runtime.launcher.Launcher'
+applicationDefaultJvmArgs = [
+        '-Dfile.encoding=UTF-8',
+        '-Djava.library.path=../wizard-browser-win64/build/native/win64'
+]
+
+dependencies {
+    compile project(":wizard-browser")
+    compile "org.develnext.jphp:jphp-core:${jphpVersion}"
+    compile "org.develnext.jphp:jphp-zend-ext:${jphpVersion}"
+    compile "org.develnext.jphp:jphp-yaml-ext:${jphpVersion}"
+    compile "org.develnext.jphp:jphp-xml-ext:${jphpVersion}"
+}
+
+task browserSandbox(dependsOn: ['run']) {
+
+}

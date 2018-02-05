@@ -1,0 +1,15 @@
+dependencies {
+    compile project(":wizard-app")
+    compile project(":wizard-browser")
+    compile project(":wizard-browser-win32")
+    compile project(":wizard-browser-win64")
+}
+
+
+task dist(dependsOn: ['unpackNative']) {
+
+}
+
+task unpackNative() {
+    // nop.
+}

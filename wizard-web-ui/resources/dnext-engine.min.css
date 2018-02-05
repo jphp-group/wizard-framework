@@ -39,6 +39,11 @@ label {
   display: block;
 }
 
+/* Progress */
+.ux-progress-bar {
+    display: inline-flex;
+}
+
 /* Labeled */
 .ux-labeled {
   display: inline-flex;

@@ -1,5 +1,0 @@
-
-layout:
-  _: VBox
-  align: [center, center]
-  padding: [30, 30, 30, 30]

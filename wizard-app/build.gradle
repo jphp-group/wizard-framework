@@ -1,0 +1,5 @@
+dependencies {
+    compile project(":wizard-core")
+    compile project(":wizard-web-ui")
+}
+

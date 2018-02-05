@@ -5,8 +5,6 @@ use framework\core\Component;
 use framework\core\Event;
 use framework\core\Logger;
 use php\format\JsonProcessor;
-use php\http\WebSocketSession;
-use php\lib\arr;
 
 /**
  * Class UIMessageEvent
@@ -20,7 +18,7 @@ class UIMessageEvent extends Event
     private $message;
 
     /**
-     * @var WebSocketSession
+     * @var AbstractUISession
      */
     private $session;
 
@@ -30,7 +28,7 @@ class UIMessageEvent extends Event
     private $uiClass;
 
     public function __construct($type, Component $sender, $context = null,
-                                SocketMessage $message, WebSocketSession $session, string $uiClass)
+                                SocketMessage $message, AbstractUISession $session, string $uiClass)
     {
         parent::__construct($type, $sender, $context);
         $this->message = $message;
@@ -47,9 +45,9 @@ class UIMessageEvent extends Event
     }
 
     /**
-     * @return WebSocketSession
+     * @return AbstractUISession
      */
-    public function session(): WebSocketSession
+    public function session(): AbstractUISession
     {
         return $this->session;
     }
@@ -70,7 +68,7 @@ class UIMessageEvent extends Event
 class UISocket extends Component
 {
     /**
-     * @var WebSocketSession[][]
+     * @var AbstractUISession[][]
      */
     protected $sessions;
 
@@ -89,6 +87,7 @@ class UISocket extends Component
      */
     public function __construct()
     {
+        parent::__construct();
     }
 
     /**
@@ -109,10 +108,10 @@ class UISocket extends Component
 
     /**
      * @param string $uiClass
-     * @param WebSocketSession $session
+     * @param AbstractUISession $session
      * @param array $message
      */
-    public function initialize(string $uiClass, WebSocketSession $session, array $message)
+    public function initialize(string $uiClass, AbstractUISession $session, array $message)
     {
         $this->sessions[$uiClass][$message['sessionIdUuid']] = $session;
         $this->activate($uiClass, $message);

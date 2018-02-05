@@ -1,7 +1,7 @@
 <?php
 namespace framework\web;
+
 use php\format\JsonProcessor;
-use php\http\WebSocketSession;
 
 /**
  * Class SocketMessage
@@ -61,11 +61,11 @@ class SocketMessage
     }
 
     /**
-     * @param WebSocketSession $session
+     * @param AbstractUISession $session
      * @param array $data
      * @param callable $callback
      */
-    public function reply(WebSocketSession $session, array $data, callable $callback = null)
+    public function reply(AbstractUISession $session, array $data, callable $callback = null)
     {
         $data['type'] = $this->getType();
         $data['id'] = $this->getId();

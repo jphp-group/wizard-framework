@@ -8,20 +8,12 @@ use framework\core\Component;
 use framework\core\Event;
 use framework\core\Logger;
 use framework\core\Module;
-use php\format\JsonProcessor;
-use php\http\HttpRedirectHandler;
-use php\http\HttpResourceHandler;
 use php\http\HttpServer;
 use php\http\HttpServerRequest;
 use php\http\HttpServerResponse;
-use php\http\WebSocketSession;
-use php\io\ResourceStream;
-use php\lang\System;
 use php\lang\ThreadLocal;
-use php\lib\fs;
 use php\lib\str;
 use php\net\ServerSocket;
-use php\net\Socket;
 use php\time\Time;
 use ReflectionClass;
 use ReflectionMethod;
@@ -202,11 +194,6 @@ class WebApplication extends Application
         Logger::info("Web Application run at '{0}:{1}', startup time = {2}ms.", $host, $port, Time::millis() - $this->getInitializeTime());
 
         $this->server->run();
-    }
-
-    public function addModule(Module $module)
-    {
-        $module->trigger(new Event('inject', $module, $this));
     }
 
     /**
