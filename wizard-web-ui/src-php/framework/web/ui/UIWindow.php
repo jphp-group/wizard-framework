@@ -10,6 +10,8 @@ use framework\web\UI;
  * @property bool $centered
  * @property bool $closable
  * @property UINode $footer
+ * @property bool $resizable
+ * @property bool $showType
  */
 class UIWindow extends UIContainer
 {
@@ -27,6 +29,17 @@ class UIWindow extends UIContainer
      * @var bool
      */
     private $closable = true;
+
+    /**
+     * @var bool
+     */
+    private $resizable = false;
+
+    /**
+     * popup, window, dialog, kiosk
+     * @var string
+     */
+    private $showType = 'popup';
 
     /**
      * @var UINode
@@ -63,7 +76,7 @@ class UIWindow extends UIContainer
     /**
      * @return string
      */
-    public function getTitle(): string
+    protected function getTitle(): string
     {
         return $this->title;
     }
@@ -71,7 +84,7 @@ class UIWindow extends UIContainer
     /**
      * @param string $title
      */
-    public function setTitle(string $title)
+    protected function setTitle(string $title)
     {
         $this->title = $title;
     }
@@ -122,6 +135,38 @@ class UIWindow extends UIContainer
     protected function setFooter(?UINode $footer)
     {
         $this->footer = $footer;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isResizable(): bool
+    {
+        return $this->resizable;
+    }
+
+    /**
+     * @param bool $resizable
+     */
+    protected function setResizable(bool $resizable)
+    {
+        $this->resizable = $resizable;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getShowType(): string
+    {
+        return $this->showType;
+    }
+
+    /**
+     * @param string $showType
+     */
+    protected function setShowType(string $showType)
+    {
+        $this->showType = $showType;
     }
 
     /**

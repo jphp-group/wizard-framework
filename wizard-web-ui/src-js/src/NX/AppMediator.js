@@ -64,7 +64,7 @@ class AppMediator {
     const handlers = {
       'ui-render': this.triggerRenderView,
       'ui-reload': this.triggerReload,
-      'ui-alert' : this.triggerAlert,
+      'ui-alert': this.triggerAlert,
       'ui-set-property': this.triggerSetProperty,
       'ui-call-method': this.triggerCallMethod,
       'ui-event-link': this.triggerOnEventLink,
@@ -121,7 +121,7 @@ class AppMediator {
             break;
 
           case "system-callback":
-            const { id } = message;
+            const {id} = message;
 
             if (this._callbacks[id]) {
               this._callbacks[id].apply(message);
@@ -401,6 +401,10 @@ class AppMediator {
 
     this.rootDom.empty();
     this.rootDom.append(this.node.dom);
+
+    this.sendIfCan('ui-render-done', {
+      size: [this.node.dom.width(), this.node.dom.height()]
+    });
   }
 
   triggerAlert(message) {
@@ -418,7 +422,7 @@ class AppMediator {
     if (node !== null) {
       node[method].apply(node, args);
     } else {
-      console.warn(`Failed to set property, node with uuid = ${uuid} is not found`);
+      console.warn(`Failed to call method .${method}(), node with uuid = ${uuid} is not found`);
     }
   }
 
@@ -432,7 +436,7 @@ class AppMediator {
     if (node !== null) {
       node[property] = value;
     } else {
-      console.warn(`Failed to set property, node with uuid = ${uuid} is not found`);
+      console.warn(`Failed to set property .${property}, node with uuid = ${uuid} is not found`);
     }
   }
 

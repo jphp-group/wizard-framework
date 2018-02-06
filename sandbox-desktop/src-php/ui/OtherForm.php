@@ -9,19 +9,10 @@ use framework\web\UIForm;
  *
  * @path /
  */
-class MainForm extends UIForm
+class OtherForm extends UIForm
 {
     protected function getFrmFormat()
     {
         return 'yml';
-    }
-
-    /**
-     * @event button.click
-     */
-    public function doClick()
-    {
-        $form = new OtherForm();
-        $form->show();
     }
 }

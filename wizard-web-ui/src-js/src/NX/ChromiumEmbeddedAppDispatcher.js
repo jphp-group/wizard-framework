@@ -7,7 +7,6 @@ class ChromiumEmbeddedAppDispatcher extends AppDispatcher
 
     this.wsUrl = wsUrl;
 
-    this.onOpen(() => {});
     this.onMessage(() => {});
     this.onError(() => {});
     this.onClose(() => {});

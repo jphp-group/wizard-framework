@@ -26,7 +26,13 @@ use php\lib\str;
  * @property string $title
  * @property bool $closable
  * @property bool $centered
- *
+ * @property int $x
+ * @property int $y
+ * @property array $position
+ * @property int $width
+ * @property int $height
+ * @property array $size
+ * @property string $showType
  */
 abstract class UIForm extends Component
 {
@@ -71,6 +77,32 @@ abstract class UIForm extends Component
     private $centered = true;
 
     /**
+     * @var int
+     */
+    private $x;
+
+    /**
+     * @var int
+     */
+    private $y;
+
+    /**
+     * @var int
+     */
+    private $width;
+
+    /**
+     * @var int
+     */
+    private $height;
+
+    /**
+     * popup, window
+     * @var string
+     */
+    private $showType = 'popup';
+
+    /**
      * @var EventSignal
      */
     public $onNavigate;
@@ -87,10 +119,45 @@ abstract class UIForm extends Component
     {
         parent::__construct();
 
-        $this->window = new UIWindow();
 
         $this->loadFrm($this->getFrmPath());
         $this->loadBinds();
+    }
+
+    /**
+     * @return UIWindow
+     */
+    protected function fetchWindow(): UIWindow
+    {
+        if ($this->window) {
+            return $this->window;
+        }
+
+        return $this->window = $this->createWindow();
+    }
+
+    /**
+     * @return UIWindow
+     */
+    protected function createWindow(): UIWindow
+    {
+        $window = new UIWindow();
+        $window->data('--form', $this);
+
+        $window->x = $this->x;
+        $window->y = $this->y;
+        $window->width  = $this->width;
+        $window->height = $this->height;
+        $window->title  = $this->title;
+        $window->centered = $this->centered;
+        $window->closable = $this->closable;
+        $window->showType = $this->showType;
+
+        $window->clear();
+        $window->add($this->layout);
+        $window->footer = $this->footer;
+
+        return $window;
     }
 
     /**
@@ -104,6 +171,11 @@ abstract class UIForm extends Component
             return;
         }
 
+        if (UI::current() instanceof AppUI) {
+            UI::current()->navigateTo($this, $args);
+            return;
+        }
+
         Logger::error('Failed to open the {0} form, it is not registered in App UI', reflect::typeOf($this));
     }
 
@@ -112,21 +184,12 @@ abstract class UIForm extends Component
      */
     public function show()
     {
-        $this->appUI->show($this, []);
-    }
-
-    public function showPopup()
-    {
-        $this->window->connectToUI($this->appUI);
-
-        $this->window->title = $this->title;
-        $this->window->centered = $this->centered;
-        $this->window->closable = $this->closable;
-
-        $this->window->clear();
-        $this->window->add($this->layout);
-        $this->window->footer = $this->footer;
-        $this->window->show();
+        if ($this->showType == 'page') {
+            $this->open();
+        } else {
+            $window = $this->fetchWindow();
+            $window->show();
+        }
     }
 
     /**
@@ -183,14 +246,10 @@ abstract class UIForm extends Component
         try {
             $data = $uiLoader->loadFromStream($stream = Stream::of($frmPath), 'layout', $this->getFrmFormat());
 
-            $this->setTitle($data['title']);
-
-            if (isset($data['closable'])) {
-                $this->setClosable($data['closable']);
-            }
-
-            if (isset($data['centered'])) {
-                $this->setCentered($data['centered']);
+            foreach (['title', 'width', 'height', 'x', 'y', 'size', 'position', 'closable', 'centered', 'showType'] as $prop) {
+                if (isset($data[$prop])) {
+                    $this->{$prop} = $data[$prop];
+                }
             }
 
             $this->layout = $uiLoader->getNode();
@@ -318,6 +377,134 @@ abstract class UIForm extends Component
     protected function setTitle(string $title)
     {
         $this->title = $title;
+    }
+
+    /**
+     * @return int
+     */
+    protected function getX(): int
+    {
+        return $this->window ? $this->window->x : $this->x;
+    }
+
+    /**
+     * @param int $x
+     */
+    protected function setX(int $x)
+    {
+        $this->x = $x;
+
+        if ($this->window) {
+            $this->window->x = $x;
+        }
+    }
+
+    /**
+     * @return int
+     */
+    protected function getY(): int
+    {
+        return $this->window ? $this->window->y : $this->y;
+    }
+
+    /**
+     * @param int $y
+     */
+    protected function setY(int $y)
+    {
+        $this->y = $y;
+
+        if ($this->window) {
+            $this->window->y = $y;
+        }
+    }
+
+    /**
+     * @return array
+     */
+    protected function getPosition(): array
+    {
+        return [$this->x, $this->y];
+    }
+
+    /**
+     * @param array $value
+     */
+    protected function setPosition(array $value)
+    {
+        [$this->x, $this->y] = $value;
+    }
+
+    /**
+     * @return int
+     */
+    protected function getWidth(): int
+    {
+        return $this->window ? $this->window->width : $this->width;
+    }
+
+    /**
+     * @param int $width
+     */
+    protected function setWidth(int $width)
+    {
+        $this->width = $width;
+
+        if ($this->window) {
+            $this->window->width = $width;
+        }
+    }
+
+    /**
+     * @return int
+     */
+    protected function getHeight(): int
+    {
+        return $this->window ? $this->window->height : $this->height;
+    }
+
+    /**
+     * @param int $height
+     */
+    protected function setHeight(int $height)
+    {
+        $this->height = $height;
+
+        if ($this->window) {
+            $this->window->height = $height;
+        }
+    }
+
+    /**
+     * @return array
+     */
+    protected function getSize(): array
+    {
+        return [$this->width, $this->height];
+    }
+
+    /**
+     * @param array $value
+     */
+    protected function setSize(array $value)
+    {
+        [$this->width, $this->height] = $value;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getShowType(): string
+    {
+        return $this->showType;
+    }
+
+    /**
+     * @param string $showType
+     */
+    protected function setShowType(string $showType)
+    {
+        $this->showType = $showType;
     }
 
     /**

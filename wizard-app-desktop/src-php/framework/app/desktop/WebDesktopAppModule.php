@@ -1,4 +1,5 @@
 <?php
+
 namespace framework\app\desktop;
 
 use cef\CefBrowser;
@@ -12,6 +13,7 @@ use framework\core\Logger;
 use framework\web\AppUI;
 use framework\web\SocketMessage;
 use framework\web\UI;
+use framework\web\ui\UIWindow;
 use framework\web\UIForm;
 use framework\web\UISocket;
 use php\lib\str;
@@ -35,6 +37,7 @@ class WebDesktopAppModule extends AbstractWebAppModule
     private $modalWindows = [];
 
     /**
+     * browsers by sessionId.
      * @var CefBrowser[]
      */
     private $cefBrowsers = [];
@@ -61,8 +64,7 @@ class WebDesktopAppModule extends AbstractWebAppModule
                 $this->initializeWebLibs();
 
                 $this->app->on('launch', function () {
-                    $window = $this->createWindow('');
-                    $window->centerOnScreen();
+                    $window = $this->createWindow();
                     $window->show();
                 });
             } else {
@@ -72,17 +74,44 @@ class WebDesktopAppModule extends AbstractWebAppModule
 
     }
 
+    /**
+     * @param string $sessionId
+     * @return CefBrowser|null
+     */
+    protected function findBrowser(string $sessionId): ?CefBrowser
+    {
+        return $this->cefBrowsers[$sessionId];
+    }
+
+    /**
+     * @param string $sessionId
+     * @return CefBrowserWindow|null
+     */
+    protected function findBrowserWindow(string $sessionId): ?CefBrowserWindow
+    {
+        if ($browser = $this->findBrowser($sessionId)) {
+            return CefBrowserWindow::find($browser);
+        }
+
+        return null;
+    }
+
     protected function createWindow($url = '/', bool $asDialog = false, bool $asModal = false)
     {
-        $browser = $this->app->getCefClient()->createBrowser('wizard://ui' . $url, true);
+        $sessionId = str::uuid();
+        $browser = $this->app->getCefClient()->createBrowser("wizard://ui/$sessionId{$url}", true);
+
+        $this->cefBrowsers[$sessionId] = $browser;
 
         $window = new CefBrowserWindow($browser, $asDialog);
+
         $window->onClosing(function () use ($window) {
             $window->free();
         });
 
-        $window->size = [800, 600];
-        $window->centerOnScreen();
+        $window->size = [100, 100];
+        $window->position = [-2000, -2000];
+        $window->resizable = true;
 
         $modalOffset = -1;
 
@@ -110,44 +139,80 @@ class WebDesktopAppModule extends AbstractWebAppModule
         return $window;
     }
 
-    /** @var SharedMap */
-    private $formsToShow;
+    protected $windows = [];
 
     protected function createUi(string $path, string $uiClass, UISocket $socket)
     {
-        if (!$this->formsToShow) {
-            $this->formsToShow = new SharedMap([]);
-        }
-
         /** @var AppUI $ui */
         $ui = new $uiClass($socket);
+
         $ui->on('detectCurrentForm', function (Event $e) use ($ui) {
-            /*$path = $e->data['path'];
+            $path = $e->data['path'];
 
             if (str::startsWith($path, '/~')) {
-                $form = $this->formsToShow->get(str::sub($path, 2));
+                $window = $this->windows[str::sub($path, 2)];
 
-                if ($form && $ui instanceof AppUI) {
-                    $ui->setCurrentForm($form);
-                    $e->consume();
+                if ($window instanceof UIWindow && $ui instanceof AppUI) {
+                    $form = $window->data('--form');
 
-                    //$this->formsToShow->remove(spl_object_hash($form));
+                    if ($form) {
+                        $ui->setCurrentForm($form);
+                        $e->consume();
+
+                        unset($this->windows[$window->uuid]);
+                    }
                 }
-            }*/
+            }
         });
 
-        $ui->on('show', function (Event $e) use ($path, &$formsToShow) {
-            /** @var UIForm $form */
-            $form = $e->context;
+        $ui->on('rendered', function (Event $e) {
+            if ($window = $this->findBrowserWindow($e->data['sessionId'])) {
+                ['size' => $size] = $e->data;
 
-            /*$this->formsToShow->set(spl_object_hash($form), $form);
+                if ($size[0] > 0 && $size[1] > 0) {
+                    $window->innerSize = $size;
+                    $window->centerOnScreen();
+                }
+            }
+        });
 
-            $window = $this->createWindow($path . "~" . spl_object_hash($form), true, true);
-            $window->size = [300, 100];
-            $window->centerOnScreen();
-            $window->show();
+        $ui->on('addWindow', function (Event $e) use ($path) {
+            /** @var UIWindow $window */
+            $window = $e->context;
 
-            $e->consume();*/
+            if ($window->showType == 'popup') return;
+
+            $this->windows[$window->uuid] = $window;
+
+            $cefWindow = $this->createWindow(
+                "{$path}~{$window->uuid}", $window->showType == 'dialog', $window->showType == 'dialog'
+            );
+
+            $window->data('--cef-window', $cefWindow);
+
+            if ($window->size[0] > 0 && $window->size[0] > 0) {
+                $cefWindow->innerSize = $window->size;
+                $cefWindow->centerOnScreen();
+            }
+
+            $cefWindow->title = $window->title;
+            $cefWindow->resizable = true;
+
+            $cefWindow->show();
+            $e->consume();
+        });
+
+        $ui->on('removeWindow', function (Event $e) {
+            /** @var UIWindow $window */
+            $window = $e->context;
+
+            if ($window->showType == 'popup') return;
+
+            $cefWindow = $window->data('--cef-window');
+
+            if ($cefWindow instanceof CefBrowserWindow) {
+                $cefWindow->free();
+            }
         });
 
         return $ui;
@@ -172,13 +237,16 @@ class WebDesktopAppModule extends AbstractWebAppModule
             UI::setup($ui);
 
             $urlArgument = '';
+            $sessionId = $this->app->getStamp();
+
             if (str::startsWith($request->url, 'wizard://ui/')) {
                 $urlArgument = str::sub($request->url, 12);
+                [$sessionId, $urlArgument] = str::split($urlArgument, '/', 2);
             }
 
             $args = [
-                'sessionId' => $this->app->getStamp(),
-                'title'     => '',
+                'sessionId' => $sessionId,
+                'title' => '',
                 'urlArgument' => $urlArgument,
                 'prefix' => 'wizard://',
                 'uiSocketUrl' => $path
@@ -201,8 +269,8 @@ class WebDesktopAppModule extends AbstractWebAppModule
             }
 
             /** @var UI $ui */
-            if (!($ui = $this->isolatedSessionInstances[$sessionId][$uiClass])) {
-                $this->isolatedSessionInstances[$sessionId][$uiClass] = $ui = $this->createUi($path, $uiClass, $socket);
+            if (!($ui = $this->isolatedSessionInstances[$sessionId][UI::class])) {
+                $this->isolatedSessionInstances[$sessionId][UI::class] = $ui = $this->createUi($path, $uiClass, $socket);
             }
 
             $ui->linkSocket($socket);
@@ -260,7 +328,7 @@ class WebDesktopAppModule extends AbstractWebAppModule
         $this->app->addResource("/dnext/engine-{$this->app->getStamp()}.min.css", $this->dnextCssFile ?: 'res://dnext-engine.min.css');
         $this->app->addResource("/dnext/engine-{$this->app->getStamp()}.js", $this->dnextJsFile ?: 'res://dnext-engine.js');
         $this->app->addResource("/dnext/engine-{$this->app->getStamp()}.js.map",
-            $this->dnextJsFile ? "$this->dnextJsFile.map": 'res://dnext-engine.js.map'
+            $this->dnextJsFile ? "$this->dnextJsFile.map" : 'res://dnext-engine.js.map'
         );
     }
 }

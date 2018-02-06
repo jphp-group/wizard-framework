@@ -64,11 +64,12 @@ class AppUI extends UI
 
         $this->setAlertFunction(function ($message, array $options) {
             $alert = new UIAlert($options['type'] ?? 'info');
-            $alert->connectToUI($this);
 
             $alert->preFormatted = $options['pre'];
             $alert->text = $message;
             $alert->title = $options['title'] ?? 'Message';
+
+            $alert->connectToUI($this);
             $alert->show();
         });
     }

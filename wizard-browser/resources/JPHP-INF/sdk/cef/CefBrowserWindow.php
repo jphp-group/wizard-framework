@@ -26,6 +26,11 @@ class CefBrowserWindow
     /**
      * @var array
      */
+    public $innerSize = [0, 0];
+
+    /**
+     * @var array
+     */
     public $position = [0, 0];
 
     /**
@@ -51,6 +56,11 @@ class CefBrowserWindow
     public $enabled = true;
 
     /**
+     * @var float
+     */
+    public $opacity = 1.0;
+
+    /**
      * @readonly
      * @var bool
      */
@@ -60,8 +70,9 @@ class CefBrowserWindow
      * CefBrowserWindow constructor.
      * @param CefBrowser $browser
      * @param bool $asDialog
+     * @param bool $undecorated
      */
-    public function __construct(CefBrowser $browser, bool $asDialog = false)
+    public function __construct(CefBrowser $browser, bool $asDialog = false, bool $undecorated = false)
     {
     }
 

@@ -144,6 +144,15 @@ abstract class UI extends Component
     }
 
     /**
+     * @param $uuid
+     * @return UIWindow|null
+     */
+    public function findWindow(string $uuid): ?UIWindow
+    {
+        return $this->windows[$uuid];
+    }
+
+    /**
      * @param UIWindow $window
      */
     public function addWindow(UIWindow $window)
@@ -153,7 +162,6 @@ abstract class UI extends Component
 
         if (!$event->isConsumed()) {
             $this->windows[$window->uuid] = $window;
-
             $window->connectToUI($this);
 
             $this->sendMessage('ui-create-node', ['schema' => $window->uiSchema()]);
@@ -169,8 +177,8 @@ abstract class UI extends Component
         $this->trigger($event);
 
         if (!$event->isConsumed()) {
-            unset($this->windows[$window->uuid]);
             $window->disconnectUI();
+            unset($this->windows[$window->uuid]);
         }
     }
 
@@ -370,6 +378,10 @@ abstract class UI extends Component
                 $this->location = $message->getData()['location'];
                 $this->trigger(new Event('ready', $this, null, $message->getData()));
                 $this->renderView();
+                break;
+
+            case 'ui-render-done':
+                $this->trigger(new Event('rendered', $this, null, $message->getData()));
                 break;
 
             case "page-change-hash":

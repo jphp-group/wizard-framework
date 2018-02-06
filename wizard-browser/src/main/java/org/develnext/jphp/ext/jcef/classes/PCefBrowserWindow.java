@@ -33,13 +33,19 @@ public class PCefBrowserWindow extends BaseObject {
 
     @Signature
     public void __construct(CefBrowser browser) {
-        __construct(browser, false);
+        __construct(browser, false, false);
     }
 
     @Signature
     public void __construct(CefBrowser browser, boolean asDialog) {
+        __construct(browser, asDialog, false);
+    }
+
+    @Signature
+    public void __construct(CefBrowser browser, boolean asDialog, boolean undecorated) {
         if (asDialog) {
             JDialog jDialog = new JDialog();
+            jDialog.setUndecorated(undecorated);
             jDialog.getContentPane().add(browser.getUIComponent());
             jDialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
             jDialog.setResizable(false);
@@ -47,16 +53,13 @@ public class PCefBrowserWindow extends BaseObject {
             this.frame = jDialog;
         } else {
             JFrame jframe = new JFrame();
+            jframe.setUndecorated(undecorated);
             jframe.getContentPane().add(browser.getUIComponent());
             jframe.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
             jframe.setResizable(false);
 
             frame = jframe;
         }
-
-        frame.pack();
-        frame.setSize(800, 600);
-        frame.setLocationRelativeTo(null);
     }
 
     @Getter
@@ -72,6 +75,42 @@ public class PCefBrowserWindow extends BaseObject {
     @Getter
     public boolean getActive() {
         return frame.isActive();
+    }
+
+    @Getter
+    public int[] getInnerSize() {
+        Container contentPane = null;
+
+        if (frame instanceof JFrame) {
+            contentPane = ((JFrame) frame).getContentPane();
+        } else if (frame instanceof JDialog) {
+            contentPane = ((JDialog) frame).getContentPane();
+        }
+
+        if (contentPane == null) {
+            return new int[] { -1, -1 };
+        }
+
+        return new int[] { contentPane.getWidth(), contentPane.getHeight() };
+    }
+
+    @Setter
+    public void setInnerSize(int[] size) {
+        Container contentPane = null;
+
+        if (frame instanceof JFrame) {
+            contentPane = ((JFrame) frame).getContentPane();
+        } else if (frame instanceof JDialog) {
+            contentPane = ((JDialog) frame).getContentPane();
+        }
+
+        if (contentPane == null) {
+            return;
+        }
+
+        contentPane.setPreferredSize(new Dimension(size[0], size[1]));
+        contentPane.setSize(size[0], size[1]);
+        frame.pack();
     }
 
     @Setter
@@ -91,6 +130,16 @@ public class PCefBrowserWindow extends BaseObject {
         if (pos.length >= 2) {
             frame.setLocation(pos[0], pos[1]);
         }
+    }
+
+    @Getter
+    public float getOpacity() {
+        return frame.getOpacity();
+    }
+
+    @Setter
+    public void setOpacity(float opacity) {
+        frame.setOpacity(opacity);
     }
 
     @Getter
