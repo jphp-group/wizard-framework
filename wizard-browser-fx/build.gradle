@@ -1,0 +1,9 @@
+apply plugin: 'application'
+
+mainClassName = 'org.develnext.framework.wizard.desktop.WizardBrowserSandbox'
+
+dependencies {
+    compile project(':wizard-browser')
+    compile "org.develnext:jphp-gui-ext:${jphpVersion}"
+}
+
