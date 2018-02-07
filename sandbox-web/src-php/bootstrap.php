@@ -38,4 +38,4 @@ $deployer = new HotDeployer(function () {
 $deployer->addDirWatcher('./src-php');
 $deployer->addDirWatcher('../wizard-web/src-php');
 $deployer->addDirWatcher('../wizard-web-ui/src-php');
-$deployer->directRun();
+$deployer->run();

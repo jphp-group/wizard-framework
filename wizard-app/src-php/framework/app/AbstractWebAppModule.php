@@ -3,8 +3,6 @@ namespace framework\app;
 
 use framework\core\Module;
 
-include_once "res://.inc/ui-functions.php";
-
 abstract class AbstractWebAppModule extends Module
 {
     /**
@@ -26,6 +24,16 @@ abstract class AbstractWebAppModule extends Module
      * @var array
      */
     protected $dnextResources = [];
+
+    /**
+     * AbstractWebAppModule constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        include_once "res://.inc/ui-functions.php";
+    }
 
     /**
      * Enable rich user interface.

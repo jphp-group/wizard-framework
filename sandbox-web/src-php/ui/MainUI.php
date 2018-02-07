@@ -7,7 +7,7 @@ use framework\web\AppUI;
  * Class MainUI
  * @package ui
  *
- * @path /app
+ * @path /
  */
 class MainUI extends AppUI
 {

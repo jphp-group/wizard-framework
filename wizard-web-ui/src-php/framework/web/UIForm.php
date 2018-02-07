@@ -37,6 +37,11 @@ use php\lib\str;
 abstract class UIForm extends Component
 {
     /**
+     * @var array
+     */
+    private $router = [];
+
+    /**
      * @var string
      */
     private $title = '';
@@ -214,6 +219,10 @@ abstract class UIForm extends Component
      */
     public function getRoutePaths(): array
     {
+        if (isset($this->router['path'])) {
+            return [$this->router['path']];
+        }
+
         $path = Annotations::getOfClass('path', new \ReflectionClass($this));
 
         if ($path) {
@@ -246,7 +255,8 @@ abstract class UIForm extends Component
         try {
             $data = $uiLoader->loadFromStream($stream = Stream::of($frmPath), 'layout', $this->getFrmFormat());
 
-            foreach (['title', 'width', 'height', 'x', 'y', 'size', 'position', 'closable', 'centered', 'showType'] as $prop) {
+            foreach (['title', 'width', 'height', 'x', 'y', 'size', 'position', 'closable',
+                         'centered', 'showType', 'router'] as $prop) {
                 if (isset($data[$prop])) {
                     $this->{$prop} = $data[$prop];
                 }

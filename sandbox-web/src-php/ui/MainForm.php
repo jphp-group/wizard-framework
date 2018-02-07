@@ -18,8 +18,6 @@ use php\time\Timer;
  * Class MainForm
  * @package ui
  *
- * @path /
- *
  * @property UIHBox $pane
  * @property UIButton $button
  * @property UIListView $quests

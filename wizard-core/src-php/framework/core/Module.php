@@ -18,6 +18,7 @@ class Module extends Component
     public function __construct()
     {
         parent::__construct();
+
         $this->loadBinds();
     }
 

@@ -579,6 +579,10 @@ var AppMediator = function () {
 
       this.rootDom.empty();
       this.rootDom.append(this.node.dom);
+
+      this.sendIfCan('ui-render-done', {
+        size: [this.node.dom.width(), this.node.dom.height()]
+      });
     }
   }, {
     key: "triggerAlert",
@@ -598,7 +602,7 @@ var AppMediator = function () {
       if (node !== null) {
         node[method].apply(node, args);
       } else {
-        console.warn("Failed to set property, node with uuid = " + uuid + " is not found");
+        console.warn("Failed to call method ." + method + "(), node with uuid = " + uuid + " is not found");
       }
     }
   }, {
@@ -613,7 +617,7 @@ var AppMediator = function () {
       if (node !== null) {
         node[property] = value;
       } else {
-        console.warn("Failed to set property, node with uuid = " + uuid + " is not found");
+        console.warn("Failed to set property ." + property + ", node with uuid = " + uuid + " is not found");
       }
     }
   }, {
@@ -692,7 +696,6 @@ var ChromiumEmbeddedAppDispatcher = function (_AppDispatcher) {
 
     _this.wsUrl = wsUrl;
 
-    _this.onOpen(function () {});
     _this.onMessage(function () {});
     _this.onError(function () {});
     _this.onClose(function () {});

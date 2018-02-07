@@ -11,6 +11,7 @@ use framework\core\Module;
 use php\http\HttpServer;
 use php\http\HttpServerRequest;
 use php\http\HttpServerResponse;
+use php\lang\System;
 use php\lang\ThreadLocal;
 use php\lib\str;
 use php\net\ServerSocket;
@@ -157,20 +158,47 @@ class WebApplication extends Application
     }
 
     /**
+     * @return int
+     */
+    public function getWebServerPort(): int
+    {
+        $port = System::getProperty('web.server.port');
+
+        if (!$port) {
+            $port = $this->settings->get('web.server.port', '5000');
+        }
+
+        return $port;
+    }
+
+    /**
+     * @return string
+     */
+    public function getWebServerHost(): string
+    {
+        $host = System::getProperty('web.server.host');
+
+        if (!$host) {
+            $host = $this->settings->get('web.server.host', 'localhost');
+        }
+
+        return $host;
+    }
+
+    /**
      * @return bool
      */
-    public function isHttpPortAvailable(): bool
+    public function isWebServerPortAvailable(): bool
     {
-        $port = $this->settings->get('web.server.port', '5000');
-        return ServerSocket::isAvailableLocalPort($port);
+        return ServerSocket::isAvailableLocalPort($this->getWebServerPort());
     }
 
     public function launch(): void
     {
         parent::launch();
 
-        $host = $this->settings->get('web.server.host', 'localhost');
-        $port = $this->settings->get('web.server.port', '5000');
+        $host = $this->getWebServerHost();
+        $port = $this->getWebServerPort();
 
         $this->server->any('/**', function (HttpServerRequest $request, HttpServerResponse $response) {
             $response->status(404);

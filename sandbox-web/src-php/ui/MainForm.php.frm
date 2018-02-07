@@ -1,5 +1,8 @@
 {
   "title": "MainForm",
+  "router": {
+    "path": "/"
+  },
   "layout": {
     "_": "VBox",
     "align": [
