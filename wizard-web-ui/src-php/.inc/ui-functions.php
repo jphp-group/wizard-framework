@@ -1,6 +1,7 @@
 <?php
 
 use framework\web\UI;
+use php\time\Timer;
 
 /**
  * @param string $url
@@ -35,4 +36,19 @@ function dump($arg) {
     ob_end_clean();
 
     alert($msg, ['type' => '', 'pre' => true, 'title' => '[DEBUG]: dump()']);
+}
+
+/**
+ * @param callable $callback
+ */
+function uiLater(callable $callback) {
+    Timer::after(1, $callback);
+}
+
+/**
+ * @param callable $callback
+ * @return mixed
+ */
+function uiLaterAndWait(callable $callback) {
+    return $callback();
 }

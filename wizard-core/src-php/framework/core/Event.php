@@ -1,4 +1,5 @@
 <?php
+
 namespace framework\core;
 
 /**
@@ -76,12 +77,36 @@ class Event
     public function __get(string $name)
     {
         switch ($name) {
-            case "type": return $this->type;
-            case "sender": return $this->sender;
-            case "context": return $this->context;
-            case "data": return $this->data;
+            case "type":
+                return $this->type;
+            case "sender":
+                return $this->sender;
+            case "context":
+                return $this->context;
+            case "data":
+                return $this->data;
+        }
+
+        if ($this->data[$name]) {
+            return $this->data[$name];
         }
 
         throw new \Error("Property '$name' is not found");
+    }
+
+    public function __isset($name)
+    {
+        switch ($name) {
+            case "type":
+                return isset($this->type);
+            case "sender":
+                return isset($this->sender);
+            case "context":
+                return isset($this->context);
+            case "data":
+                return isset($this->data);
+        }
+
+        return isset($this->data[$name]);
     }
 }
