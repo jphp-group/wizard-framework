@@ -101,9 +101,10 @@ abstract class UIEffectComponent extends Component
     {
         $owner = $e->context;
 
-        $this->off('change-any', __CLASS__);
-
         if ($owner instanceof UINode) {
+            $this->reset($owner);
+            $this->off('change-any', __CLASS__);
+
             foreach ($this->ownerBindIds as $event => $bindId) {
                 $owner->off($event, $bindId);
             }

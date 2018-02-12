@@ -1,7 +1,6 @@
 <?php
 namespace framework\web\ui\effects;
 
-use framework\web\ui\UILabeled;
 use php\lib\str;
 
 /**
@@ -102,16 +101,8 @@ class UIShadowEffect extends UIEffectComponent
         $propertyValue = flow($propertyValue)->find(function ($value) { return (bool) trim($value); })->toArray();
 
         $this->owner->css([
-            $this->getCssProperty() => str::join($propertyValue, ',')
+            $this->getCssProperty() => str::join($propertyValue, ',') ?: null
         ]);
-    }
-
-    /**
-     * @event finalize
-     */
-    protected function handleFinalize()
-    {
-        $this->handleReset();
     }
 
     /**

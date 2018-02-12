@@ -10,6 +10,7 @@ use php\lib\str;
  * Class UIAnimation
  * @package framework\web\ui\animations
  *
+ * @property UINode $owner
  * @property mixed $duration
  * @property mixed $delay
  * @property string $when

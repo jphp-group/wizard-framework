@@ -9,7 +9,6 @@ use php\lib\str;
 use php\time\Timer;
 
 /**
- * Class UIFadeAnimation
  * @package framework\web\ui\animations
  *
  * @property array $frames

@@ -206,6 +206,8 @@ class Components implements \ArrayAccess, \Countable, \IteratorAggregate
     public function offsetSet($offset, $value)
     {
         if ($offset) {
+            $this->removeById($offset);
+
             if ($value instanceof Component) {
                 $value->id = $offset;
             }
