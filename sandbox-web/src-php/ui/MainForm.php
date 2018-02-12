@@ -3,7 +3,8 @@
 namespace ui;
 
 use framework\core\Event;
-use framework\web\ui\animations\UIFadeAnimation;
+use framework\web\ui\animations\UICSSAnimation;
+use framework\web\ui\effects\UIShadowEffect;
 use framework\web\ui\UIAlert;
 use framework\web\ui\UIButton;
 use framework\web\ui\UICheckbox;
@@ -37,6 +38,20 @@ class MainForm extends UIForm
             $this->doButtonClick($e);
         }
     }*/
+
+
+    /**
+     * @event button.click-left
+     * @param Event $e
+     */
+    public function doButtonClick2(Event $e)
+    {
+        if (isset($this->button->components->{'shadow'})) {
+            $this->button->components->{'shadow'}->free();
+        }
+
+        $this->button->components->{'innerShadow'}->radius += 1;
+    }
 
     /**
      * event button.click-left

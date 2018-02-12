@@ -3,6 +3,7 @@
 namespace framework\web;
 
 use framework\core\Component;
+use framework\core\ComponentLoader;
 use framework\web\ui\UIContainer;
 use framework\web\ui\UINode;
 use php\format\JsonProcessor;
@@ -33,6 +34,18 @@ class UILoader extends Component
      * @var array
      */
     private $components = [];
+
+    /**
+     * @var ComponentLoader
+     */
+    private $componentLoader;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->componentLoader = new ComponentLoader();
+    }
 
     protected function findComponent($name)
     {
@@ -172,7 +185,7 @@ class UILoader extends Component
          */
         if ($ownComponents) {
             foreach ($ownComponents as $component) {
-                $node->components->add(Component::make($component));
+                $node->components->add($this->componentLoader->load($component));
             }
         }
 
@@ -225,7 +238,7 @@ class UILoader extends Component
         $schema = $stream->parseAs($format, $flags);
 
         if (isset($schemaKey)) {
-            $this->import((array)$schema['components']);
+            $this->import((array) $schema['components']);
             $this->load((array)$schema[$schemaKey]);
         } else {
             $this->load($schema);

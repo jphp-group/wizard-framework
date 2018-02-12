@@ -18,14 +18,8 @@
         "text": "Wizard Framework (Демонстрация)",
         "font": {"size": 22},
         "width": "100%",
-        "opacity": 0,
         "style": "border-bottom: 1px solid silver; color: gray;",
-        "padding": [0, 0, 30, 0],
-        "components": [
-          {
-            "_": "framework\\web\\ui\\animations\\UIFadeAnimation"
-          }
-        ]
+        "padding": [0, 0, 30, 0]
       },
       {
         "_": "Label",
@@ -41,13 +35,32 @@
             "_": "TextField",
             "id": "input",
             "placeholder": "Введите текст задания",
-            "width": "100%"
+            "width": "100%",
+            "components": [
+              {
+                "_": "framework\\web\\ui\\effects\\UIShadowEffect"
+              }
+            ]
           },
           {
             "_": "Button",
             "id": "button",
             "kind": "info",
-            "text": "Добавить"
+            "text": "Добавить",
+            "components": [
+              {
+                "_": "framework\\web\\ui\\effects\\UIShadowEffect",
+                "id": "shadow",
+                "radius": 15
+              },
+              {
+                "_": "framework\\web\\ui\\effects\\UIShadowEffect",
+                "id": "innerShadow",
+                "color": "white",
+                "radius": 5,
+                "inner": true
+              }
+            ]
           }
         ]
       },
@@ -74,8 +87,16 @@
         "target": "_blank",
         "components": [
           {
-            "_": "components\\HelloWorldComponent",
-            "when": "render"
+            "_": "framework\\web\\ui\\animations\\UICSSAnimation",
+            "when": "hover",
+            "reverseAnimated": false,
+            "frames": [
+                {"opacity": 1, "font-size": 15},
+                {"opacity": 0.3, "font-size": 25},
+                {"opacity": 1, "font-size": 15}
+            ],
+            "duration": "1s",
+            "loop": true
           }
         ]
       }

@@ -69,6 +69,8 @@ class AppMediator {
       'ui-call-method': this.triggerCallMethod,
       'ui-event-link': this.triggerOnEventLink,
       'ui-create-node': this.triggerCreateNode,
+      'ui-create-css-style': this.triggerCreateCssStyle,
+      'ui-destroy-css-style': this.triggerDestroyCssStyle
     };
 
     this.dispatcher.onMessage((data) => {
@@ -486,6 +488,26 @@ class AppMediator {
     this._nodes[node.uuid] = node;
 
     node.trigger('render');
+  }
+
+  triggerCreateCssStyle(message) {
+    this.triggerDestroyCssStyle(message);
+
+    const { id, style } = message;
+
+    const tag = document.createElement('style');
+
+    tag.type = 'text/css';
+    tag.innerHTML = style;
+    tag.id = id;
+    tag.className = 'dynamic-css';
+
+    jQuery('head').append(jQuery(tag));
+  }
+
+  triggerDestroyCssStyle(message) {
+    const { id } = message;
+    jQuery(`.dynamic-css#${id}`).remove();
   }
 
   triggerReload(message) {

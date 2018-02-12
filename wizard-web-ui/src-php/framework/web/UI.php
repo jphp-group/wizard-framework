@@ -153,6 +153,30 @@ abstract class UI extends Component
     }
 
     /**
+     * @param string $style
+     * @param string|null $idStyle
+     * @param callable|null $callback
+     * @return string
+     */
+    public function createCssStyle(string $style, string $idStyle = null, ?callable $callback = null): string
+    {
+        $idStyle = $idStyle ?? str::uuid();
+
+        $this->sendMessage('ui-create-css-style', ['id' => $idStyle, 'style' => $style], $callback);
+
+        return $idStyle;
+    }
+
+    /**
+     * @param string $idStyle
+     * @param callable|null $callback
+     */
+    public function destroyCssStyle(string $idStyle, ?callable $callback = null)
+    {
+        $this->sendMessage('ui-destroy-css-style', ['id' => $idStyle], $callback);
+    }
+
+    /**
      * @param UIWindow $window
      */
     public function addWindow(UIWindow $window)

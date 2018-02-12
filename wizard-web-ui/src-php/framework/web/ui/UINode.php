@@ -86,11 +86,6 @@ abstract class UINode extends Component implements UIViewable
     private $selectionEnabled = true;
 
     /**
-     * @var float
-     */
-    private $opacity = 1.0;
-
-    /**
      * @var string
      */
     private $tooltip = '';
@@ -167,7 +162,7 @@ abstract class UINode extends Component implements UIViewable
     {
         parent::__construct();
 
-        $this->uuid = str::uuid();
+        $this->uuid = 'n' . str::uuid();
     }
 
     /**
@@ -420,17 +415,17 @@ abstract class UINode extends Component implements UIViewable
     /**
      * @return float
      */
-    protected function getOpacity(): float
+    protected function getOpacity(): ?float
     {
-        return $this->opacity;
+        return $this->css('opacity');
     }
 
     /**
      * @param float $opacity
      */
-    protected function setOpacity(float $opacity)
+    protected function setOpacity(?float $opacity)
     {
-        $this->opacity = $opacity;
+        $this->css(['opacity' => $opacity]);
     }
 
     /**
@@ -603,11 +598,93 @@ abstract class UINode extends Component implements UIViewable
     }
 
     /**
-     * @param array $style
+     * @param string|array $style
+     * @param null|string $idStyle
+     * @param callable|null $callback
+     * @return null|string
      */
-    public function css(array $style)
+    public function addCssStyle($style, ?string $idStyle = null, ?callable $callback = null): ?string
     {
-        $this->callRemoteMethod('css', [$style]);
+        if (is_iterable($style)) {
+            $style = flow($style)->reduce(function ($result, $value, $key) {
+                $result .= "$key:$value;";
+                return $result;
+            });
+        }
+
+        if ($this->isConnectedToUI()) {
+            return $this->getConnectedUI()->createCssStyle(".{$this->uuid} { \n" . $style . "\n }", $idStyle, $callback);
+        } else {
+            Logger::warn("Failed to {0}::addCssStyle(...), ui is not connected", reflect::typeOf($this));
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $idStyle
+     * @return string
+     */
+    public function removeCssStyle(string $idStyle)
+    {
+        if ($this->isConnectedToUI()) {
+            $this->getConnectedUI()->destroyCssStyle($idStyle);
+        } else {
+            Logger::warn("Failed to {0}::removeCssStyle(...), ui is not connected", reflect::typeOf($this));
+        }
+    }
+
+    /**
+     * @param array|string $style
+     * @return null|string
+     */
+    public function css($style)
+    {
+        $oldStyle = $this->style;
+
+        if (is_array($style)) {
+            $css = flow(str::split($oldStyle, ';'))->reduce(function ($result, $el) {
+                if (!$result) {
+                    $result = [];
+                }
+
+                [$prop, $value] = str::split($el, ':');
+
+                $prop = str::trim($prop);
+                $value = str::trim($value);
+
+                $result[$prop] = $value;
+                return $result;
+            });
+
+            foreach ($style as $prop => $value) {
+                if ($value === null) {
+                    unset($css[$prop]);
+                } else {
+                    $css[$prop] = $value;
+                }
+            }
+
+            $style = flow($css)->reduce(function ($result, $value, $key) {
+                if ($value === null) return $result;
+
+                $result .= "$key:$value;";
+                return $result;
+            });
+
+            $this->style = $style;
+            $this->changeRemoteProperty('style', $style);
+        } else {
+            $result = flow(str::split($oldStyle, ';'))
+                ->map(function ($el) {
+                    return str::split($el, ':');
+                })
+                ->findOne(function ($el) use ($style) {
+                    return (trim($el[0]) === $style);
+                });
+
+            return $result ? $result[1] : null;
+        }
     }
 
     /**
@@ -738,7 +815,7 @@ abstract class UINode extends Component implements UIViewable
                     $this->callRemoteMethod($method, $args, true);
                 });
             } else {
-                Logger::warn("Failed to UINode::callRemoteMethod({0}, args), ui is not connected", $method);
+                Logger::warn("Failed to {0}::callRemoteMethod({1}, args), ui is not connected", reflect::typeOf($this), $method);
             }
         }
     }

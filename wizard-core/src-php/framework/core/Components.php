@@ -90,21 +90,6 @@ class Components implements \ArrayAccess, \Countable, \IteratorAggregate
     }
 
     /**
-     * @param iterable[] $components
-     * @return array
-     */
-    public function addFromData(iterable... $components): array
-    {
-        $result = [];
-
-        foreach ($components as $data) {
-            $result[] = $this->add(Component::make($data));
-        }
-
-        return $result;
-    }
-
-    /**
      * @param Component $component
      * @throws \Exception
      */
@@ -227,11 +212,7 @@ class Components implements \ArrayAccess, \Countable, \IteratorAggregate
 
             $this->add($value);
         } else {
-            if (is_array($value)) {
-                $this->addFromData($value);
-            } else {
-                $this->add($value);
-            }
+            $this->add($value);
         }
     }
 

@@ -57,7 +57,6 @@ abstract class Component
      */
     public function __construct()
     {
-        $this->loadDescription();
         $this->loadBinds();
 
         $reflect = new \ReflectionClass($this);
@@ -134,14 +133,11 @@ abstract class Component
     protected function setProperties(array $properties)
     {
         foreach ($properties as $prop => $value) {
-            if (method_exists($this, "set$prop")) {
-                if (property_exists($this, $prop)) {
-                    $this->{"set$prop"}($value);
-                    continue;
-                }
+            try {
+                $this->{$prop} = $value;
+            } catch (\Error $e) {
+                Logger::warn("Property '$prop' doesn't exist, will be ignore.");
             }
-
-            Logger::warn("Property '$prop' doesn't exist, will be ignore.");
         }
     }
 
@@ -256,40 +252,6 @@ abstract class Component
     }
 
     /**
-     * Load meta data.
-     */
-    protected function loadDescription()
-    {
-        foreach (['json', 'yml'] as $format) {
-            if (Processor::isRegistered($format)) {
-                $file = reflect::typeModule(reflect::typeOf($this))->getName() . ".$format";
-
-                try {
-                    Stream::tryAccess($file, function (Stream $stream) use ($format) {
-                        $data = $stream->parseAs($format);
-
-                        if ($data) {
-                            foreach ((array) $data as $prop => $value) {
-                                if ($prop === 'components') continue;
-
-                                $this->{$prop} = $value;
-                            }
-
-                            if (is_iterable($data['components'])) {
-                                $this->components->addFromData(...$data['components']);
-                            }
-                        }
-                    });
-
-                    return;
-                } catch (IOException $e) {
-                    // nop.
-                }
-            }
-        }
-    }
-
-    /**
      * Remove this component from owner.
      */
     public function free()
@@ -364,39 +326,5 @@ abstract class Component
         }
 
         throw new \Error("Property '$name' is not exists in class " . reflect::typeOf($this) . " or readonly");
-    }
-
-    /**
-     * @param array $data
-     * @return Component
-     * @throws \Exception
-     */
-    public static function make(array $data): Component
-    {
-        if ($type = $data['_']) {
-            $c = new $type;
-
-            if ($c instanceof Component) {
-                unset($data['_']);
-
-                if ($components = $data['components']) {
-                    unset($data['components']);
-                }
-
-                foreach ($data as $prop => $value) {
-                    $c->{$prop} = $value;
-                }
-
-                if (is_iterable($components)) {
-                    $c->components->addFromData(...$components);
-                }
-
-                return $c;
-            } else {
-                throw new \Exception("Type of data must class extends " . __CLASS__);
-            }
-        } else {
-            throw new \Exception("Data must have type as '_' key");
-        }
     }
 }

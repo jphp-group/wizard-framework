@@ -4,6 +4,7 @@ namespace framework\web\ui\animations;
 use framework\core\Component;
 use framework\core\Event;
 use framework\web\ui\UINode;
+use php\lib\str;
 
 /**
  * Class UIAnimation
@@ -12,9 +13,16 @@ use framework\web\ui\UINode;
  * @property mixed $duration
  * @property mixed $delay
  * @property string $when
+ * @property bool $loop
+ * @property bool $reverseAnimated
  */
 abstract class UIAnimationComponent extends Component
 {
+    /**
+     * @var string
+     */
+    protected $idStyle;
+
     /**
      * @var mixed
      */
@@ -32,9 +40,19 @@ abstract class UIAnimationComponent extends Component
     private $when = 'render';
 
     /**
-     * @var EventSignal
+     * @var bool
      */
-    public $onComplete;
+    private $loop = false;
+
+    /**
+     * @var bool
+     */
+    private $reverseAnimated = true;
+
+    /**
+     * @var array
+     */
+    private $ownerBindIds = [];
 
     /**
      * UIAnimation constructor.
@@ -42,9 +60,11 @@ abstract class UIAnimationComponent extends Component
      * @param mixed $delay
      * @param string $when
      */
-    public function __construct($duration = '1s', $delay = 0, string $when = 'render')
+    public function __construct($duration = '0.5s', $delay = 0, string $when = 'render')
     {
         parent::__construct();
+
+        $this->idStyle = 's' . str::uuid();
 
         $this->duration = $duration;
         $this->delay = $delay;
@@ -78,9 +98,11 @@ abstract class UIAnimationComponent extends Component
         $owner = $e->context;
 
         if ($owner instanceof UINode) {
+            $this->trigger(new Event('initialize', $this, $owner));
+
             switch ($this->when) {
                 case 'render':
-                    $owner->bind('render', function () use ($owner) {
+                    $this->ownerBindIds['render'] = $owner->bind('render', function () use ($owner) {
                         $this->animate($owner);
                     });
 
@@ -88,7 +110,7 @@ abstract class UIAnimationComponent extends Component
 
                 case 'click':
                     $clickCount = 0;
-                    $owner->bind('click', function () use ($owner, &$clickCount) {
+                    $this->ownerBindIds['click'] = $owner->bind('click', function () use ($owner, &$clickCount) {
                         if ($clickCount % 2 == 0) {
                             $this->animate($owner);
                         } else {
@@ -100,10 +122,10 @@ abstract class UIAnimationComponent extends Component
                     break;
 
                 case 'hover':
-                    $owner->bind('mouseEnter', function () use ($owner) {
+                    $this->ownerBindIds['mouseEnter'] = $owner->bind('mouseEnter', function () use ($owner) {
                         $this->animate($owner);
                     });
-                    $owner->bind('mouseLeave', function () use ($owner) {
+                    $this->ownerBindIds['mouseLeave'] = $owner->bind('mouseLeave', function () use ($owner) {
                         $this->reverseAnimate($owner);
                     });
                     break;
@@ -111,9 +133,22 @@ abstract class UIAnimationComponent extends Component
         }
     }
 
-    public function handleRemoveFrom()
+    /**
+     * @event removeFrom
+     * @param Event $e
+     */
+    public function handleRemoveFrom(Event $e)
     {
+        $owner = $e->context;
 
+        if ($owner instanceof UINode) {
+            foreach ($this->ownerBindIds as $event => $bindId) {
+                $owner->off($event, $bindId);
+            }
+
+            $this->ownerBindIds = [];
+            $this->trigger(new Event('finalize', $this, $owner));
+        }
     }
 
     /**
@@ -162,5 +197,37 @@ abstract class UIAnimationComponent extends Component
     protected function setWhen(string $when)
     {
         $this->when = $when;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isLoop(): bool
+    {
+        return $this->loop;
+    }
+
+    /**
+     * @param bool $loop
+     */
+    protected function setLoop(bool $loop)
+    {
+        $this->loop = $loop;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isReverseAnimated(): bool
+    {
+        return $this->reverseAnimated;
+    }
+
+    /**
+     * @param bool $reverseAnimated
+     */
+    protected function setReverseAnimated(bool $reverseAnimated)
+    {
+        $this->reverseAnimated = $reverseAnimated;
     }
 }
