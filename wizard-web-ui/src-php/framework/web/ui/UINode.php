@@ -181,7 +181,7 @@ abstract class UINode extends Component implements UIViewable
         $defaultProperties = $class->getDefaultProperties();
 
         foreach ($this->getProperties() as $name => $value) {
-            if ($name === 'parent' || $name === 'connectedUi') continue;
+            if ($name === 'parent' || $name === 'connectedUi' || $name === 'components') continue;
 
             if ($value instanceof UIViewable) {
                 $value = $value->uiSchema();
@@ -603,11 +603,20 @@ abstract class UINode extends Component implements UIViewable
     }
 
     /**
+     * @param array $style
+     */
+    public function css(array $style)
+    {
+        $this->callRemoteMethod('css', [$style]);
+    }
+
+    /**
      * @param int|string $duration
      * @param float $opacity
      * @param callable|null $complete
+     * @param string $queue
      */
-    public function fadeTo($duration, float $opacity, callable $complete = null)
+    public function fadeTo($duration, float $opacity, callable $complete = null, string $queue = 'general')
     {
         $this->animate(['opacity' => $opacity], ['duration' => $duration, 'complete' => function () use ($opacity, $complete) {
             $this->provideUserInput(['opacity' => $opacity]);
@@ -615,38 +624,59 @@ abstract class UINode extends Component implements UIViewable
             if ($complete) {
                 $complete();
             }
-        }]);
+        }], $queue);
     }
 
     /**
      * @param int|string $duration
      * @param callable|null $complete
+     * @param string $queue
      */
-    public function fadeIn($duration = 400, callable $complete = null)
+    public function fadeIn($duration = 400, callable $complete = null, string $queue = 'general')
     {
-        $this->fadeTo($duration, 1.0, $complete);
+        $this->fadeTo($duration, 1.0, $complete, $queue);
     }
 
     /**
      * @param int|string $duration
      * @param callable|null $complete
+     * @param string $queue
      */
-    public function fadeOut($duration = 400, callable $complete = null)
+    public function fadeOut($duration = 400, callable $complete = null, string $queue = 'general')
     {
-        $this->fadeTo($duration, 0.0, $complete);
+        $this->fadeTo($duration, 0.0, $complete, $queue);
     }
 
     /**
      * @param array $properties
      * @param array $options
+     * @param null|string $queue
      */
-    public function animate(array $properties, array $options)
+    public function animate(array $properties, array $options, ?string $queue = 'general')
     {
         if (isset($options['duration'])) {
             $options['duration'] = Timer::parsePeriod($options['duration']);
         }
 
+        //$options['queue'] = $queue;
+
         $this->callRemoteMethod('animate', [$properties, $options]);
+    }
+
+    public function stopAllAnimate(bool $clearQueue = false, bool $jumpToEnd = false, ?callable $callback = null)
+    {
+        $this->callRemoteMethod('stopAllAnimate', [$clearQueue, $jumpToEnd, $callback]);
+    }
+
+    /**
+     * @param bool $clearQueue
+     * @param bool $jumpToEnd
+     * @param null|string $queue
+     * @param callable|null $callback
+     */
+    public function stopAnimate(bool $clearQueue = false, bool $jumpToEnd = false, string $queue = 'general', ?callable $callback = null)
+    {
+        $this->callRemoteMethod('stopAnimate', [$queue, $clearQueue, $jumpToEnd, $callback]);
     }
 
     public function free()

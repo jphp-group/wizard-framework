@@ -20,11 +20,11 @@ $deployer = new HotDeployer(function () {
     );
 
     $app = new WebApplication();
-    $app->addModule($webUi);
+    $app->components[] = $webUi;
     $webUi->addUI(MainUI::class);
 
-    $app->addModule(new WebAssets('/assets', './assets'));
-    $app->addModule(new WebDevModule());
+    $app->components[] = new WebAssets('/assets', './assets');
+    $app->components[] = new WebDevModule();
     $app->launch();
 }, function () {
     if (WebApplication::isInitialized()) {
@@ -36,6 +36,7 @@ $deployer = new HotDeployer(function () {
 
 //$deployer->addFileWatcher('application.watcher');
 $deployer->addDirWatcher('./src-php');
+$deployer->addDirWatcher('../wizard-core/src-php');
 $deployer->addDirWatcher('../wizard-web/src-php');
 $deployer->addDirWatcher('../wizard-web-ui/src-php');
 $deployer->run();

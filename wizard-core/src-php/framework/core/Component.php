@@ -1,7 +1,13 @@
 <?php
+
 namespace framework\core;
 
 use Closure;
+use php\format\JsonProcessor;
+use php\format\Processor;
+use php\io\IOException;
+use php\io\Stream;
+use php\lib\fs;
 use php\lib\reflect;
 use php\lib\str;
 
@@ -10,7 +16,9 @@ use php\lib\str;
  * @package framework\core
  *
  * @property string $id
- * @property Behaviour[] $behaviours
+ * @property array $properties
+ * @property Component $owner
+ * @property Components $components
  */
 abstract class Component
 {
@@ -20,9 +28,9 @@ abstract class Component
     private $id;
 
     /**
-     * @var Behaviour[]
+     * @var Component[]
      */
-    public $__behaviours = [];
+    private $components = [];
 
     /**
      * @var array
@@ -40,10 +48,18 @@ abstract class Component
     private $eventSignals = [];
 
     /**
+     * @var Component
+     */
+    private $owner;
+
+    /**
      * Component constructor.
      */
     public function __construct()
     {
+        $this->loadDescription();
+        $this->loadBinds();
+
         $reflect = new \ReflectionClass($this);
         $props = $reflect->getProperties();
 
@@ -59,11 +75,38 @@ abstract class Component
         }
     }
 
+    /**
+     * @return Component|null
+     */
+    protected function getOwner(): ?Component
+    {
+        return $this->owner;
+    }
+
+    /**
+     * @param Component|null $component
+     */
+    public function __setOwner(?Component $component)
+    {
+        $this->owner = $component;
+    }
+
+    /**
+     * @return Components
+     */
+    protected function getComponents(): Components
+    {
+        if (!$this->components) {
+            return $this->components = new Components($this);
+        }
+
+        return $this->components;
+    }
 
     /**
      * @return array
      */
-    public function getProperties(): array
+    protected function getProperties(): array
     {
         $reflect = new \ReflectionClass($this);
         $props = $reflect->getProperties();
@@ -83,6 +126,23 @@ abstract class Component
         }
 
         return $result;
+    }
+
+    /**
+     * @param array $properties
+     */
+    protected function setProperties(array $properties)
+    {
+        foreach ($properties as $prop => $value) {
+            if (method_exists($this, "set$prop")) {
+                if (property_exists($this, $prop)) {
+                    $this->{"set$prop"}($value);
+                    continue;
+                }
+            }
+
+            Logger::warn("Property '$prop' doesn't exist, will be ignore.");
+        }
     }
 
     /**
@@ -153,7 +213,7 @@ abstract class Component
                 $handler($e);
             }
         } else {
-            foreach ((array) $this->eventHandlers[$eventType] as $group => $handler) {
+            foreach ((array)$this->eventHandlers[$eventType] as $group => $handler) {
                 $handler($e);
 
                 if ($e->isConsumed()) {
@@ -180,13 +240,70 @@ abstract class Component
     }
 
     /**
-     * @return Behaviour[]
+     * Load event binds.
      */
-    protected function getBehaviours(): array
+    protected function loadBinds()
     {
-        return $this->behaviours;
+        $binder = new AnnotationEventBinder($this, $this, function (Component $context, string $id) {
+            if ($component = $context->components->{$id}) {
+                return $component;
+            } else {
+                return $context->{$id};
+            }
+        });
+
+        $binder->loadBinds();
     }
 
+    /**
+     * Load meta data.
+     */
+    protected function loadDescription()
+    {
+        foreach (['json', 'yml'] as $format) {
+            if (Processor::isRegistered($format)) {
+                $file = reflect::typeModule(reflect::typeOf($this))->getName() . ".$format";
+
+                try {
+                    Stream::tryAccess($file, function (Stream $stream) use ($format) {
+                        $data = $stream->parseAs($format);
+
+                        if ($data) {
+                            foreach ((array) $data as $prop => $value) {
+                                if ($prop === 'components') continue;
+
+                                $this->{$prop} = $value;
+                            }
+
+                            if (is_iterable($data['components'])) {
+                                $this->components->addFromData(...$data['components']);
+                            }
+                        }
+                    });
+
+                    return;
+                } catch (IOException $e) {
+                    // nop.
+                }
+            }
+        }
+    }
+
+    /**
+     * Remove this component from owner.
+     */
+    public function free()
+    {
+        if ($this->owner) {
+            $this->owner->components->remove($this);
+        }
+    }
+
+    /**
+     * @param string $name
+     * @return bool|EventSignal
+     * @throws \Error
+     */
     public function __get(string $name)
     {
         $method = "get$name";
@@ -197,7 +314,7 @@ abstract class Component
 
         $method = "is$name";
         if (method_exists($this, $method)) {
-            return (bool) $this->{$method}();
+            return (bool)$this->{$method}();
         }
 
         if ($signal = $this->eventSignals[$name]) {
@@ -207,6 +324,12 @@ abstract class Component
         throw new \Error("Property '$name' is not exists in class " . reflect::typeOf($this));
     }
 
+    /**
+     * @param string $name
+     * @param $value
+     * @return bool|EventSignal|mixed
+     * @throws \Error
+     */
     public function __set(string $name, $value)
     {
         if ($signal = $this->eventSignals[$name]) {
@@ -228,7 +351,7 @@ abstract class Component
             return $oldValue;
         }
 
-        $event = new Event("change-$name", $this,null, $data);
+        $event = new Event("change-$name", $this, null, $data);
         $this->trigger($event);
 
         if ($event->isConsumed()) {
@@ -241,5 +364,39 @@ abstract class Component
         }
 
         throw new \Error("Property '$name' is not exists in class " . reflect::typeOf($this) . " or readonly");
+    }
+
+    /**
+     * @param array $data
+     * @return Component
+     * @throws \Exception
+     */
+    public static function make(array $data): Component
+    {
+        if ($type = $data['_']) {
+            $c = new $type;
+
+            if ($c instanceof Component) {
+                unset($data['_']);
+
+                if ($components = $data['components']) {
+                    unset($data['components']);
+                }
+
+                foreach ($data as $prop => $value) {
+                    $c->{$prop} = $value;
+                }
+
+                if (is_iterable($components)) {
+                    $c->components->addFromData(...$components);
+                }
+
+                return $c;
+            } else {
+                throw new \Exception("Type of data must class extends " . __CLASS__);
+            }
+        } else {
+            throw new \Exception("Data must have type as '_' key");
+        }
     }
 }

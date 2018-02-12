@@ -1,13 +1,13 @@
 <?php
 namespace framework\web;
 
-use framework\core\Module;
+use framework\core\Component;
 
 /**
  * Class UIModule
  * @package framework\web
  */
-abstract class UIModule extends Module
+abstract class UIModule extends Component
 {
     /**
      * @return array

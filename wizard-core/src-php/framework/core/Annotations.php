@@ -59,6 +59,10 @@ class Annotations
      */
     public static function get(string $annotationName, string $comment, $default = null)
     {
+        if (!$comment) {
+            return $default;
+        }
+
         return static::parse($comment)[$annotationName] ?: $default;
     }
 

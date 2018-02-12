@@ -118,15 +118,33 @@ abstract class UIForm extends Component
     public $onShow;
 
     /**
+     * @var bool
+     */
+    private $initialized;
+
+    /**
      * UIForm constructor.
      */
     public function __construct()
     {
         parent::__construct();
 
+        $this->initialized = true;
 
         $this->loadFrm($this->getFrmPath());
         $this->loadBinds();
+    }
+
+    protected function loadBinds()
+    {
+        if ($this->initialized) {
+            parent::loadBinds();
+        }
+    }
+
+    protected function loadDescription()
+    {
+        // nop.
     }
 
     /**
@@ -265,6 +283,7 @@ abstract class UIForm extends Component
             $this->layout = $uiLoader->getNode();
             $this->nodesById = $uiLoader->getNodesById();
 
+
             if ($data['footer']) {
                 $footerUiLoader = new UILoader();
                 $footerUiLoader->load($data['footer']);
@@ -281,12 +300,6 @@ abstract class UIForm extends Component
                 $stream->close();
             }
         }
-    }
-
-    protected function loadBinds()
-    {
-        $binder = new AnnotationEventBinder($this, $this);
-        $binder->loadBinds();
     }
 
     /**
@@ -527,6 +540,27 @@ abstract class UIForm extends Component
             return $node;
         }
 
+        if (isset($this->components->{$name})) {
+            return $this->components->{$name};
+        }
+
         return parent::__get($name);
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function __isset(string $name)
+    {
+        if (isset($this->nodesById[$name])) {
+            return true;
+        }
+
+        if (isset($this->components->{$name})) {
+            return true;
+        }
+
+        return false;
     }
 }

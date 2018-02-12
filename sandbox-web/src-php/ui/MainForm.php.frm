@@ -18,8 +18,14 @@
         "text": "Wizard Framework (Демонстрация)",
         "font": {"size": 22},
         "width": "100%",
+        "opacity": 0,
         "style": "border-bottom: 1px solid silver; color: gray;",
-        "padding": [0, 0, 30, 0]
+        "padding": [0, 0, 30, 0],
+        "components": [
+          {
+            "_": "framework\\web\\ui\\animations\\UIFadeAnimation"
+          }
+        ]
       },
       {
         "_": "Label",
@@ -65,7 +71,13 @@
         "_": "Hyperlink",
         "text": "Автор - Дмитрий Зайцев",
         "href": "#",
-        "target": "_blank"
+        "target": "_blank",
+        "components": [
+          {
+            "_": "components\\HelloWorldComponent",
+            "when": "render"
+          }
+        ]
       }
     ]
   }

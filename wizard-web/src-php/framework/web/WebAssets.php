@@ -1,12 +1,12 @@
 <?php
 namespace framework\web;
 
+use framework\core\Component;
 use framework\core\Event;
 use framework\core\Logger;
-use framework\core\Module;
 use php\http\HttpResourceHandler;
 
-class WebAssets extends Module
+class WebAssets extends Component
 {
     /**
      * @var string
@@ -31,10 +31,10 @@ class WebAssets extends Module
     }
 
     /**
-     * @event inject
+     * @event addTo
      * @param Event $event
      */
-    protected function onInject(Event $event)
+    protected function handleAddTo(Event $event)
     {
         if ($event->context instanceof WebApplication) {
             $this->app = $event->context;

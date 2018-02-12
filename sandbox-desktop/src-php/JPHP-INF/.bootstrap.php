@@ -11,7 +11,7 @@ $appModule->setupResources(
     './../wizard-web-ui/src-js/build/lib/dnext-engine.min.css'
 );
 
-$app->addModule($appModule);
+$app->components->add($appModule);
 
 $appModule->addUI(MainUI::class);
 

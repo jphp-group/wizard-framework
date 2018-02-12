@@ -1,7 +1,7 @@
 <?php
 namespace script;
 
-use framework\core\Module;
+use framework\core\Component;
 use framework\web\UI;
 use php\gui\framework\AbstractScript;
 use php\lang\Thread;
@@ -60,7 +60,7 @@ class MacroScript extends AbstractScript
      */
     public function call()
     {
-        $key = $this->getOwner() instanceof Module ? $this->getOwner()->id : "";
+        $key = $this->getOwner() instanceof Component ? $this->getOwner()->id : "";
         $key .= "#$this->id";
 
         if ($this->runOnce && self::$alreadyRun[$key]) {

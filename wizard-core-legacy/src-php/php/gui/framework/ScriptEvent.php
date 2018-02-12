@@ -1,6 +1,8 @@
 <?php
 namespace php\gui\framework;
 
+use framework\core\Event;
+
 /**
  * Class ScriptEvent
  * @package php\gui\framework
@@ -8,7 +10,7 @@ namespace php\gui\framework;
  *
  * @packages framework
  */
-class ScriptEvent extends \stdClass
+class ScriptEvent extends Event
 {
     /**
      * @var AbstractScript

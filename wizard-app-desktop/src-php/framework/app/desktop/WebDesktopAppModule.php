@@ -53,25 +53,25 @@ class WebDesktopAppModule extends AbstractWebAppModule
      */
     private $isolatedSessionInstances = [];
 
-    public function __construct()
+    /**
+     * @event addTo
+     * @param Event $e
+     * @throws \Exception
+     */
+    protected function handleAddTo(Event $e)
     {
-        parent::__construct();
+        if ($e->context instanceof DesktopApplication) {
+            $this->app = $e->context;
 
-        $this->on('inject', function (Event $event) {
-            if ($event->context instanceof DesktopApplication) {
-                $this->app = $event->context;
+            $this->initializeWebLibs();
 
-                $this->initializeWebLibs();
-
-                $this->app->on('launch', function () {
-                    $window = $this->createWindow();
-                    $window->show();
-                });
-            } else {
-                throw new \Exception("DesktopUI module only for Desktop Applications");
-            }
-        });
-
+            $this->app->on('launch', function () {
+                $window = $this->createWindow();
+                $window->show();
+            });
+        } else {
+            throw new \Exception("DesktopUI module only for Desktop Applications");
+        }
     }
 
     /**

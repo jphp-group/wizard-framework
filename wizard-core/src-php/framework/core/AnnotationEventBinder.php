@@ -1,5 +1,6 @@
 <?php
 namespace framework\core;
+
 use php\lib\str;
 
 /**
@@ -19,11 +20,17 @@ class AnnotationEventBinder
     private $handler;
 
     /**
+     * @var callable
+     */
+    private $lookup;
+
+    /**
      * AnnotationEventBinder constructor.
      * @param Component $context
      * @param object $handler
+     * @param callable|null $lookup
      */
-    public function __construct(Component $context, object $handler)
+    public function __construct(Component $context, object $handler, ?callable $lookup = null)
     {
         $this->context = $context;
         $this->handler = $handler;
@@ -36,7 +43,11 @@ class AnnotationEventBinder
     protected function lookup(string $id): ?Component
     {
         if ($id) {
-            $result = $this->context->{$id};
+            if ($this->lookup) {
+                $result = call_user_func($this->lookup, $this->context, $id);
+            } else {
+                $result = $this->context->{$id};
+            }
         } else {
             $result = $this->context;
         }
@@ -47,6 +58,10 @@ class AnnotationEventBinder
     protected function tryBindMethod(\ReflectionMethod $method, object $context)
     {
         $binds = Annotations::getOfMethod('event', $method);
+
+        if (!$binds) {
+            return;
+        }
 
         if (!is_array($binds)) {
             $binds = [$binds];
@@ -60,10 +75,32 @@ class AnnotationEventBinder
                 $id = '';
             }
 
+            if ($id === '$owner') {
+                $method->setAccessible(true);
+                $key = str::uuid();
+
+                $this->context->bind('addTo', function (Event $e) use ($event, $method, $context, $key) {
+                    $e->context->on($event, function (Event $e) use ($method, $context, $e) {
+                        $method->invokeArgs($context, [$e]);
+                    }, $key);
+                });
+
+                $this->context->bind('removeFrom', function (Event $e) use ($event, $key) {
+                   $e->context->off($event, $key);
+                });
+
+                continue;
+            }
+
             $component = $this->lookup($id);
 
             if ($component) {
                 $method->setAccessible(true);
+
+                /*Logger::debug(
+                    "Bind event '{0}' handle via annotation with {1}::{2}()",
+                    $event, $method->getDeclaringClass()->getName(), $method->getName()
+                );*/
 
                 $component->on($event, function (Event $e) use ($method, $context) {
                     $method->invokeArgs($context, [$e]);

@@ -564,6 +564,31 @@ class Node {
     this.dom.animate(properties, options);
   }
 
+  /**
+   * Stop animation.
+   */
+  stopAllAnimate(clearQueue, jumpToEnd, callback) {
+    this.dom.stop(clearQueue, jumpToEnd);
+
+    if (callback) {
+      callback();
+    }
+  }
+
+  /**
+   * Stop animation by queue.
+   * @param queue
+   * @param clearQueue
+   * @param jumpToEnd
+   */
+  stopAnimate(queue, clearQueue, jumpToEnd, callback) {
+    this.dom.stop(queue, clearQueue, jumpToEnd);
+
+    if (callback) {
+      callback();
+    }
+  }
+
   on(event, callback) {
     this.dom.on(event, (event) => {
       event.sender = this;

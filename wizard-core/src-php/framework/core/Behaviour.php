@@ -21,8 +21,6 @@ abstract class Behaviour extends Component
         parent::__construct();
 
         $this->target = $target;
-
-        $target->__behaviours[] = $this;
     }
 
     /**

@@ -35,41 +35,42 @@ class WebServerAppModule extends AbstractWebAppModule
      */
     protected $app;
 
-    public function __construct()
+    /**
+     * @event addTo
+     * @param Event $e
+     * @throws \Exception
+     */
+    protected function handleAddTo(Event $e)
     {
-        parent::__construct();
+        if ($e->context instanceof WebApplication) {
+            $this->app = $e->context;
 
-        $this->on('inject', function (Event $event) {
-            if ($event->context instanceof WebApplication) {
-                $this->app = $event->context;
+            $this->app->on('shutdown', function (Event $event) {
+                Logger::warn("Shutdown Web UI");
 
-                $this->app->on('shutdown', function (Event $event) {
-                    Logger::warn("Shutdown Web UI");
+                foreach ($this->isolatedSessionInstances as $sid => $instances) {
+                    foreach ($this->uiClasses as $class => $reflection) {
+                        /** @var UI $ui */
+                        $ui = $instances[$class];
 
-                    foreach ($this->isolatedSessionInstances as $sid => $instances) {
-                        foreach ($this->uiClasses as $class => $reflection) {
-                            /** @var UI $ui */
-                            $ui = $instances[$class];
-
-                            if ($ui) {
-                                $ui->sendMessage('ui-reload', []);
-                            }
+                        if ($ui) {
+                            $ui->sendMessage('ui-reload', []);
                         }
                     }
+                }
 
-                    foreach ($this->isolatedSessionInstances as $sid => $instances) {
-                        /** @var UISocket $socket */
-                        if ($socket = $instances[UISocket::class]) {
-                            $socket->shutdown();
-                        }
+                foreach ($this->isolatedSessionInstances as $sid => $instances) {
+                    /** @var UISocket $socket */
+                    if ($socket = $instances[UISocket::class]) {
+                        $socket->shutdown();
                     }
-                }, __CLASS__);
+                }
+            }, __CLASS__);
 
-                $this->initializeWebLib($event->context);
-            } else {
-                throw new \Exception("WebUI module only for Web Applications");
-            }
-        });
+            $this->initializeWebLib($e->context);
+        } else {
+            throw new \Exception("WebUI module only for Web Applications");
+        }
     }
 
     /**
@@ -93,7 +94,7 @@ class WebServerAppModule extends AbstractWebAppModule
                 $this->app->setupRequestAndResponse($request, $response);
 
                 /** @var UI $instance */
-                $instance = $this->app->getInstance($uiClass);
+                $instance = new $uiClass();
                 $instance->trigger(new Event('beforeRequest', $instance, $this));
 
                 $handler($instance, $request, $response);
@@ -196,7 +197,7 @@ class WebServerAppModule extends AbstractWebAppModule
             fs::copy("res://lib/material-icons/$file", "$tempDir/$file");
         }
 
-        $app->addModule(new WebAssets('/dnext/material-icons', $dir));
+        $app->components[] = new WebAssets('/dnext/material-icons', $dir);
     }
 
     protected function initializeWebBootstrapLib(WebApplication $app)
@@ -209,7 +210,7 @@ class WebServerAppModule extends AbstractWebAppModule
             fs::copy("res://lib/bootstrap4/$file", "$tempDir/$file");
         }
 
-        $app->addModule(new WebAssets('/dnext/bootstrap4', $dir));
+        $app->components[] = new WebAssets('/dnext/bootstrap4', $dir);
     }
 
     protected function initializeWebJqueryLib(WebApplication $app)
@@ -222,7 +223,7 @@ class WebServerAppModule extends AbstractWebAppModule
             fs::copy("res://lib/jquery/$file", "$tempDir/$file");
         }
 
-        $app->addModule(new WebAssets('/dnext/jquery', $dir));
+        $app->components[] = new WebAssets('/dnext/jquery', $dir);
     }
 
     protected function initializeWebLib(WebApplication $app)
@@ -274,9 +275,10 @@ class WebServerAppModule extends AbstractWebAppModule
         $this->initializeWebBootstrapLib($app);
         $this->initializeWebJqueryLib($app);
 
-        if ($this->getModules()) {
+        if ($this->components->count()) {
             Logger::info("Add DNext Modules:");
-            foreach ($this->getModules() as $module) {
+
+            foreach ($this->components as $module) {
                 if ($module instanceof UIModule) {
                     $moduleName = str::replace(reflect::typeOf($module), '\\', '/');
                     $prefix = "/dnext/module/" . $moduleName;

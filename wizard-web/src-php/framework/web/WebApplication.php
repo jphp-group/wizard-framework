@@ -7,7 +7,6 @@ use framework\core\Application;
 use framework\core\Component;
 use framework\core\Event;
 use framework\core\Logger;
-use framework\core\Module;
 use php\http\HttpServer;
 use php\http\HttpServerRequest;
 use php\http\HttpServerResponse;
@@ -52,19 +51,14 @@ class WebApplication extends Application
     protected $globalSessionInstances = [];
 
     /**
-     * @var Module[]
-     */
-    protected $modules = [];
-
-    /**
      * Shutdown.
      */
     public function shutdown()
     {
         $this->trigger(new Event('shutdown', $this));
 
-        foreach ($this->modules as $module) {
-            $module->trigger(new Event('shutdown', $module, $this));
+        foreach ($this->components as $component) {
+            $component->trigger(new Event('shutdown', $component, $this));
         }
 
         $this->server()->shutdown();

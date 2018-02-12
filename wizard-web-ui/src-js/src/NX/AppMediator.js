@@ -397,13 +397,33 @@ class AppMediator {
    */
   triggerRenderView(message) {
     const uiLoader = new UILoader();
-    this.node = uiLoader.load(message['schema'], this);
+    this.node = uiLoader.load(message['schema']);
 
     this.rootDom.empty();
     this.rootDom.append(this.node.dom);
 
     this.sendIfCan('ui-render-done', {
       size: [this.node.dom.width(), this.node.dom.height()]
+    }, () => {
+      const triggerRender = (node) => {
+        node.trigger('render');
+
+        let innerNodes = node.innerNodes();
+
+        for (let key in innerNodes) {
+          if (innerNodes.hasOwnProperty(key)) {
+            triggerRender(innerNodes[key]);
+          }
+        }
+      };
+
+      triggerRender(this.node);
+
+      for (const key in this._nodes) {
+        if (this._nodes.hasOwnProperty(key)) {
+          triggerRender(this._nodes[key]);
+        }
+      }
     });
   }
 
@@ -461,9 +481,11 @@ class AppMediator {
     const schema = message['schema'];
 
     const uiLoader = new UILoader();
-    const node = uiLoader.load(schema, this);
+    const node = uiLoader.load(schema);
 
     this._nodes[node.uuid] = node;
+
+    node.trigger('render');
   }
 
   triggerReload(message) {

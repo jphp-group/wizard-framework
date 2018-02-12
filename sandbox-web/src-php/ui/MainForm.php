@@ -3,6 +3,7 @@
 namespace ui;
 
 use framework\core\Event;
+use framework\web\ui\animations\UIFadeAnimation;
 use framework\web\ui\UIAlert;
 use framework\web\ui\UIButton;
 use framework\web\ui\UICheckbox;
@@ -38,7 +39,7 @@ class MainForm extends UIForm
     }*/
 
     /**
-     * @event button.click-left
+     * event button.click-left
      * @event input.keyUp-Enter
      * @param Event $e
      */

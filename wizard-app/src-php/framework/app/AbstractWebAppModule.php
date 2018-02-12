@@ -1,9 +1,9 @@
 <?php
 namespace framework\app;
 
-use framework\core\Module;
+use framework\core\Component;
 
-abstract class AbstractWebAppModule extends Module
+abstract class AbstractWebAppModule extends Component
 {
     /**
      * @var array

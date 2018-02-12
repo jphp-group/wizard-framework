@@ -1,4 +1,5 @@
 <?php
+
 namespace framework\web;
 
 use framework\core\Component;
@@ -43,7 +44,7 @@ class UILoader extends Component
             if ($component) {
                 $find = null;
                 $find = function ($components, $id) use (&$find) {
-                    foreach ((array) $components as $one) {
+                    foreach ((array)$components as $one) {
                         if ($one['id'] === $id) {
                             return $one;
                         }
@@ -58,7 +59,7 @@ class UILoader extends Component
                     return null;
                 };
 
-                return $find((array) $component['_content'], $sub);
+                return $find((array)$component['_content'], $sub);
             } else {
                 return $component;
             }
@@ -142,9 +143,8 @@ class UILoader extends Component
 
         $node = new $type();
 
-        if (isset($data['behaviours'])) {
-
-            unset($data['behaviours']);
+        if ($ownComponents = $data['components']) {
+            unset($data['components']);
         }
 
         foreach ($data as $key => $value) {
@@ -165,6 +165,15 @@ class UILoader extends Component
 
         if ($node->id) {
             $this->subNodes[$node->id] = $node;
+        }
+
+        /*
+         * Load Components.
+         */
+        if ($ownComponents) {
+            foreach ($ownComponents as $component) {
+                $node->components->add(Component::make($component));
+            }
         }
 
         return $node;
@@ -205,17 +214,19 @@ class UILoader extends Component
     {
         switch ($format) {
             case "json":
-                $flags = JsonProcessor::DESERIALIZE_LENIENT | JsonProcessor::DESERIALIZE_AS_ARRAYS; break;
+                $flags = JsonProcessor::DESERIALIZE_LENIENT | JsonProcessor::DESERIALIZE_AS_ARRAYS;
+                break;
 
             default:
-                $flags = 0; break;
+                $flags = 0;
+                break;
         }
 
         $schema = $stream->parseAs($format, $flags);
 
         if (isset($schemaKey)) {
-            $this->import((array) $schema['components']);
-            $this->load((array) $schema[$schemaKey]);
+            $this->import((array)$schema['components']);
+            $this->load((array)$schema[$schemaKey]);
         } else {
             $this->load($schema);
         }

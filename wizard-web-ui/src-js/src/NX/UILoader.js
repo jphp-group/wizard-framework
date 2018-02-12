@@ -45,7 +45,7 @@ class UILoader {
           const children = object['_content'];
 
           for (let i = 0; i < children.length; i++) {
-            const child = this.load(children[i], AppMediator);
+            const child = this.load(children[i]);
             node.add(child);
           }
         }

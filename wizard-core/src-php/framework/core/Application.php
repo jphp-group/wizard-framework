@@ -122,7 +122,7 @@ abstract class Application extends Component
         $this->trigger(new Event('launch', $this));
     }
 
-    public function addModule(Module $module)
+    public function addModule(Component $module)
     {
         $module->trigger(new Event('inject', $module, $this));
     }

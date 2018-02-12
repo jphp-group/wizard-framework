@@ -2,19 +2,18 @@
 
 namespace framework\web;
 
+use framework\core\Component;
 use framework\core\Event;
-use framework\core\Module;
 use php\time\Timer;
 
 /**
  * Class WebDevModule
  * @package framework\web
  */
-class WebDevModule extends Module
+class WebDevModule extends Component
 {
     /**
      * WebDevModule constructor.
-     * @param HotDeployer $deployer
      */
     public function __construct()
     {
@@ -22,10 +21,10 @@ class WebDevModule extends Module
     }
 
     /**
-     * @event inject
+     * @event addTo
      * @param Event $event
      */
-    protected function onInject(Event $event)
+    protected function handleAddTo(Event $event)
     {
         if ($event->context instanceof WebApplication) {
             $app = $event->context;
