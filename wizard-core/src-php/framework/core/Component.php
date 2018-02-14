@@ -263,7 +263,7 @@ abstract class Component
 
     /**
      * @param string $name
-     * @return bool|EventSignal
+     * @return bool|EventSignal|mixed
      * @throws \Error
      */
     public function __get(string $name)
@@ -326,5 +326,13 @@ abstract class Component
         }
 
         throw new \Error("Property '$name' is not exists in class " . reflect::typeOf($this) . " or readonly");
+    }
+
+    /**
+     * @return array
+     */
+    public function __debugInfo()
+    {
+        return $this->getProperties();
     }
 }

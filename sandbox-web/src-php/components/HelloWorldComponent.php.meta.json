@@ -1,0 +1,11 @@
+{
+  "name": {
+    "en": "Hello World",
+    "ru": "Привет Мир"
+  },
+  "description": {
+    "en": "Hello World Component",
+    "ru": "Привет Мир Компонент"
+  },
+  "author": "Foobar"
+}

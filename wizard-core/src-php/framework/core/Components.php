@@ -243,4 +243,11 @@ class Components implements \ArrayAccess, \Countable, \IteratorAggregate
     {
         return flow($this->components);
     }
+
+    public function __debugInfo()
+    {
+        return $this->components;
+    }
+
+
 }

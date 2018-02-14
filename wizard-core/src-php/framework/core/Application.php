@@ -9,6 +9,9 @@ use php\time\Time;
 /**
  * Class Application
  * @package framework\core
+ *
+ * @property string $stamp
+ * @property int $initializeTime
  */
 abstract class Application extends Component
 {
@@ -51,7 +54,7 @@ abstract class Application extends Component
     /**
      * @return int
      */
-    public function getInitializeTime(): int
+    protected function getInitializeTime(): int
     {
         return $this->initializeTime;
     }
@@ -59,7 +62,7 @@ abstract class Application extends Component
     /**
      * @return string
      */
-    public function getStamp(): string
+    protected function getStamp(): string
     {
         return $this->stamp;
     }
@@ -110,7 +113,7 @@ abstract class Application extends Component
         try {
             $this->settings->load(Stream::of('res://application.conf'));
         } catch (IOException $e) {
-            Logger::warn("Failed to load res://application.conf");
+            //Logger::warn("Failed to load res://application.conf");
         }
     }
 

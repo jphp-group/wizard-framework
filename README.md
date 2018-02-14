@@ -24,13 +24,13 @@ Then you can run wizard sandbox:
 cd <path_to_wizard_dir>
 
 // for linux
-./gradlew sandbox
+./gradlew sandboxWeb
 
 // for windows
-gradlew.bat sandbox
+gradlew.bat sandboxWeb
 ```
 
-Then open `http://localhost:5000/app` in your browser (opera, chrome or firefox). Your browser
+Then open `http://localhost:5000/` in your browser (opera, chrome or firefox). Your browser
 must support the WebSocket feature.
 
 

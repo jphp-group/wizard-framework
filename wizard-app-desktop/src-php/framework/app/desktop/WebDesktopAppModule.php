@@ -237,7 +237,7 @@ class WebDesktopAppModule extends AbstractWebAppModule
             UI::setup($ui);
 
             $urlArgument = '';
-            $sessionId = $this->app->getStamp();
+            $sessionId = $this->app->stamp;
 
             if (str::startsWith($request->url, 'wizard://ui/')) {
                 $urlArgument = str::sub($request->url, 12);
@@ -325,9 +325,9 @@ class WebDesktopAppModule extends AbstractWebAppModule
             $this->app->addResource("/dnext/material-icons/$file", "res://lib/material-icons/$file");
         }
 
-        $this->app->addResource("/dnext/engine-{$this->app->getStamp()}.min.css", $this->dnextCssFile ?: 'res://dnext-engine.min.css');
-        $this->app->addResource("/dnext/engine-{$this->app->getStamp()}.js", $this->dnextJsFile ?: 'res://dnext-engine.js');
-        $this->app->addResource("/dnext/engine-{$this->app->getStamp()}.js.map",
+        $this->app->addResource("/dnext/engine-{$this->app->stamp}.min.css", $this->dnextCssFile ?: 'res://dnext-engine.min.css');
+        $this->app->addResource("/dnext/engine-{$this->app->stamp}.js", $this->dnextJsFile ?: 'res://dnext-engine.js');
+        $this->app->addResource("/dnext/engine-{$this->app->stamp}.js.map",
             $this->dnextJsFile ? "$this->dnextJsFile.map" : 'res://dnext-engine.js.map'
         );
     }

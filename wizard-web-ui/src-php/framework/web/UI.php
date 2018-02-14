@@ -442,9 +442,9 @@ abstract class UI extends Component
 
         $body = str::replace($body, '{{dnextJqueryJSUrl}}', $prefix . 'dnext/jquery/jquery-3.2.1.min.js');
 
-        $body = str::replace($body, '{{dnextCSSUrl}}', $prefix . 'dnext/engine-' . Application::current()->getStamp() . '.min.css');
+        $body = str::replace($body, '{{dnextCSSUrl}}', $prefix . 'dnext/engine-' . Application::current()->stamp . '.min.css');
         $body = str::replace($body, '{{dnextFontCSSUrl}}', $prefix . 'dnext/material-icons/material-icons.css');
-        $body = str::replace($body, '{{dnextJSUrl}}', $prefix . 'dnext/engine-' . Application::current()->getStamp() . '.js');
+        $body = str::replace($body, '{{dnextJSUrl}}', $prefix . 'dnext/engine-' . Application::current()->stamp . '.js');
 
         $body = str::replace($body, '{{uiSchemaUrl}}', "$path/@ui-schema");
         $body = str::replace($body, '{{uiSocketUrl}}', "$path/@ws/");

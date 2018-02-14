@@ -255,11 +255,11 @@ class WebServerAppModule extends AbstractWebAppModule
 
         $server = $app->server();
 
-        $server->get($jsUrl = "/dnext/engine-{$app->getStamp()}.js", new HttpResourceHandler($jsFile));
-        $server->get($cssUrl = "/dnext/engine-{$app->getStamp()}.min.css", new HttpResourceHandler($cssFile));
+        $server->get($jsUrl = "/dnext/engine-{$app->stamp}.js", new HttpResourceHandler($jsFile));
+        $server->get($cssUrl = "/dnext/engine-{$app->stamp}.min.css", new HttpResourceHandler($cssFile));
 
         if ($mapFile) {
-            $server->get($mapUrl = "/dnext/engine-{$app->getStamp()}.js.map", new HttpResourceHandler($mapFile));
+            $server->get($mapUrl = "/dnext/engine-{$app->stamp}.js.map", new HttpResourceHandler($mapFile));
         }
 
         Logger::info("Add DNext Engine:");

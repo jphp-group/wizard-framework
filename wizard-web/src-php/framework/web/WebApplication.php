@@ -74,7 +74,7 @@ class WebApplication extends Application
 
         Logger::addWriter(Logger::stdoutWriter(true));
 
-        Logger::info("Initialize Web Application ({0})", $this->getStamp());
+        Logger::info("Initialize Web Application ({0})", $this->stamp);
     }
 
     /**

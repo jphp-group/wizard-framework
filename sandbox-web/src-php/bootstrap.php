@@ -4,11 +4,21 @@ use bundle\aceeditor\AceEditorModule;
 use bundle\slider\SliderModule;
 use framework\app\web\WebServerAppModule;
 use framework\core\Event;
+use framework\ide\IdeComponentLoader;
 use framework\web\HotDeployer;
 use framework\web\WebApplication;
 use framework\web\WebAssets;
 use framework\web\WebDevModule;
 use ui\MainUI;
+
+$ideComponentLoader = new IdeComponentLoader();
+$ideComponentLoader->addZipFile('../wizard-core/build/libs/wizard-core-1.0.0-SNAPSHOT.jar');
+$ideComponentLoader->addZipFile('../wizard-web-ui/build/libs/wizard-web-ui-1.0.0-SNAPSHOT.jar');
+//$ideComponentLoader->addClassPath('res://');
+$ideComponentLoader->addClassPath('./src-php');
+$ideComponent = $ideComponentLoader->load(\framework\web\ui\animations\UICSSAnimation::class);
+
+print_r($ideComponent->properties);
 
 $deployer = new HotDeployer(function () {
     $webUi = new WebServerAppModule();
