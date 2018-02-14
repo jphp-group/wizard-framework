@@ -2,6 +2,7 @@
 namespace framework\ide;
 
 use framework\core\Component;
+use php\lib\str;
 
 /**
  * @package framework\ide
@@ -9,6 +10,7 @@ use framework\core\Component;
  * @property string $name
  * @property string $description
  * @property string $className
+ * @property bool $abstract
  * @property IdeComponent $parent
  * @property IdeComponentField[] $fields
  *
@@ -19,6 +21,11 @@ class IdeComponent extends Component
      * @var string
      */
     private $name;
+
+    /**
+     * @var bool
+     */
+    private $abstract;
 
     /**
      * @var string
@@ -118,5 +125,34 @@ class IdeComponent extends Component
     protected function setDescription(string $description)
     {
         $this->description = $description;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isAbstract(): bool
+    {
+        return $this->abstract;
+    }
+
+    /**
+     * @param bool $abstract
+     */
+    protected function setAbstract(bool $abstract)
+    {
+        $this->abstract = $abstract;
+    }
+
+    /**
+     * @param string $className
+     * @return bool
+     */
+    public function isSubclassOf(string $className): bool
+    {
+        if ($className === $this->className) {
+            return true;
+        }
+
+        return $this->parent && $this->parent->isSubclassOf($className);
     }
 }

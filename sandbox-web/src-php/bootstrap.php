@@ -16,9 +16,10 @@ $ideComponentLoader->addZipFile('../wizard-core/build/libs/wizard-core-1.0.0-SNA
 $ideComponentLoader->addZipFile('../wizard-web-ui/build/libs/wizard-web-ui-1.0.0-SNAPSHOT.jar');
 //$ideComponentLoader->addClassPath('res://');
 $ideComponentLoader->addClassPath('./src-php');
-$ideComponent = $ideComponentLoader->load(\framework\web\ui\animations\UICSSAnimation::class);
+$components = $ideComponentLoader->findComponents(\framework\web\ui\animations\UIAnimationComponent::class);
 
-print_r($ideComponent->properties);
+print_r(\php\lib\arr::keys($components));
+//print_r($ideComponent->properties);
 
 $deployer = new HotDeployer(function () {
     $webUi = new WebServerAppModule();
