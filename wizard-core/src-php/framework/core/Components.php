@@ -90,6 +90,23 @@ class Components implements \ArrayAccess, \Countable, \IteratorAggregate
     }
 
     /**
+     * @param Component[] $components
+     */
+    public function addAll(array $components)
+    {
+        flow($components)->each([$this, 'add']);
+    }
+
+    /**
+     * @param Component[] $components
+     */
+    public function setAll(array $components)
+    {
+        $this->clear();
+        $this->addAll($components);
+    }
+
+    /**
      * @param Component $component
      * @throws \Exception
      */
@@ -150,6 +167,15 @@ class Components implements \ArrayAccess, \Countable, \IteratorAggregate
         } else {
             return false;
         }
+    }
+
+    /**
+     * Remove all components.
+     */
+    public function clear()
+    {
+        $components = $this->components;
+        flow($components)->each([$this, 'remove']);
     }
 
     /**

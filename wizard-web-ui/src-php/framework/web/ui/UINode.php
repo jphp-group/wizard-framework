@@ -673,7 +673,7 @@ abstract class UINode extends Component implements UIViewable
             });
 
             $this->style = $style;
-            $this->changeRemoteProperty('style', $style);
+            $this->callRemoteMethod('css', [$css]);
         } else {
             $result = flow(str::split($oldStyle, ';'))
                 ->map(function ($el) {
@@ -817,15 +817,6 @@ abstract class UINode extends Component implements UIViewable
             } else {
                 Logger::warn("Failed to {0}::callRemoteMethod({1}, args), ui is not connected", reflect::typeOf($this), $method);
             }
-        }
-    }
-
-    public function callRemoteMethod2(string $method, array $args = [])
-    {
-        if ($this->connectedUi) {
-            $this->callRemoteMethod($method, $args);
-        } else {
-
         }
     }
 
