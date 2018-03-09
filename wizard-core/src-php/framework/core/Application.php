@@ -45,6 +45,7 @@ abstract class Application extends Component
         parent::__construct();
 
         self::$instance = $this;
+        $this->settings = new Settings();
         $this->stamp = str::random();
         $this->initializeTime = Time::millis();
 
@@ -84,6 +85,15 @@ abstract class Application extends Component
     }
 
     /**
+     * @param string $path
+     * @param string $format
+     */
+    public function addSettings(string $path, string $format = 'ini')
+    {
+        $this->settings->loadFile($path, $format);
+    }
+
+    /**
      * @param string $class
      * @return Component
      */
@@ -108,13 +118,6 @@ abstract class Application extends Component
     protected function initialize()
     {
         $this->trigger(new Event('initialize', $this));
-        $this->settings = new Settings();
-
-        try {
-            $this->settings->load(Stream::of('res://application.conf'));
-        } catch (IOException $e) {
-            //Logger::warn("Failed to load res://application.conf");
-        }
     }
 
     /**

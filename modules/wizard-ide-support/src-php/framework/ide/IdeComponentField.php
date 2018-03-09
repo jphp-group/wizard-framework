@@ -8,7 +8,10 @@ use framework\core\Component;
  *
  * @property array $type
  * @property string $name
- * @property string $default
+ * @property string $localizedName
+ * @property string $description
+ * @property string $localizedDescription
+ * @property mixed $default
  */
 class IdeComponentField extends Component
 {
@@ -21,6 +24,11 @@ class IdeComponentField extends Component
      * @var string
      */
     private $name;
+
+    /**
+     * @var string
+     */
+    private $description;
 
     /**
      * @var string
@@ -51,6 +59,15 @@ class IdeComponentField extends Component
         return $this->name;
     }
 
+    protected function getLocalizedName(): string
+    {
+        if ($this->owner instanceof IdeComponent) {
+            return $this->owner->localizer->translate($this->name);
+        } else {
+            return $this->name;
+        }
+    }
+
     /**
      * @param string $name
      */
@@ -60,19 +77,39 @@ class IdeComponentField extends Component
     }
 
     /**
-     * @return string
+     * @return mixed
      */
-    protected function getDefault(): ?string
+    protected function getDefault()
     {
         return $this->default;
     }
 
     /**
-     * @param string $default
+     * @param mixed $default
      */
-    protected function setDefault(?string $default)
+    protected function setDefault($default)
     {
         $this->default = $default;
     }
-    
+
+    /**
+     * @return string
+     */
+    protected function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    protected function getLocalizedDescription(): string
+    {
+        return $this->owner instanceof IdeComponent ? $this->owner->localizer->translate($this->description) : $this->description;
+    }
+
+    /**
+     * @param string $description
+     */
+    protected function setDescription(string $description)
+    {
+        $this->description = $description;
+    }
 }

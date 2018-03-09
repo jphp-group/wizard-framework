@@ -3,6 +3,7 @@ namespace framework\web\ui\animations;
 
 use framework\core\Component;
 use framework\core\Event;
+use framework\core\EventSignal;
 use framework\web\ui\UINode;
 use php\lib\str;
 
@@ -54,6 +55,21 @@ abstract class UIAnimationComponent extends Component
      * @var array
      */
     private $ownerBindIds = [];
+
+    /**
+     * @var EventSignal
+     */
+    public $onAnimate;
+
+    /**
+     * @var EventSignal
+     */
+    public $onReverseAnimate;
+
+    /**
+     * @var EventSignal
+     */
+    public $onInitialize;
 
     /**
      * UIAnimation constructor.

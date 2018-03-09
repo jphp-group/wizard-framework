@@ -6,10 +6,12 @@ applicationDefaultJvmArgs = ['-Dfile.encoding=UTF-8']
 dependencies {
     compile project(":wizard-app-web")
     compile project(":modules/wizard-ide-support")
+    compile project(":modules/wizard-httpclient")
     compile "org.develnext.jphp:jphp-core:${jphpVersion}"
     compile "org.develnext.jphp:jphp-zend-ext:${jphpVersion}"
     compile "org.develnext.jphp:jphp-yaml-ext:${jphpVersion}"
     compile "org.develnext.jphp:jphp-xml-ext:${jphpVersion}"
+    compile "org.develnext.jphp:jphp-jsoup-ext:${jphpVersion}"
 }
 
 task webSandbox(dependsOn: ['run']) {

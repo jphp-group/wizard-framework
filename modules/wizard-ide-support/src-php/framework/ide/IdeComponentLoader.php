@@ -4,7 +4,9 @@ namespace framework\ide;
 
 use framework\core\Component;
 use framework\core\Logger;
+use framework\localization\Localizer;
 use php\compress\ZipFile;
+use php\io\IOException;
 use php\io\Stream;
 use php\lang\Environment;
 use php\lang\Module;
@@ -39,13 +41,25 @@ class IdeComponentLoader extends Component
     private $zipFiles = [];
 
     /**
-     * IdeComponentLoader constructor.
+     * @var array
      */
-    public function __construct()
+    private $metaLoaders = [];
+    /**
+     * @var Localizer|null
+     */
+    private $localizer;
+
+    /**
+     * IdeComponentLoader constructor.
+     * @param Localizer|null $localizer
+     */
+    public function __construct(?Localizer $localizer = null)
     {
         parent::__construct();
 
         $this->reset();
+
+        $this->localizer = $localizer;
     }
 
     /**
@@ -55,7 +69,6 @@ class IdeComponentLoader extends Component
     {
         foreach ($this->zipFiles as $zipFile) {
             $zip = new ZipFile($zipFile);
-
             foreach ($zip->statAll() as $stat) {
                 ['name' => $name, 'directory' => $directory] = $stat;
 
@@ -92,6 +105,44 @@ class IdeComponentLoader extends Component
         }
     }
 
+    protected function loadMeta(IdeComponent $ideComponent, Stream $stream, string $format)
+    {
+        [
+            'name' => $ideComponent->name,
+            'description' => $ideComponent->description,
+            'localizer' => $localizer,
+            'fields' => $fields,
+        ] = $stream->parseAs($format);
+
+        if (is_array($localizer)) {
+            $l = new Localizer($this->localizer);
+
+            foreach ($localizer as $lang => $messages) {
+                if (is_array($messages)) {
+                    $l->addMessages($lang, $messages);
+                }
+            }
+
+            $ideComponent->localizer = $l;
+        }
+
+        if (is_array($fields)) {
+            foreach ($fields as $name => $field) {
+                if ($f = $ideComponent->fields[$name]) {
+                    if (isset($field['name'])) {
+                        $f->name = $field['name'];
+                    }
+
+                    if (isset($field['description'])) {
+                        $f->description = $field['description'];
+                    }
+                }
+            }
+        }
+
+        return $stream;
+    }
+
     /**
      * @param string $pathToZip
      */
@@ -102,6 +153,23 @@ class IdeComponentLoader extends Component
         }
 
         $this->zipFiles[$pathToZip] = $pathToZip;
+
+        $this->metaLoaders[$pathToZip] = function (IdeComponent $ideComponent) use ($pathToZip) {
+            $filename = str::replace($ideComponent->className, '\\', '/') . '.php.meta';
+
+            $zip = new ZipFile($pathToZip, false);
+            foreach (['json', 'yml'] as $format) {
+                if ($zip->has("$filename.$format")) {
+                    $zip->read("$filename.$format", function (array $stat, Stream $stream) use ($format, $ideComponent) {
+                        $this->loadMeta($ideComponent, $stream, $format);
+                    });
+
+                    return true;
+                }
+            }
+
+            return false;
+        };
 
         $this->env->execute(function () use ($pathToZip) {
             $zip = new ZipFile($pathToZip, false);
@@ -133,6 +201,26 @@ class IdeComponentLoader extends Component
 
         $this->classPaths[$path] = $path;
 
+        $this->metaLoaders[$path] = function (IdeComponent $ideComponent) use ($path) {
+            $filename = $path . '/' . str::replace($ideComponent->className, '\\', '/') . '.php.meta';
+
+            foreach (['json', 'yml'] as $format) {
+                if (Stream::exists("$filename.$format")) {
+                    try {
+                        Stream::tryAccess("$filename.$format", function (Stream $stream) use ($ideComponent, $format) {
+                            $this->loadMeta($ideComponent, $stream, $format);
+                        });
+                    } catch (IOException $e) {
+                        Logger::error("Failed to load meta file of {0} component", $ideComponent->className);
+                    }
+
+                    return true;
+                }
+            }
+
+            return false;
+        };
+
         $this->env->execute(function () use ($path) {
             spl_autoload_register(function ($className) use ($path) {
                 $filename = str::replace($className, '\\', '/') . '.php';
@@ -155,9 +243,11 @@ class IdeComponentLoader extends Component
         $classPaths = $this->classPaths;
         $zipFiles = $this->zipFiles;
 
+        $this->metaLoaders = [];
         $this->classPaths = [];
         $this->components = [];
         $this->zipFiles = [];
+
         $this->env = new Environment(null, Environment::HOT_RELOAD);
 
         foreach ($classPaths as $path) {
@@ -263,11 +353,19 @@ class IdeComponentLoader extends Component
                 $result['file'] = $ref->getFileName();
                 $result['abstract'] = $ref->isAbstract();
                 $result['fields'] = [];
+                $result['eventSignals'] = [];
 
                 foreach ($ref->getProperties() as $property) {
                     $name = $property->getName();
 
                     if ($property->getDeclaringClass()->getName() !== $ref->getName()) {
+                        continue;
+                    }
+
+                    if ($property->isPublic() && str::startsWith($name, 'on')
+                        && str::contains($property->getDocComment(), '@var EventSignal')) {
+                        $eventSignal = str::lowerFirst(str::sub($name, 2));
+                        $result['eventSignals'][$eventSignal] = $eventSignal;
                         continue;
                     }
 
@@ -308,6 +406,7 @@ class IdeComponentLoader extends Component
         foreach ($result['fields'] as $name => $field) {
             $fields[$name] = $f = new IdeComponentField();
 
+            $f->id = $name;
             $f->properties = [
                 'name' => $name,
                 'default' => $field['default'],
@@ -319,9 +418,27 @@ class IdeComponentLoader extends Component
         $c->properties = [
             'className' => $result['className'],
             'parent' => $result['parent'] && $this->isComponent($result['parent']) ? $this->load($result['parent']) : null,
-            'fields' => $fields,
-            'abstract' => $result['abstract']
+            'abstract' => $result['abstract'],
+            'events' => $result['eventSignals'],
         ];
+
+        foreach ($fields as $one) {
+            $c->components[] = $one;
+        }
+
+        foreach ($this->metaLoaders as $metaLoader) {
+            if ($metaLoader($c)) {
+                break;
+            }
+        }
+
+        if (!$c->localizer) {
+            $c->localizer = $this->localizer;
+        }
+
+        if (!$c->localizer) {
+            $c->localizer = new Localizer();
+        }
 
         return $this->components[$className] = $c;
     }

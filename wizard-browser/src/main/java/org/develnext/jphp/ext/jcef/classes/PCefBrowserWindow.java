@@ -350,6 +350,13 @@ public class PCefBrowserWindow extends BaseObject {
     }
 
     @Signature
+    public void maximize() {
+        if (frame instanceof JFrame) {
+            ((JFrame) frame).setExtendedState(((JFrame) frame).getExtendedState() | JFrame.MAXIMIZED_BOTH);
+        }
+    }
+
+    @Signature
     public static PCefBrowserWindow find(Environment env, CefBrowser browser) {
         Component uiComponent = browser.getUIComponent();
         Window window = SwingUtilities.getWindowAncestor(uiComponent);

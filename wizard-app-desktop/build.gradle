@@ -1,8 +1,6 @@
 dependencies {
-    compile project(":wizard-app")
+    compile project(":wizard-app-web")
     compile project(":wizard-browser")
-    compile project(":wizard-browser-win32")
-    compile project(":wizard-browser-win64")
 }
 
 

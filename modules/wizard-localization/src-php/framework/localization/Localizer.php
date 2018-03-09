@@ -6,6 +6,7 @@ use framework\core\Event;
 use framework\core\Logger;
 use php\lib\arr;
 use php\lib\fs;
+use php\lib\reflect;
 use php\lib\str;
 
 /**
@@ -13,6 +14,7 @@ use php\lib\str;
  *
  * @property string $language
  * @property string[] $languages
+ * @property Localizer $parent
  */
 class Localizer extends Component
 {
@@ -27,14 +29,35 @@ class Localizer extends Component
     private $language;
 
     /**
-     * Localizer constructor.
-     * @param string $language
+     * @var Localizer
      */
-    public function __construct(string $language = null)
+    private $parent;
+
+    /**
+     * Localizer constructor.
+     * @param Localizer $parent
+     */
+    public function __construct(?Localizer $parent = null)
     {
         parent::__construct();
 
-        $this->language = $language;
+        $this->parent = $parent;
+    }
+
+    public function __debugInfo()
+    {
+        $info = parent::__debugInfo();
+        $info['languages'] = $this->languages;
+
+        return $info;
+    }
+
+    /**
+     * @return Localizer
+     */
+    protected function getParent(): ?Localizer
+    {
+        return $this->parent;
     }
 
     /**
@@ -42,7 +65,7 @@ class Localizer extends Component
      */
     protected function getLanguage(): ?string
     {
-        return $this->language;
+        return $this->parent ? $this->parent->getLanguage() : $this->language;
     }
 
     /**
@@ -50,7 +73,11 @@ class Localizer extends Component
      */
     protected function setLanguage(?string $language)
     {
-        $this->language = $language;
+        if ($this->parent) {
+            $this->parent->setLanguage($language);
+        } else {
+            $this->language = $language;
+        }
     }
 
     /**
@@ -70,11 +97,19 @@ class Localizer extends Component
      */
     public function translate(string $message, array $args = []): string
     {
-        if (!$this->language) {
+        $language = $this->getLanguage();
+
+        if (!$language) {
             throw new \Exception("Default Language is not set");
         }
 
-        $message = $this->messages[$this->language][$message] ?? $message;
+        if (isset($this->messages[$language][$message])) {
+            $message = $this->messages[$language][$message];
+        } else if ($this->parent) {
+            return $this->parent->translate($message, $args);
+        } else {
+            // nop.
+        }
 
         foreach ($args as $key => $value) {
             $message = str::replace($message, "{{$key}}", $value);
@@ -137,9 +172,7 @@ class Localizer extends Component
 
         if (!$event->isConsumed()) {
             if ($this->messages[$lang]) {
-                foreach ($messages as $key => $message) {
-                    $this->messages[$key] = $message;
-                }
+                $this->messages[$lang] = flow($this->messages[$lang], $messages)->toMap();
             } else {
                 $this->messages[$lang] = $messages;
             }

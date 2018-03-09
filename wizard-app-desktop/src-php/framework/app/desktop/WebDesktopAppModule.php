@@ -167,6 +167,7 @@ class WebDesktopAppModule extends AbstractWebAppModule
 
         $ui->on('rendered', function (Event $e) {
             if ($window = $this->findBrowserWindow($e->data['sessionId'])) {
+
                 ['size' => $size] = $e->data;
 
                 if ($size[0] > 0 && $size[1] > 0) {

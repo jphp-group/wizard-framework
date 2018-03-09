@@ -3,6 +3,8 @@ namespace framework\core;
 
 use php\io\IOException;
 use php\io\Stream;
+use php\lib\fs;
+use php\lib\str;
 use php\util\Configuration;
 
 /**
@@ -18,22 +20,22 @@ class Settings
 
     /**
      * @param Stream $stream
-     * @throws IOException
+     * @param string $format
      */
-    public function load(Stream $stream)
+    public function load(Stream $stream, string $format = 'ini')
     {
-        $config = new Configuration($stream);
-        $this->data = $config->toArray();
+        $config = $stream->parseAs($format);
+        $this->data = flow($this->data, $config)->toMap();
     }
 
     /**
      * @param string $file
-     * @throws IOException
+     * @param string $format
      */
-    public function loadFile(string $file)
+    public function loadFile(string $file, string $format = 'ini')
     {
-        $config = new Configuration($file);
-        $this->data = $config->toArray();
+        $config = fs::parseAs($file, $format);
+        $this->data = flow($this->data, $config)->toMap();
     }
 
     /**
@@ -43,7 +45,19 @@ class Settings
      */
     public function get(string $name, $default = null)
     {
-        return $this->data[$name] ?? $default;
+        if (isset($this->data[$name])) {
+            return $this->data[$name];
+        }
+
+        $parts = str::split($name, '.');
+
+        $data = $this->data;
+
+        foreach ($parts as $part) {
+            $data = $data[$part];
+        }
+
+        return $data ?? $default;
     }
 
     /**

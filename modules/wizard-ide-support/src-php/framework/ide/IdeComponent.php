@@ -2,18 +2,25 @@
 namespace framework\ide;
 
 use framework\core\Component;
+use framework\localization\Localizer;
+use php\graphic\Image;
+use php\lib\reflect;
 use php\lib\str;
 
 /**
  * @package framework\ide
  *
  * @property string $name
+ * @property string $localizedName
  * @property string $description
+ * @property string $localizedDescription
+ * @property Image $icon
  * @property string $className
  * @property bool $abstract
  * @property IdeComponent $parent
  * @property IdeComponentField[] $fields
- *
+ * @property string[] $events
+ * @property Localizer $localizer
  */
 class IdeComponent extends Component
 {
@@ -21,6 +28,11 @@ class IdeComponent extends Component
      * @var string
      */
     private $name;
+
+    /**
+     * @var Image
+     */
+    private $icon;
 
     /**
      * @var bool
@@ -43,9 +55,14 @@ class IdeComponent extends Component
     private $parent;
 
     /**
-     * @var IdeComponentField[]
+     * @var array
      */
-    private $fields = [];
+    private $events = [];
+
+    /**
+     * @var Localizer
+     */
+    private $localizer;
 
     /**
      * @return string
@@ -68,15 +85,7 @@ class IdeComponent extends Component
      */
     protected function getFields(): array
     {
-        return $this->fields;
-    }
-
-    /**
-     * @param IdeComponentField[] $fields
-     */
-    protected function setFields(array $fields)
-    {
-        $this->fields = $fields;
+        return $this->components->findByClass(IdeComponentField::class);
     }
 
     /**
@@ -93,6 +102,22 @@ class IdeComponent extends Component
     protected function setParent(?IdeComponent $parent)
     {
         $this->parent = $parent;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getLocalizedName(): string
+    {
+        return $this->localizer ? $this->localizer->translate($this->name) : $this->name;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getLocalizedDescription(): string
+    {
+        return $this->localizer ? $this->localizer->translate($this->description) : $this->description;
     }
 
     /**
@@ -142,6 +167,55 @@ class IdeComponent extends Component
     {
         $this->abstract = $abstract;
     }
+
+    /**
+     * @return string[]
+     */
+    protected function getEvents(): array
+    {
+        return $this->events;
+    }
+
+    /**
+     * @return Localizer
+     */
+    protected function getLocalizer(): ?Localizer
+    {
+        return $this->localizer;
+    }
+
+    /**
+     * @param Localizer $localizer
+     */
+    protected function setLocalizer(?Localizer $localizer)
+    {
+        $this->localizer = $localizer;
+    }
+
+    /**
+     * @param string[] $events
+     */
+    protected function setEvents(array $events)
+    {
+        $this->events = $events;
+    }
+
+    /**
+     * @return Image
+     */
+    protected function getIcon(): ?Image
+    {
+        return $this->icon;
+    }
+
+    /**
+     * @param Image $icon
+     */
+    protected function setIcon(?Image $icon)
+    {
+        $this->icon = $icon;
+    }
+
 
     /**
      * @param string $className

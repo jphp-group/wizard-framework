@@ -4,8 +4,34 @@ namespace components;
 use framework\web\ui\animations\UIAnimationComponent;
 use framework\web\ui\UINode;
 
+/**
+ * Class HelloWorldComponent
+ * @package components
+ */
 class HelloWorldComponent extends UIAnimationComponent
 {
+    /**
+     * @var int
+     */
+    private $myProp = 40;
+
+    /**
+     * @return mixed
+     */
+    protected function getMyProp()
+    {
+        return $this->myProp;
+    }
+
+    /**
+     * @param mixed $myProp
+     */
+    protected function setMyProp($myProp)
+    {
+        $this->myProp = $myProp;
+    }
+
+
     /**
      * @event $owner.render
      */

@@ -15,6 +15,6 @@ class MainUI extends AppUI
     {
         parent::__construct();
 
-        $this->registerForm('Main', new MainForm());
+        $this->registerNotFoundForm('Main', new MainForm());
     }
 }

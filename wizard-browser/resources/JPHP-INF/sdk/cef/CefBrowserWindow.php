@@ -146,6 +146,8 @@ class CefBrowserWindow
     {
     }
 
+    public function maximize(): void {}
+
     /**
      * Find window of browser.
      *

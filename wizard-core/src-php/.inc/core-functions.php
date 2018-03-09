@@ -1,5 +1,6 @@
 <?php
 
+use framework\core\Promise;
 use php\lang\Thread;
 use php\time\Timer;
 

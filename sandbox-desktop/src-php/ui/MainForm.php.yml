@@ -3,7 +3,7 @@ title: MainForm
 layout:
   _: VBox
   align: [center, center]
-  size: [600, 400]
+  size: [100%, 100%]
   _content:
     - _: Button
       id: button

@@ -5,6 +5,8 @@ applicationDefaultJvmArgs = ['-Dfile.encoding=UTF-8']
 
 dependencies {
     compile project(":wizard-app-desktop")
+    compile project(":wizard-browser-win32")
+
     compile "org.develnext.jphp:jphp-core:${jphpVersion}"
     compile "org.develnext.jphp:jphp-zend-ext:${jphpVersion}"
     compile "org.develnext.jphp:jphp-yaml-ext:${jphpVersion}"

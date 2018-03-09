@@ -94,6 +94,8 @@ $browser = $client->createBrowser('wizard://test', false);
 
 $window = new CefBrowserWindow($browser);
 $window->title = 'Hello World';
+$window->size = [600, 400];
+$window->centerOnScreen();
 $window->onClosing(function (CefBrowserWindow $window) {
     $window->free();
 });

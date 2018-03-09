@@ -215,6 +215,7 @@ class WebApplication extends Application
 
         Logger::info("Web Application run at '{0}:{1}', startup time = {2}ms.", $host, $port, Time::millis() - $this->getInitializeTime());
 
+        $this->trigger(new Event('serverRun', $this));
         $this->server->run();
     }
 

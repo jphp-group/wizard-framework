@@ -6,8 +6,6 @@ use framework\web\UIForm;
 /**
  * Class MainForm
  * @package ui
- *
- * @path /
  */
 class OtherForm extends UIForm
 {

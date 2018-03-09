@@ -198,7 +198,6 @@ abstract class Component
     /**
      * @param Event $e
      * @param null|string $group
-     * @internal param string $eventType
      */
     public function trigger(Event $e, ?string $group = null)
     {
