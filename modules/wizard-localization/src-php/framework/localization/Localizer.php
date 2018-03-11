@@ -90,18 +90,24 @@ class Localizer extends Component
 
 
     /**
-     * @param string $message
+     * @param string|TranslationText $message
      * @param array $args
      * @return string
      * @throws \Exception
      */
-    public function translate(string $message, array $args = []): string
+    public function translate($message, array $args = []): string
     {
         $language = $this->getLanguage();
 
         if (!$language) {
             throw new \Exception("Default Language is not set");
         }
+
+        if ($message instanceof TranslationText) {
+            $message = $message->get($language);
+        }
+
+        $message = "$message";
 
         if (isset($this->messages[$language][$message])) {
             $message = $this->messages[$language][$message];
