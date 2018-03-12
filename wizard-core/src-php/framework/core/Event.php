@@ -6,8 +6,8 @@ namespace framework\core;
  * Class Event
  * @package framework\core
  *
- * @property Component $sender
- * @property Component|null $context
+ * @property Component|object $sender
+ * @property Component|object|null $context
  * @property string $type
  * @property array $data
  */
@@ -19,7 +19,7 @@ class Event
     private $type;
 
     /**
-     * @var Component
+     * @var Component|object
      */
     private $sender;
 
@@ -29,7 +29,7 @@ class Event
     private $consumed = false;
 
     /**
-     * @var Component|null
+     * @var Component|object
      */
     private $context;
 
@@ -41,11 +41,11 @@ class Event
     /**
      * Event constructor.
      * @param string $type
-     * @param Component $sender
-     * @param Component|null $context
+     * @param object $sender
+     * @param object|null $context
      * @param array|null $data
      */
-    public function __construct(string $type, Component $sender, ?Component $context = null, ?array $data = null)
+    public function __construct(string $type, object $sender, ?object $context = null, ?array $data = null)
     {
         $this->type = $type;
         $this->sender = $sender;

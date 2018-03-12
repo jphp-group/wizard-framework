@@ -28,20 +28,15 @@ class ScriptEvent extends Event
     public $usage = 0;
 
     /**
-     * @var bool
-     */
-    private $consumed = false;
-
-    /**
      * ScriptEvent constructor.
      * @param AbstractScript $sender
      * @param null $target
      */
-    public function __construct(AbstractScript $sender = null, $target = null)
+    /*public function __construct($sender = null, $target = null)
     {
         $this->sender = $sender;
         $this->target = $target ?: $sender;
-    }
+    }*/
 
 
     public function done()
@@ -52,21 +47,5 @@ class ScriptEvent extends Event
     public function isDone()
     {
         return $this->usage <= 0;
-    }
-
-    /**
-     * Consume event.
-     */
-    public function consume()
-    {
-        $this->consumed = true;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isConsumed()
-    {
-        return $this->consumed;
     }
 }
