@@ -1,0 +1,24 @@
+
+name: wizard-web-ui
+version: 0.1.0
+description: Web UI framework for Wizard.
+
+plugins: [Doc, Hub]
+
+deps:
+  wizard-core: '~0.1.0'
+
+sources:
+- src-php
+- resources
+
+doc:
+  url-prefix: 'https://github.com/jphp-group/wizard-framework/blob/master/%name%/api-docs/'
+  langs: {en: English, ru: Русский}
+
+config:
+  ignore:
+  - /out/**
+  - /components/**
+  - /.gradle/**
+  - /src-js/**

@@ -7,3 +7,9 @@ out/
 *.tmp
 
 build/
+
+vendor/
+package.*.yml
+!package.php.yml
+
+package-lock.php.yml

@@ -1,0 +1,20 @@
+
+name: wizard-web
+version: 0.1.0
+description: Web MVC for Wizard framework.
+
+plugins: [Doc, Hub]
+
+deps:
+  wizard-core: '~0.1.0'
+
+sources:
+- src-php
+
+doc:
+  url-prefix: 'https://github.com/jphp-group/wizard-framework/blob/master/%name%/api-docs/'
+  langs: {en: English, ru: Русский}
+
+config:
+  ignore:
+  - /out/**

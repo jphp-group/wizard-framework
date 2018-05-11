@@ -1,4 +1,0 @@
-
-dependencies {
-    compile project(":wizard-web-ui")
-}

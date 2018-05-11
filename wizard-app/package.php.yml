@@ -1,0 +1,23 @@
+
+name: wizard-app
+version: 0.1.0
+description: App Web UI Module for Wizard Framework.
+
+plugins: [Doc, Hub]
+
+deps:
+  wizard-core: '~0.1.0'
+  wizard-web-ui: '~0.1.0'
+
+sources:
+- src-php
+- resources
+
+doc:
+  url-prefix: 'https://github.com/jphp-group/wizard-framework/blob/master/%name%/api-docs/'
+  langs: {en: English, ru: Русский}
+
+config:
+  ignore:
+  - /out/**
+  - /build.gradle
