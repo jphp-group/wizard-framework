@@ -8,6 +8,9 @@ plugins: [Doc, Hub]
 deps:
   jphp-runtime: '>=1.0.0'
 
+devDeps:
+  tester: '~1.0.0'
+
 sources:
 - src-php
 

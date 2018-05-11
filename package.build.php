@@ -38,3 +38,9 @@ function task_publish(Event $event)
     }
 }
 
+function task_test(Event $event)
+{
+    Tasks::runExternal("./wizard-core", "install");
+    Tasks::runExternal("./wizard-core", "test");
+}
+
