@@ -1,0 +1,10 @@
+name: wizard-framework
+version: 0.1.0
+type: project
+
+modules:
+- wizard-core
+- wizard-web
+- wizard-web-ui
+- wizard-app
+- wizard-app-web
