@@ -7,15 +7,9 @@ use packager\Event;
  */
 function task_hubPublish(Event $event)
 {
-    $flags = [];
-
-    if ($event->isFlag('f', 'force')) {
-        $flags = ['force'];
-    }
-
     foreach ($event->package()->getAny('modules', []) as $i => $module) {
         Tasks::copy("./package.hub.yml", "./$module", true);
-        Tasks::runExternal("./$module", 'hub:publish', [], ...$flags);
+        Tasks::runExternal("./$module", 'hub:publish', [], ...$event->flags());
 
         if ($i == 0) {
             Tasks::copy("./wizard-core/package.hub.yml", "./");
