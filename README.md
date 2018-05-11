@@ -1,5 +1,7 @@
 # Wizard Framework
 
+[![Build Status](https://travis-ci.org/jphp-group/wizard-framework.svg?branch=master)](https://travis-ci.org/jphp-group/wizard-framework)
+
 Wizard Framework is a jphp framework for the web/mobile/desktop.
 
 # How to taste?
