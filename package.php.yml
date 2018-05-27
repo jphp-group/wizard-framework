@@ -8,3 +8,4 @@ modules:
 - wizard-web-ui
 - wizard-app
 - wizard-app-web
+- modules/wizard-localization
