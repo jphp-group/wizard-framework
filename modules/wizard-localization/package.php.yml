@@ -1,0 +1,21 @@
+
+name: wizard-localization
+version: 0.1.0
+description: Lozalization module for Wizard.
+
+plugins: [Doc, Hub]
+
+deps:
+  wizard-core: '~0.1.0'
+
+sources:
+- src-php
+
+doc:
+  url-prefix: 'https://github.com/jphp-group/wizard-framework/blob/master/modules/%name%/api-docs/'
+  langs: {en: English, ru: Русский}
+
+config:
+  ignore:
+  - /out/**
+  - build.gradle

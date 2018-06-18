@@ -321,7 +321,15 @@ abstract class Component
 
         if (method_exists($this, $method)) {
             $closure = Closure::fromCallable([$this, $method]);
-            return $closure($value);
+            $r = $closure($value);
+
+            $event = new Event("after-change-any", $this, null, $data);
+            $this->trigger($event);
+
+            $event = new Event("after-change-$name", $this, null, $data);
+            $this->trigger($event);
+
+            return $r;
         }
 
         throw new \Error("Property '$name' is not exists in class " . reflect::typeOf($this) . " or readonly");
