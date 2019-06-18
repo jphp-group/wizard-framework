@@ -29,12 +29,13 @@ function task_docBuild(Event $event)
 }
 
 /**
- * @jppm-task publish
+ * @jppm-task build
  */
 function task_publish(Event $event)
 {
     foreach ($event->package()->getAny('modules', []) as $i => $module) {
-        Tasks::runExternal("./$module", 'publish', [], ...$event->flags());
+        Tasks::runExternal("./$module", 'install', [], ...$event->flags());
+        Tasks::runExternal("./$module", 'wizard:build', [], ...$event->flags());
     }
 }
 

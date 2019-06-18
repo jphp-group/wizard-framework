@@ -1,12 +1,12 @@
 
 name: wizard-localization
-version: 0.1.0
+version: 0.1.1
 description: Lozalization module for Wizard.
 
 plugins: [Doc, Hub]
 
 deps:
-  wizard-core: '~0.1.0'
+  wizard-core: '*'
 
 sources:
 - src-php

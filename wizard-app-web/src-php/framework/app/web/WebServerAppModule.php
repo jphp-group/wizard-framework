@@ -18,6 +18,7 @@ use php\http\HttpServerRequest;
 use php\http\HttpServerResponse;
 use php\http\WebSocketSession;
 use php\io\ResourceStream;
+use php\io\Stream;
 use php\lang\System;
 use php\lib\fs;
 use php\lib\reflect;
@@ -34,6 +35,15 @@ class WebServerAppModule extends AbstractWebAppModule
      * @var WebApplication
      */
     protected $app;
+
+    /**
+     * @param WebApplication $app
+     */
+    public function setApp(WebApplication $app): void
+    {
+        $this->app = $app;
+        $this->app->components[] = $this;
+    }
 
     /**
      * @event addTo
@@ -76,6 +86,7 @@ class WebServerAppModule extends AbstractWebAppModule
     /**
      * @param string $uiClass
      * @return $this
+     * @throws \ReflectionException
      */
     public function addUI(string $uiClass)
     {
@@ -109,6 +120,8 @@ class WebServerAppModule extends AbstractWebAppModule
 
         $this->app->server()->addWebSocket("$path/@ws/", [
             'onConnect' => function (WebSocketSession $session) {
+                echo "New WS connect";
+                var_dump($session);
             },
 
             'onMessage' => function (WebSocketSession $session, $text) use ($uiClass) {
@@ -172,9 +185,22 @@ class WebServerAppModule extends AbstractWebAppModule
                 'urlArgument' => $request->attribute('**')
             ];
 
-            $body = $ui->makeHtmlView($path, 'window.NX.WebSocketAppDispatcher', $this->dnextResources, $args);
-            $response->contentType('text/html');
-            $response->body($body);
+            if (str::contains($args['urlArgument'], "dnext/engine")) {
+                // css/js
+                if (str::contains($args['urlArgument'], ".css")) {
+                    $response->contentType('text/css');
+                    $response->body(Stream::getContents("res://dnext-engine.min.css"));
+                } else if (str::contains($args['urlArgument'], ".js")) {
+                    $response->contentType('text/javascript');
+                    $response->body(Stream::getContents("res://dnext-engine.js"));
+                } else {
+                    $response->status(404, "Unknown engine resource");
+                }
+            } else {
+                $body = $ui->makeHtmlView($path, 'window.NX.WebSocketAppDispatcher', $args);
+                $response->contentType('text/html');
+                $response->body($body);
+            }
         });
 
         return $this;

@@ -41,7 +41,7 @@ abstract class AbstractWebAppModule extends Component
      * @param string $cssFile
      * @return $this
      */
-    public function setupResources(string $jsFile = '', string $cssFile = '')
+    public function setupResources(string $jsFile = "", string $cssFile = "")
     {
         $this->dnextCssFile = $cssFile;
         $this->dnextJsFile = $jsFile;

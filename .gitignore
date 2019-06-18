@@ -1,4 +1,3 @@
-
 out/
 .gradle/
 .idea/
@@ -7,6 +6,8 @@ out/
 *.tmp
 
 build/
+node_modules/
+resources/
 
 vendor/
 package.*.yml

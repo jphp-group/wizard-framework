@@ -5,8 +5,7 @@ jdk:
   - oraclejdk8
 
 before_install:
-  - wget -O - https://github.com/jphp-compiler/jphp/releases/download/jppm-0.3.0/jppm-setup-0.3.0.sh | bash
+  - wget -O - https://github.com/jphp-compiler/jphp/releases/download/jppm-0.4.1/jppm-setup-0.4.1.sh | bash
 
 script:
- - jppm install
- - jppm test
+ - jppm build

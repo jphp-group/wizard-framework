@@ -33,7 +33,7 @@ class UILoader extends Component
     /**
      * @var array
      */
-    private $components = [];
+    public $components = [];
 
     /**
      * @var ComponentLoader
@@ -185,7 +185,7 @@ class UILoader extends Component
          */
         if ($ownComponents) {
             foreach ($ownComponents as $component) {
-                $node->components->add($this->componentLoader->load($component));
+                $node->components[] = $this->componentLoader->load($component);
             }
         }
 
@@ -223,7 +223,7 @@ class UILoader extends Component
      * @param string $format
      * @return mixed
      */
-    public function loadFromStream(Stream $stream, ?string $schemaKey = null, string $format = 'json')
+    public function loadFromStream(Stream $stream, ?string $schemaKey = null, string $format = "json")
     {
         switch ($format) {
             case "json":

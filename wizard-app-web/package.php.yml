@@ -1,13 +1,13 @@
 
 name: wizard-app-web
-version: 0.1.0
+version: 0.1.1
 description: App Web UI Module for Wizard Framework.
 
 plugins: [Doc, Hub]
 
 deps:
-  wizard-app: '~0.1.0'
-  wizard-web: '~0.1.0'
+  wizard-app: '*'
+  wizard-web: '*'
 
 sources:
 - src-php

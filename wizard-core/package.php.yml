@@ -1,15 +1,16 @@
 
 name: wizard-core
-version: 0.1.1
+version: 0.1.2
 description: Core of Wizard framework.
 
 plugins: [Doc, Hub]
 
 deps:
-  jphp-runtime: '>=1.0.0'
+  jphp-runtime: '*'
+  jphp-yaml-ext: '*'
 
 devDeps:
-  tester: '~1.0.0'
+  tester: '*'
 
 sources:
 - src-php

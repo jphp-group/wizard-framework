@@ -1,0 +1,17 @@
+name: sandbox-web
+version: 1.0.0
+description: Sandbox for wizard framework
+deps:
+  jphp-core: '*'
+  jphp-zend-ext: '*'
+  wizard-web-ui: '*'
+  wizard-web: '*'
+  wizard-app: '*'
+  wizard-app-web: '*'
+  wizard-core: '*'
+plugins:
+- App
+sources:
+- src
+includes:
+- index.php

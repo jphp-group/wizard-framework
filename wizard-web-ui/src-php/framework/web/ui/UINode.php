@@ -786,7 +786,7 @@ abstract class UINode extends Component implements UIViewable
         return [];
     }
 
-    public function on(string $eventType, callable $handler, string $group = 'general')
+    public function on(string $eventType, callable $handler, string $group = "general")
     {
         parent::on($eventType, $handler, $group);
 
