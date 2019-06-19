@@ -422,7 +422,7 @@ abstract class UI extends Component
         }
     }
 
-    public function makeHtmlView(string $path, string $jsAppDispatcher, array $args = []): string
+    public function makeHtmlView(string $path, string $jsAppDispatcher, array $resources, array $args = []): string
     {
         $moduleFile = reflect::typeModule(__CLASS__)->getName();
         $ext = fs::ext($moduleFile);
@@ -434,13 +434,20 @@ abstract class UI extends Component
             $body = str::replace($body, "{\{$name\}}", $value);
         }
 
-        $prefix = $args['prefix'] ?? '/';
-
-        $body = str::replace($body, '{{dnextCSSUrl}}', $prefix . 'dnext/engine.min.css');
-        $body = str::replace($body, '{{dnextJSUrl}}', $prefix . 'dnext/engine.js');
         $body = str::replace($body, '{{uiSchemaUrl}}', "$path/@ui-schema");
         $body = str::replace($body, '{{uiSocketUrl}}', "$path/@ws/");
         $body = str::replace($body, '{{jsAppDispatcher}}', $jsAppDispatcher);
+
+        $head = [];
+
+        foreach ($resources as $file => $data) {
+            if ($data["type"] == "text/css")
+                $head[] = "<link rel=\"stylesheet\" href=\"$file\">";
+            else if ($data["type"] == "text/javascript")
+                $head[] = "<script type=\"text/javascript\" src=\"$file\"></script>";
+        }
+
+        $body = str::replace($body, "{{head}}", str::join($head, "\n"));
 
         return $body;
     }

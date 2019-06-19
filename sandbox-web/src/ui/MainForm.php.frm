@@ -15,7 +15,7 @@
     "_content": [
       {
         "_": "Label",
-        "text": "Wizard Framework (TDOD лист)",
+        "text": "Wizard Framework (TODO List)",
         "font": {"size": 22},
         "width": "100%",
         "style": "border-bottom: 1px solid silver; color: gray;",

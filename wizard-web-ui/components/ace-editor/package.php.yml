@@ -1,0 +1,16 @@
+name: wizard-web-ui-ace-editor
+version: 1.0.0
+description: Ace editor for Wizard Web UI framework.
+
+deps:
+  wizard-web-ui: '*'
+
+sources:
+  - src-php
+  - resources
+
+config:
+  ignore:
+    - /out/**
+    - /.gradle/**
+    - /src-js/**

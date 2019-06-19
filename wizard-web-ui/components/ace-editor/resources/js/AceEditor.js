@@ -1,5 +1,3 @@
-
-
 class AceEditor extends UX.TextInputControl {
   get theme() {
     return this._theme;

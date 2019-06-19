@@ -17,6 +17,7 @@ class MainUI extends AppUI
 
         $this->registerForm('MainForm', new MainForm());
         $this->registerForm('OtherForm', new OtherForm());
+        $this->registerForm('CodeForm', new CodeForm());
 
         $this->registerNotFoundForm('NotFound', new NotFoundForm());
     }

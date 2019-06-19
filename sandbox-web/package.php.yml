@@ -9,6 +9,8 @@ deps:
   wizard-app: '*'
   wizard-app-web: '*'
   wizard-core: '*'
+  wizard-web-ui-ace-editor: '*'
+  wizard-web-ui-slider: '*'
 plugins:
 - App
 sources:

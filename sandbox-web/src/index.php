@@ -1,5 +1,7 @@
 <?php
 
+use bundle\aceeditor\AceEditorModule;
+use bundle\slider\SliderModule;
 use framework\app\web\WebServerAppModule;
 use framework\core\Event;
 use framework\web\HotDeployer;
@@ -13,6 +15,8 @@ $deployer = new HotDeployer(function () {
     $webUi = new WebServerAppModule();
     $webUi->setApp($app);
     $webUi->addUI(MainUI::class);
+    $webUi->addModule(new AceEditorModule());
+    $webUi->addModule(new SliderModule());
 
     $app->launch();
 }, function () {

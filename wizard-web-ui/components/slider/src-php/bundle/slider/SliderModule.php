@@ -11,9 +11,18 @@ class SliderModule extends UIModule
     public function getRequiredResources(): array
     {
         return [
-            'res://js/slider/bootstrap-slider.min.js',
-            'res://js/Slider.js',
-            'res://css/slider/bootstrap-slider.min.css'
+            "js/slider/bootstrap-slider.min.js" => [
+                "type" => "text/javascript",
+                "content" => "res://js/slider/bootstrap-slider.min.js"
+            ],
+            "js/Slider.js" => [
+                "type" => "text/javascript",
+                "content" => "res://js/Slider.js"
+            ],
+            "css/slider/bootstrap-slider.min.css" => [
+                "type" => "text/css",
+                "content" => "res://css/slider/bootstrap-slider.min.css"
+            ]
         ];
     }
 }

@@ -25,4 +25,9 @@ function task_buildWebLib(Event $event) {
 
     // Publish package
     Tasks::run('publish', [], "yes");
+
+    foreach ($event->package()->getAny('components', []) as $i => $module) {
+        Tasks::runExternal("./components/$module", 'install', [], ...$event->flags());
+        Tasks::runExternal("./components/$module", 'wizard:build', [], ...$event->flags());
+    }
 }
