@@ -1,0 +1,16 @@
+name: wizard-web-ui-slider
+version: 1.0.0
+description: Bootstrap slider for Wizard Web UI framework.
+
+deps:
+  wizard-web-ui: '*'
+
+sources:
+  - src-php
+  - resources
+
+config:
+  ignore:
+    - /out/**
+    - /.gradle/**
+    - /src-js/**

@@ -16,10 +16,6 @@ gulp {
     colors = true
 }
 
-dependencies {
-    compile project(":wizard-core")
-}
-
 task buildCss(dependsOn: 'gulp_compile-css') {
     doLast {
         copy {
@@ -46,7 +42,3 @@ task buildJs(dependsOn: ['gulp_compile']) {
 
 task buildWebLib(dependsOn: ['buildCss', 'buildJs']) {
 }
-
-
-
-processResources.dependsOn buildWebLib

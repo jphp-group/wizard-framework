@@ -1,38 +1,22 @@
 # Wizard Framework
 
-[![Build Status](https://travis-ci.org/jphp-group/wizard-framework.svg?branch=master)](https://travis-ci.org/jphp-group/wizard-framework)
+[![Build Status](https://travis-ci.org/MWGuy/wizard-framework.svg?branch=master)](https://travis-ci.org/MWGuy/wizard-framework)
 
-Wizard Framework is a jphp framework for the web/mobile/desktop.
+Wizard Framework is a jphp framework for the web/desktop.
 
 # How to taste?
 
-If you want to see our framework in action, you can use the `sandbox` project in the `sandbox/` directory.
+If you want to see our framework in action, you can use the `sandbox` project in the `sandbox-web/` directory.
 
-Before you should install Java 8 and run the `npmInstall gulpInstall` gradle task (it can take a lot of time):
-```
-cd <path_to_wizard_dir>
+Before you should install Java and jppm then run the `jppm build` command.
 
-// for linux
-chmod +x gradlew
-./gradlew npmInstall installGulp
+Then you can run wizard sandbox
 
-// for windows
-gradlew.bat npmInstall installGulp
+```bash
+cd path/to/wizard/sandbox-web
+jppm update
+jppm start
 ```
 
-Then you can run wizard sandbox:
-
-```
-cd <path_to_wizard_dir>
-
-// for linux
-./gradlew sandboxWeb
-
-// for windows
-gradlew.bat sandboxWeb
-```
-
-Then open `http://localhost:5000/` in your browser (opera, chrome or firefox). Your browser
-must support the WebSocket feature.
-
-
+Then open `http://localhost:5000/` in your browser (opera, chrome or firefox).
+Your browser must support the WebSocket feature.

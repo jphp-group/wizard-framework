@@ -1,12 +1,13 @@
 
 name: wizard-web
-version: 0.1.0
+version: 0.1.1
 description: Web MVC for Wizard framework.
 
 plugins: [Doc, Hub]
 
 deps:
-  wizard-core: '~0.1.0'
+  wizard-core: '*'
+  jphp-httpserver-ext: '*'
 
 sources:
 - src-php

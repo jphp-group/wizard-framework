@@ -33,7 +33,7 @@ class UIAceEditor extends UITextInputControl
      * @param string $mode
      * @param string $theme
      */
-    public function __construct(string $mode = '', string $theme = '')
+    public function __construct(string $mode = "", string $theme = "")
     {
         parent::__construct();
 

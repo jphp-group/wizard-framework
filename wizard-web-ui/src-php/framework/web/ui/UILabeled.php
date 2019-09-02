@@ -73,7 +73,7 @@ abstract class UILabeled extends UINode
      * @param string|null $text
      * @param UINode|null $graphic
      */
-    public function __construct(string $text = '', UINode $graphic = null)
+    public function __construct(string $text = "", UINode $graphic = null)
     {
         parent::__construct();
 

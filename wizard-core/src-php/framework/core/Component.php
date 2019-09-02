@@ -3,11 +3,6 @@
 namespace framework\core;
 
 use Closure;
-use php\format\JsonProcessor;
-use php\format\Processor;
-use php\io\IOException;
-use php\io\Stream;
-use php\lib\fs;
 use php\lib\reflect;
 use php\lib\str;
 
@@ -18,7 +13,7 @@ use php\lib\str;
  * @property string $id
  * @property array $properties
  * @property Component $owner
- * @property Components $components
+ * @property Component[] $components
  */
 abstract class Component
 {
@@ -30,7 +25,7 @@ abstract class Component
     /**
      * @var Component[]
      */
-    private $components = [];
+    public $components = [];
 
     /**
      * @var array
@@ -91,19 +86,16 @@ abstract class Component
     }
 
     /**
-     * @return Components
+     * @return array
      */
-    protected function getComponents(): Components
+    protected function getComponents(): array
     {
-        if (!$this->components) {
-            return $this->components = new Components($this);
-        }
-
         return $this->components;
     }
 
     /**
      * @return array
+     * @throws \ReflectionException
      */
     protected function getProperties(): array
     {
@@ -255,9 +247,9 @@ abstract class Component
      */
     public function free()
     {
-        if ($this->owner) {
-            $this->owner->components->remove($this);
-        }
+        if ($this->owner)
+            if (($key = array_search($this, $this->owner->components)) !== false)
+                unset($this->owner->components[$key]);
     }
 
     /**
@@ -337,6 +329,7 @@ abstract class Component
 
     /**
      * @return array
+     * @throws \ReflectionException
      */
     public function __debugInfo()
     {

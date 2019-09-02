@@ -1,12 +1,12 @@
 
 name: wizard-web-ui
-version: 0.1.0
+version: 0.1.1
 description: Web UI framework for Wizard.
 
 plugins: [Doc, Hub]
 
 deps:
-  wizard-core: '~0.1.0'
+  wizard-core: '*'
   jphp-json-ext: '*'
 
 sources:
@@ -23,3 +23,7 @@ config:
   - /components/**
   - /.gradle/**
   - /src-js/**
+
+components:
+  - ace-editor
+  - slider

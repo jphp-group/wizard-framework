@@ -18,10 +18,13 @@ use php\http\HttpServerRequest;
 use php\http\HttpServerResponse;
 use php\http\WebSocketSession;
 use php\io\ResourceStream;
+use php\io\Stream;
 use php\lang\System;
+use php\lib\arr;
 use php\lib\fs;
 use php\lib\reflect;
 use php\lib\str;
+use php\time\Time;
 
 class WebServerAppModule extends AbstractWebAppModule
 {
@@ -34,6 +37,38 @@ class WebServerAppModule extends AbstractWebAppModule
      * @var WebApplication
      */
     protected $app;
+
+    /**
+     * @var array
+     */
+    protected $resources = [
+        "engine.min.css" => [
+            "type" => "text/css",
+            "content" => "res://dnext-engine.min.css"
+        ],
+        "engine.js" => [
+            "type" => "text/javascript",
+            "content" => "res://dnext-engine.js"
+        ],
+    ];
+
+    /**
+     * @param WebApplication $app
+     */
+    public function setApp(WebApplication $app): void
+    {
+        $this->app = $app;
+        $this->app->components[] = $this;
+    }
+
+    /**
+     * @param UIModule $module
+     * @throws \ReflectionException
+     */
+    public function addModule(UIModule $module) {
+        Logger::debug("Register module {0}", (new \ReflectionClass($module))->getName());
+        $this->resources = flow($this->resources, $module->getRequiredResources(), $module->getResources())->toMap();
+    }
 
     /**
      * @event addTo
@@ -76,6 +111,7 @@ class WebServerAppModule extends AbstractWebAppModule
     /**
      * @param string $uiClass
      * @return $this
+     * @throws \ReflectionException
      */
     public function addUI(string $uiClass)
     {
@@ -172,7 +208,16 @@ class WebServerAppModule extends AbstractWebAppModule
                 'urlArgument' => $request->attribute('**')
             ];
 
-            $body = $ui->makeHtmlView($path, 'window.NX.WebSocketAppDispatcher', $this->dnextResources, $args);
+            foreach ($this->resources as $resource => $data) {
+                if (!str::contains($args["urlArgument"], $resource)) continue;
+
+                $response->contentType($data["type"]);
+                $response->body(Stream::getContents($data["content"]));
+
+                return;
+            }
+
+            $body = $ui->makeHtmlView($path, 'window.NX.WebSocketAppDispatcher', $this->resources, $args);
             $response->contentType('text/html');
             $response->body($body);
         });
